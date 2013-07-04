@@ -36,7 +36,8 @@ HEADERS  += MainWindow.h \
     NodeLine.h
 
 OTHER_FILES += \
-    locations.json
+    locations.json \
+    README.md
 
 RESOURCES += \
     Resources.qrc
