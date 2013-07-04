@@ -14,6 +14,10 @@
  *****************************************************************************/
 
 #include "SiloListView.h"
+#include "Location.h"
+#include "Silo.h"
+#include "NodeLine.h"
+#include "Node.h"
 #include <QDebug>
 
 SiloListView::SiloListView(QWidget *parent) :
@@ -23,5 +27,18 @@ SiloListView::SiloListView(QWidget *parent) :
 
 void SiloListView::displaySilos(Location *location)
 {
-    qDebug() << location;
+    foreach (Silo *silo, location->silos())
+    {
+        qDebug() << "Silo at" << location->name();
+        foreach (NodeLine *line, silo->lines())
+        {
+            QString text;
+            foreach (Node *node, line->nodes())
+            {
+                text.append(node->name());
+                text.append(", ");
+            }
+            qDebug() << text;
+        }
+    }
 }

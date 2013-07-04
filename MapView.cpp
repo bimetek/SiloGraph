@@ -53,35 +53,35 @@ MapView::MapView(QWidget *parent) :
         QVariantMap info = item.toMap();
 
         Location *location = new Location(this);
-        location->setTitle(info["title"].toString());
+        location->setName(info["name"].toString());
         location->setLatitude(info["latitude"].toDouble());
         location->setLongitude(info["longitude"].toDouble());
-        foreach(QVariant siloItem, info["silos"].toList())
+        foreach (QVariant siloItem, info["silos"].toList())
         {
             Silo *silo = new Silo(location);
             info = siloItem.toMap();
-            foreach(QVariant lineItem, info["lines"].toList())
+            foreach (QVariant lineItem, info["lines"].toList())
             {
                 NodeLine *line = new NodeLine(silo);
                 info = lineItem.toMap();
-                foreach(QVariant nodeItem, info["nodes"].toList())
+                for (int i = 0; i < info["nodesCount"].toInt(); i++)
                 {
                     Node *node = new Node(line);
-                    Q_UNUSED(nodeItem);
+                    node->setName(QString("s%1").arg(QString::number(i + 1)));
                     line->addNode(node);
                 }
                 silo->addLine(line);
             }
             location->addSilo(silo);
         }
-        _locations.insert(location->title(), location);
+        _locations.insert(location->name(), location);
 
-        QPushButton *button = new QPushButton(location->title(), this);
+        QPushButton *button = new QPushButton(location->name(), this);
         button->move((location->longitude() - 121.0) * 100.0,
                      (location->latitude() - 24.0) * 100.0);
 
         connect(button, SIGNAL(clicked()), mapper, SLOT(map()));
-        mapper->setMapping(button, location->title());
+        mapper->setMapping(button, location->name());
     }
     delete json;
 }

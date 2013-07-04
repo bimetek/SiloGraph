@@ -29,14 +29,14 @@ public:
     inline void addSilo(Silo *silo) { silos().append(silo); }
 
 private:
-    QString _title;
+    QString _name;
     double _latitude;
     double _longitude;
     QList<Silo *> _silos;
 
 public:
-    inline QString title() { return _title; }
-    inline void setTitle(QString title) { _title = title; }
+    inline QString name() { return _name; }
+    inline void setName(QString name) { _name = name; }
     inline double latitude() { return _latitude; }
     inline void setLatitude(double latitude) { _latitude = latitude; }
     inline double longitude() { return _longitude; }

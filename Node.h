@@ -24,6 +24,13 @@ class Node : public QObject
 
 public:
     explicit Node(QObject *parent = 0);
+
+private:
+    QString _name;
+
+public:
+    inline QString name() { return _name; }
+    inline void setName(QString name) { _name = name; }
 };
 
 #endif // NODE_H
