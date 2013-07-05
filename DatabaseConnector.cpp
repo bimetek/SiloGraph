@@ -59,26 +59,36 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
 {
     QString address = silo->location()->databaseAddress();
     QSqlDatabase db = QSqlDatabase::database(address);
+
+    QString queryString;
     if (node)
     {
         QString queryFormat =
                 "SELECT %1, date FROM rawdata WHERE silo_cable=\"%2\" "
                 "ORDER BY date DESC LIMIT 10";
-        QSqlQuery query = db.exec(queryFormat.arg(node->name(),
-                                                  node->line()->name()));
-        if (query.size())
+        queryString = queryFormat.arg(node->name(), node->line()->name());
+    }
+    else
+    {
+        QString queryFormat =
+                "SELECT Full, date FROM average WHERE silo=\"%1\" "
+                "ORDER BY date DESC LIMIT 10";
+        queryString = queryFormat.arg(silo->name());
+    }
+
+    QSqlQuery query = db.exec();
+    if (query.size())
+    {
+        QString text = "";
+        while (query.next())
         {
-            QString text = "";
-            while (query.next())
+            for (int i = 0; i < query.record().count(); i++)
             {
-                for (int i = 0; i < query.record().count(); i++)
-                {
-                    QString value = query.value(i).toString();
-                    text += (value + " ");
-                }
-                text += "\n";
+                QString value = query.value(i).toString();
+                text += (value + " ");
             }
-            qDebug() << text;
+            text += "\n";
         }
+        qDebug() << text;
     }
 }
