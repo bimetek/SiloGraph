@@ -18,6 +18,8 @@
 
 #include <QObject>
 #include <QList>
+#include <QString>
+class Silo;
 class Node;
 
 class NodeLine : public QObject
@@ -26,12 +28,18 @@ class NodeLine : public QObject
 
 public:
     explicit NodeLine(QObject *parent = 0);
-    inline void addNode(Node *node) { nodes().append(node); }
+    void addNode(Node *node);
 
 private:
+    QString _name;
+    Silo *_silo;
     QList<Node *> _nodes;
 
 public:
+    inline QString name() { return _name; }
+    inline void setName(QString name) { _name = name; }
+    inline Silo *silo() { return _silo; }
+    inline void setSilo(Silo *silo) { _silo = silo; }
     inline QList<Node *> &nodes() { return _nodes; }
 };
 

@@ -16,6 +16,10 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <QLayout>
+
 #define W_SCALE 1       // Scale everything in UI
+
+void clearLayout(QLayout *layout);
 
 #endif // GLOBALS_H

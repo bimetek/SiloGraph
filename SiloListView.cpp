@@ -14,10 +14,13 @@
  *****************************************************************************/
 
 #include "SiloListView.h"
+#include <QHBoxLayout>
+#include "Globals.h"
 #include "Location.h"
 #include "Silo.h"
 #include "NodeLine.h"
 #include "Node.h"
+#include "SiloView.h"
 #include <QDebug>
 
 SiloListView::SiloListView(QWidget *parent) :
@@ -25,20 +28,26 @@ SiloListView::SiloListView(QWidget *parent) :
 {
 }
 
-void SiloListView::displaySilos(Location *location)
+void SiloListView::setLocation(Location *location)
 {
+    _currentLocation = location;
+
+    QHBoxLayout *newLayout = 0;
+    if (layout())
+    {
+        newLayout = reinterpret_cast<QHBoxLayout *>(layout());
+        clearLayout(newLayout);
+    }
+    else
+    {
+        newLayout = new QHBoxLayout();
+        setLayout(newLayout);
+    }
     foreach (Silo *silo, location->silos())
     {
-        qDebug() << "Silo at" << location->name();
-        foreach (NodeLine *line, silo->lines())
-        {
-            QString text;
-            foreach (Node *node, line->nodes())
-            {
-                text.append(node->name());
-                text.append(", ");
-            }
-            qDebug() << text;
-        }
+        SiloView *sv = new SiloView(silo);
+        newLayout->addWidget(sv);
+        connect(sv, SIGNAL(targetSwitched(Node *,Silo *)),
+                this, SIGNAL(targetSwitched(Node *,Silo *)));
     }
 }

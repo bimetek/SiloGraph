@@ -37,11 +37,22 @@ MapView::MapView(QWidget *parent) :
 
     QJson::Parser parser;
     bool success = false;
+
+    QFile *dbFile = new QFile(":/data/databases.json");
+    QVariantMap dbInfo = parser.parse(dbFile, &success).toMap();
+    if (!success)
+    {
+        qFatal("Database JSON cannot be parsed");
+        return;
+    }
+    QString defaultAddress = dbInfo["default"].toString();
+    delete dbFile;
+
     QFile *json = new QFile(":/data/locations.json");
     QVariantMap result = parser.parse(json, &success).toMap();
     if (!success)
     {
-        qFatal("Location JSON cannot parsed");
+        qFatal("Location JSON cannot be parsed");
         return;
     }
 
@@ -51,19 +62,25 @@ MapView::MapView(QWidget *parent) :
     foreach(QVariant item, result["locations"].toList())
     {
         QVariantMap info = item.toMap();
+        QString address = defaultAddress;
+        if (info.contains("databaseAddress"))
+            address = info["databaseAddress"].toString();
 
         Location *location = new Location(this);
         location->setName(info["name"].toString());
+        location->setDatabaseAddress(address);
         location->setLatitude(info["latitude"].toDouble());
         location->setLongitude(info["longitude"].toDouble());
         foreach (QVariant siloItem, info["silos"].toList())
         {
             Silo *silo = new Silo(location);
             info = siloItem.toMap();
+            silo->setName(info["name"].toString());
             foreach (QVariant lineItem, info["lines"].toList())
             {
                 NodeLine *line = new NodeLine(silo);
                 info = lineItem.toMap();
+                line->setName(info["name"].toString());
                 for (int i = 0; i < info["nodesCount"].toInt(); i++)
                 {
                     Node *node = new Node(line);

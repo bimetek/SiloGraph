@@ -18,6 +18,7 @@
 
 #include <QObject>
 #include <QList>
+#include <QString>
 class Silo;
 
 class Location : public QObject
@@ -26,10 +27,11 @@ class Location : public QObject
 
 public:
     explicit Location(QObject *parent = 0);
-    inline void addSilo(Silo *silo) { silos().append(silo); }
+    void addSilo(Silo *silo);
 
 private:
     QString _name;
+    QString _databaseAddress;
     double _latitude;
     double _longitude;
     QList<Silo *> _silos;
@@ -37,6 +39,8 @@ private:
 public:
     inline QString name() { return _name; }
     inline void setName(QString name) { _name = name; }
+    inline QString databaseAddress() { return _databaseAddress; }
+    inline void setDatabaseAddress(QString addr) { _databaseAddress = addr; }
     inline double latitude() { return _latitude; }
     inline void setLatitude(double latitude) { _latitude = latitude; }
     inline double longitude() { return _longitude; }

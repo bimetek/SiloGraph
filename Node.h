@@ -17,6 +17,7 @@
 #define NODE_H
 
 #include <QObject>
+class NodeLine;
 
 class Node : public QObject
 {
@@ -27,10 +28,13 @@ public:
 
 private:
     QString _name;
+    NodeLine *_line;
 
 public:
     inline QString name() { return _name; }
     inline void setName(QString name) { _name = name; }
+    inline NodeLine *line() { return _line; }
+    inline void setLine(NodeLine *line) { _line = line; }
 };
 
 #endif // NODE_H

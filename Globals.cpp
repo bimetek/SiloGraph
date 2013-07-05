@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Location.cpp
+ * Globals.cpp
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 05/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -13,16 +13,20 @@
  * this file belongs to.
  *****************************************************************************/
 
-#include "Location.h"
-#include "Silo.h"
+#include "Globals.h"
+#include <QWidget>
 
-Location::Location(QObject *parent) :
-    QObject(parent)
+void clearLayout(QLayout *layout)
 {
-}
-
-void Location::addSilo(Silo *silo)
-{
-    silos().append(silo);
-    silo->setLocation(this);
+    QLayoutItem *item = layout->takeAt(0);
+    while (item)
+    {
+        if (item->layout())
+        {
+            clearLayout(item->layout());
+            delete item->layout();
+        }
+        delete item->widget();
+        item = layout->takeAt(0);
+    }
 }

@@ -6,6 +6,7 @@
             "longitude": 121.567104,
             "silos": [
                 {
+                    "name": "S01",
                     "lines": [
                         {"nodesCount": 9},
                         {"nodesCount": 8},
@@ -13,6 +14,7 @@
                     ]
                 },
                 {
+                    "name": "S02",
                     "lines": [
                         {"nodesCount": 9},
                         {"nodesCount": 8},
@@ -27,15 +29,29 @@
             "longitude": 121.755981,
             "silos": [
                 {
+                    "name": "S01",
                     "lines": [
-                        {"nodesCount": 10},
-                        {"nodesCount": 9}
+                        {
+                            "name": "S01C01",
+                            "nodesCount": 10
+                        },
+                        {
+                            "name": "S01C02",
+                            "nodesCount": 9
+                        }
                     ]
                 },
                 {
+                    "name": "S02",
                     "lines": [
-                        {"nodesCount": 10},
-                        {"nodesCount": 9}
+                        {
+                            "name": "S02C01",
+                            "nodesCount": 10
+                        },
+                        {
+                            "name": "S02C02",
+                            "nodesCount": 9
+                        }
                     ]
                 }
             ]

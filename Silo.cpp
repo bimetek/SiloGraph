@@ -14,8 +14,15 @@
  *****************************************************************************/
 
 #include "Silo.h"
+#include "NodeLine.h"
 
 Silo::Silo(QObject *parent) :
     QObject(parent)
 {
 }
+
+ void Silo::addLine(NodeLine *line)
+ {
+     lines().append(line);
+     line->setSilo(this);
+ }

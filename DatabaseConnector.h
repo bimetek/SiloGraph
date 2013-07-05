@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Location.cpp
+ * DatabaseConnector.h
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 05/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -13,16 +13,22 @@
  * this file belongs to.
  *****************************************************************************/
 
-#include "Location.h"
-#include "Silo.h"
+#ifndef DATABASECONNECTOR_H
+#define DATABASECONNECTOR_H
 
-Location::Location(QObject *parent) :
-    QObject(parent)
-{
-}
+#include <QObject>
+class Node;
+class Silo;
 
-void Location::addSilo(Silo *silo)
+class DatabaseConnector : public QObject
 {
-    silos().append(silo);
-    silo->setLocation(this);
-}
+    Q_OBJECT
+
+public:
+    explicit DatabaseConnector(QObject *parent = 0);
+
+public slots:
+    void fetchData(Node *node, Silo *silo);
+};
+
+#endif // DATABASECONNECTOR_H

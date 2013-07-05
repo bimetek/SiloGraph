@@ -18,6 +18,8 @@
 
 #include <QWidget>
 class Location;
+class Node;
+class Silo;
 
 class SiloListView : public QWidget
 {
@@ -25,10 +27,14 @@ class SiloListView : public QWidget
 public:
     explicit SiloListView(QWidget *parent = 0);
 
-signals:
-
 public slots:
-    void displaySilos(Location *location);
+    void setLocation(Location *location);
+
+signals:
+    void targetSwitched(Node *node, Silo *silo);
+
+private:
+    Location *_currentLocation;
 };
 
 #endif // SILOLISTVIEW_H

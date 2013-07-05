@@ -14,8 +14,15 @@
  *****************************************************************************/
 
 #include "NodeLine.h"
+#include "Node.h"
 
 NodeLine::NodeLine(QObject *parent) :
     QObject(parent)
 {
+}
+
+void NodeLine::addNode(Node *node)
+{
+    nodes().append(node);
+    node->setLine(this);
 }

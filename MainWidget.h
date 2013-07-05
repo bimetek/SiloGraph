@@ -21,6 +21,7 @@
 class GraphContainer;
 class MapView;
 class SiloListView;
+class DatabaseConnector;
 
 class MainWidget : public QWidget
 {
@@ -33,6 +34,7 @@ private:
     GraphContainer *_graphContainer;
     MapView *_mapView;
     SiloListView *_siloListView;
+    DatabaseConnector *_dbc;
 };
 
 #endif // MAINWIDGET_H

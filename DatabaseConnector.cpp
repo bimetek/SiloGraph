@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Location.cpp
+ * DatabaseConnector.cpp
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 05/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -13,16 +13,20 @@
  * this file belongs to.
  *****************************************************************************/
 
+#include "DatabaseConnector.h"
 #include "Location.h"
 #include "Silo.h"
+#include "Node.h"
+#include <QDebug>
 
-Location::Location(QObject *parent) :
+DatabaseConnector::DatabaseConnector(QObject *parent) :
     QObject(parent)
 {
 }
 
-void Location::addSilo(Silo *silo)
+void DatabaseConnector::fetchData(Node *node, Silo *silo)
 {
-    silos().append(silo);
-    silo->setLocation(this);
+    qDebug() << "Fetching data for" << node->name()
+             << "in silo" << silo->name()
+             << "for" << silo->location()->name();
 }

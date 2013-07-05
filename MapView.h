@@ -18,8 +18,6 @@
 
 #include <QWidget>
 #include <QHash>
-class QPushButton;
-class QSignalMapper;
 class Location;
 
 class MapView : public QWidget

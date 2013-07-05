@@ -22,7 +22,10 @@ SOURCES += main.cpp\
     Location.cpp \
     Silo.cpp \
     Node.cpp \
-    NodeLine.cpp
+    NodeLine.cpp \
+    SiloView.cpp \
+    Globals.cpp \
+    DatabaseConnector.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
@@ -33,11 +36,14 @@ HEADERS  += MainWindow.h \
     Location.h \
     Silo.h \
     Node.h \
-    NodeLine.h
+    NodeLine.h \
+    SiloView.h \
+    DatabaseConnector.h
 
 OTHER_FILES += \
     locations.json \
-    README.md
+    README.md \
+    databases.json
 
 RESOURCES += \
     Resources.qrc

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Location.cpp
+ * SiloView.h
  *
  * Created: 04/7 2013 by uranusjr
  *
@@ -13,16 +13,28 @@
  * this file belongs to.
  *****************************************************************************/
 
-#include "Location.h"
-#include "Silo.h"
+#ifndef SILOVIEW_H
+#define SILOVIEW_H
 
-Location::Location(QObject *parent) :
-    QObject(parent)
-{
-}
+#include <QWidget>
+class Silo;
+class Node;
 
-void Location::addSilo(Silo *silo)
+class SiloView : public QWidget
 {
-    silos().append(silo);
-    silo->setLocation(this);
-}
+    Q_OBJECT
+
+public:
+    explicit SiloView(Silo *silo, QWidget *parent = 0);
+
+signals:
+    void targetSwitched(Node *node, Silo *silo);
+
+private slots:
+    void switchToNode(QObject *obj);
+
+private:
+    Silo *_silo;
+};
+
+#endif // SILOVIEW_H

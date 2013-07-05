@@ -16,6 +16,7 @@
 #include "MainWidget.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include "DatabaseConnector.h"
 #include "GraphContainer.h"
 #include "MapView.h"
 #include "SiloListView.h"
@@ -23,6 +24,7 @@
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent)
 {
+    _dbc = new DatabaseConnector(this);
     _mapView = new MapView();
     _siloListView = new SiloListView();
     _graphContainer = new GraphContainer();
@@ -38,5 +40,7 @@ MainWidget::MainWidget(QWidget *parent) :
     setLayout(mainLayout);
 
     connect(_mapView, SIGNAL(locationChanged(Location *)),
-            _siloListView, SLOT(displaySilos(Location *)));
+            _siloListView, SLOT(setLocation(Location *)));
+    connect(_siloListView, SIGNAL(targetSwitched(Node *,Silo *)),
+            _dbc, SLOT(fetchData(Node *,Silo *)));
 }
