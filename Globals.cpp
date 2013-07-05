@@ -30,3 +30,18 @@ void clearLayout(QLayout *layout)
         item = layout->takeAt(0);
     }
 }
+
+QLocale::Language getCurrentLanguage()
+{
+    return QLocale::English;
+}
+
+QLocale::Country getCurrentCountry()
+{
+    return QLocale::UnitedStates;
+}
+
+QLocale getCurrentLocale()
+{
+    return QLocale(getCurrentLanguage(), getCurrentCountry());
+}

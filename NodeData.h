@@ -1,7 +1,7 @@
 /*****************************************************************************
- * MainWidget.h
+ * NodeData.h
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 06/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -13,28 +13,28 @@
  * this file belongs to.
  *****************************************************************************/
 
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#ifndef NODEDATA_H
+#define NODEDATA_H
 
-#include <QWidget>
+#include <QObject>
+#include <QDateTime>
 
-class GraphContainer;
-class MapView;
-class SiloListView;
-class DatabaseConnector;
-
-class MainWidget : public QWidget
+class NodeData : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit NodeData(QObject *parent = 0);
 
 private:
-    GraphContainer *_plotContainer;
-    MapView *_mapView;
-    SiloListView *_siloListView;
-    DatabaseConnector *_dbc;
+    QDateTime _dateTime;
+    double _temperature;
+
+public:
+    inline QDateTime dateTime() { return _dateTime; }
+    inline void setDateTime(QDateTime dateTime) { _dateTime = dateTime; }
+    inline double temperature() { return _temperature; }
+    inline void setTemperature(double temp) { _temperature = temp; }
 };
 
-#endif // MAINWIDGET_H
+#endif // NODEDATA_H

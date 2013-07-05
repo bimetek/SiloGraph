@@ -23,6 +23,7 @@
 #include "Silo.h"
 #include "NodeLine.h"
 #include "Node.h"
+#include "NodeData.h"
 #include <QDebug>
 
 DatabaseConnector::DatabaseConnector(QObject *parent) :
@@ -65,30 +66,31 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
     {
         QString queryFormat =
                 "SELECT %1, date FROM rawdata WHERE silo_cable=\"%2\" "
-                "ORDER BY date DESC LIMIT 10";
+                "ORDER BY date DESC LIMIT 50";
         queryString = queryFormat.arg(node->name(), node->line()->name());
     }
     else
     {
         QString queryFormat =
                 "SELECT Full, date FROM average WHERE silo=\"%1\" "
-                "ORDER BY date DESC LIMIT 10";
+                "ORDER BY date DESC LIMIT 50";
         queryString = queryFormat.arg(silo->name());
     }
 
-    QSqlQuery query = db.exec();
+    QSqlQuery query = db.exec(queryString);
     if (query.size())
     {
-        QString text = "";
+        QList<NodeData *> dataSet;
         while (query.next())
         {
-            for (int i = 0; i < query.record().count(); i++)
-            {
-                QString value = query.value(i).toString();
-                text += (value + " ");
-            }
-            text += "\n";
+            if (query.value(0).isNull())    // NULL temperature; ignore it
+                continue;
+            NodeData *data = new NodeData(this);
+            data->setTemperature(query.value(0).toDouble());
+            data->setDateTime(query.value(1).toDateTime());
+            dataSet.insert(0, data);
         }
-        qDebug() << text;
+        if (dataSet.size())
+            emit dataFetched(node, silo, dataSet);
     }
 }

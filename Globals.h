@@ -20,6 +20,11 @@
 
 #define W_SCALE 1       // Scale everything in UI
 
+#include <QLocale>
+
 void clearLayout(QLayout *layout);
+QLocale::Language getCurrentLanguage();
+QLocale::Country getCurrentCountry();
+QLocale getCurrentLocale();
 
 #endif // GLOBALS_H

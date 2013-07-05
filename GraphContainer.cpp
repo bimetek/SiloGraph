@@ -14,8 +14,76 @@
  *****************************************************************************/
 
 #include "GraphContainer.h"
+#include <QDateTime>
+#include <QGridLayout>
+#include <QPointF>
+#include <QVector>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_scale_draw.h>
+#include <qwt_scale_engine.h>
+#include "Globals.h"
+#include "Node.h"
+#include "Silo.h"
+#include "NodeData.h"
+#include <QDebug>
+
+
+class DateTimeDraw : public QwtScaleDraw
+{
+public:
+    DateTimeDraw(QDateTime dt) { setDateTime(dt); }
+    virtual QwtText label(double v) const
+    {
+        QDateTime dt = _datetime.addSecs(v);
+        return getCurrentLocale().toString(dt, "HH:mm:ss");
+    }
+    void setDateTime(QDateTime dt) { _datetime = dt; }
+
+private:
+    QDateTime _datetime;
+};
+
 
 GraphContainer::GraphContainer(QWidget *parent) :
     QWidget(parent)
 {
+    _plot = new QwtPlot();
+    _plot->setAxisAutoScale(QwtPlot::yLeft);
+    _plot->setAxisScaleDraw(QwtPlot::xBottom,
+                            new DateTimeDraw(QDateTime::currentDateTime()));
+
+    // Enable float-ending to make curve "fit" to plot's right
+    QwtScaleEngine *engine = _plot->axisScaleEngine(QwtPlot::xBottom);
+    engine->setAttribute(QwtScaleEngine::Floating, true);
+
+    _temperatureCurve = new QwtPlotCurve("temperature");
+    _temperatureCurve->setYAxis(QwtPlot::yLeft);
+    _temperatureCurve->attach(_plot);
+
+    QGridLayout *mainLayout = new QGridLayout();
+    mainLayout->addWidget(_plot, 0, 0);
+    setLayout(mainLayout);
+}
+
+void GraphContainer::updatePlot(Node *node, Silo *silo,
+                                QList<NodeData *> dataSet)
+{
+    Q_UNUSED(node);
+    Q_UNUSED(silo);
+    QDateTime firstDateTime = dataSet.first()->dateTime();
+
+    QVector<QPointF> points;
+    foreach (NodeData *data, dataSet)
+    {
+        QPointF point(firstDateTime.secsTo(data->dateTime()),
+                      data->temperature());
+        points.append(point);
+    }
+    qDeleteAll(dataSet);
+
+    _temperatureCurve->setSamples(points);
+    _plot->setAxisScaleDraw(QwtPlot::xBottom,
+                            new DateTimeDraw(firstDateTime));
+    _plot->replot();
 }

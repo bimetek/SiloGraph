@@ -17,8 +17,10 @@
 #define DATABASECONNECTOR_H
 
 #include <QObject>
+#include <QList>
 class Node;
 class Silo;
+class NodeData;
 
 class DatabaseConnector : public QObject
 {
@@ -29,6 +31,9 @@ public:
 
 public slots:
     void fetchData(Node *node, Silo *silo);
+
+signals:
+    void dataFetched(Node *node, Silo *silo, QList<NodeData *> dataSet);
 };
 
 #endif // DATABASECONNECTOR_H

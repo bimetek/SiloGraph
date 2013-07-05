@@ -1,7 +1,7 @@
 /*****************************************************************************
- * MainWidget.h
+ * NodeData.cpp
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 06/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -13,28 +13,9 @@
  * this file belongs to.
  *****************************************************************************/
 
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#include "NodeData.h"
 
-#include <QWidget>
-
-class GraphContainer;
-class MapView;
-class SiloListView;
-class DatabaseConnector;
-
-class MainWidget : public QWidget
+NodeData::NodeData(QObject *parent) :
+    QObject(parent)
 {
-    Q_OBJECT
-
-public:
-    explicit MainWidget(QWidget *parent = 0);
-
-private:
-    GraphContainer *_plotContainer;
-    MapView *_mapView;
-    SiloListView *_siloListView;
-    DatabaseConnector *_dbc;
-};
-
-#endif // MAINWIDGET_H
+}

@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SiloGraph
 TEMPLATE = app
 
+CONFIG += qwt
+
 LIBS += -lqjson
 
 SOURCES += main.cpp\
@@ -25,7 +27,8 @@ SOURCES += main.cpp\
     NodeLine.cpp \
     SiloView.cpp \
     Globals.cpp \
-    DatabaseConnector.cpp
+    DatabaseConnector.cpp \
+    NodeData.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
@@ -38,7 +41,8 @@ HEADERS  += MainWindow.h \
     Node.h \
     NodeLine.h \
     SiloView.h \
-    DatabaseConnector.h
+    DatabaseConnector.h \
+    NodeData.h
 
 OTHER_FILES += \
     locations.json \

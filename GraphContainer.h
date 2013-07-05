@@ -17,17 +17,26 @@
 #define GRAPHCONTAINER_H
 
 #include <QWidget>
+#include <QList>
+class QwtPlot;
+class QwtPlotCurve;
+class Node;
+class Silo;
+class NodeData;
 
 class GraphContainer : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit GraphContainer(QWidget *parent = 0);
-    
-signals:
-    
+
 public slots:
-    
+    void updatePlot(Node *node, Silo *silo, QList<NodeData *> dataSet);
+
+private:
+    QwtPlot *_plot;
+    QwtPlotCurve *_temperatureCurve;
 };
 
 #endif // GRAPHCONTAINER_H

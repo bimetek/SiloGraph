@@ -27,12 +27,12 @@ MainWidget::MainWidget(QWidget *parent) :
     _dbc = new DatabaseConnector(this);
     _mapView = new MapView();
     _siloListView = new SiloListView();
-    _graphContainer = new GraphContainer();
+    _plotContainer = new GraphContainer();
 
     // Right side
     QVBoxLayout *detailLayout = new QVBoxLayout();
     detailLayout->addWidget(_siloListView, 1);
-    detailLayout->addWidget(_graphContainer, 1);
+    detailLayout->addWidget(_plotContainer, 1);
 
     QHBoxLayout *mainLayout = new QHBoxLayout();
     mainLayout->addWidget(_mapView, 0);
@@ -43,4 +43,7 @@ MainWidget::MainWidget(QWidget *parent) :
             _siloListView, SLOT(setLocation(Location *)));
     connect(_siloListView, SIGNAL(targetSwitched(Node *,Silo *)),
             _dbc, SLOT(fetchData(Node *,Silo *)));
+    connect(_dbc, SIGNAL(dataFetched(Node *, Silo *, QList<NodeData *>)),
+            _plotContainer,
+            SLOT(updatePlot(Node *, Silo *, QList<NodeData *>)));
 }
