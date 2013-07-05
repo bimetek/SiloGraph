@@ -14,19 +14,71 @@
  *****************************************************************************/
 
 #include "DatabaseConnector.h"
+#include <QFile>
+#include <QSqlQuery>
+#include <QSqlRecord>
+#include <QVariantMap>
+#include <qjson/parser.h>
 #include "Location.h"
 #include "Silo.h"
+#include "NodeLine.h"
 #include "Node.h"
 #include <QDebug>
 
 DatabaseConnector::DatabaseConnector(QObject *parent) :
     QObject(parent)
 {
+    QJson::Parser parser;
+    bool success = false;
+    QFile *dbFile = new QFile(":/data/databases.json");
+    QVariant result = parser.parse(dbFile, &success);
+    delete dbFile;
+
+    if (!success)
+    {
+        qFatal("Database JSON cannot be parsed");
+        return;
+    }
+    QVariantMap dbs = result.toMap()["databases"].toMap();
+    foreach (QString key, dbs.keys())
+    {
+        QVariantMap info = dbs[key].toMap();
+        QString address = info["address"].toString();
+        QSqlDatabase db = QSqlDatabase::addDatabase(info["driver"].toString(),
+                                                    address);
+        db.setHostName(address);
+        db.setUserName(info["username"].toString());
+        db.setPassword(info["password"].toString());
+        db.setDatabaseName("almin");
+        if (info.contains("port"))
+            db.setPort(info["port"].toInt());
+    }
 }
 
 void DatabaseConnector::fetchData(Node *node, Silo *silo)
 {
-    qDebug() << "Fetching data for" << node->name()
-             << "in silo" << silo->name()
-             << "for" << silo->location()->name();
+    QString address = silo->location()->databaseAddress();
+    QSqlDatabase db = QSqlDatabase::database(address);
+    if (node)
+    {
+        QString queryFormat =
+                "SELECT %1, date FROM rawdata WHERE silo_cable=\"%2\" "
+                "ORDER BY date DESC LIMIT 10";
+        QSqlQuery query = db.exec(queryFormat.arg(node->name(),
+                                                  node->line()->name()));
+        if (query.size())
+        {
+            QString text = "";
+            while (query.next())
+            {
+                for (int i = 0; i < query.record().count(); i++)
+                {
+                    QString value = query.value(i).toString();
+                    text += (value + " ");
+                }
+                text += "\n";
+            }
+            qDebug() << text;
+        }
+    }
 }
