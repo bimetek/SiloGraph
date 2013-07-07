@@ -18,7 +18,8 @@ after a new checkout, as it is set to be *assumed unchanged* in Git.
 
 ## Dependencies
 
-* Qt 4.8. Qt 5 and other Qt 4 versions should work, but only Qt 4.8 is tested.
+* Qt 4.8 with WebKit. Qt 5 and other Qt 4 versions should work, but only Qt 4.8
+  is tested.
 * Appropriate Qt database driver(s) and dependencies.
   See [documentation](http://qt-project.org/doc/qt-4.8/sql-driver.html) for
   details.
