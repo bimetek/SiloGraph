@@ -18,7 +18,9 @@
 
 #include <QWidget>
 #include <QHash>
-class Location;
+class QWebFrame;
+class QWebView;
+class MapMarker;
 
 class MapView : public QWidget
 {
@@ -27,14 +29,21 @@ class MapView : public QWidget
 public:
     explicit MapView(QWidget *parent = 0);
 
+public slots:
+    void appendMarker(MapMarker *marker);
+    void onMarkerClicked(int index);
+
 signals:
-    void locationChanged(Location *location);
+    void mapLoaded();
+    void markerClicked(MapMarker *marker);
 
 private slots:
-    void switchToLocation(QString title);
+    void addObjectReference();
 
 private:
-    QHash<QString, Location *> _locations;
+    QHash<int, MapMarker *> _markers;
+    QWebView *_webView;
+    QWebFrame *frame();
 };
 
 #endif // MAPVIEW_H

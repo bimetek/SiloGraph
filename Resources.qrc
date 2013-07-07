@@ -3,4 +3,8 @@
         <file>locations.json</file>
         <file>databases.json</file>
     </qresource>
+    <qresource prefix="/web">
+        <file>map.html</file>
+        <file>map.js</file>
+    </qresource>
 </RCC>

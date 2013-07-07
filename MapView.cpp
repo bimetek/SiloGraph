@@ -14,96 +14,54 @@
  *****************************************************************************/
 
 #include "MapView.h"
-#include <QFile>
-#include <QPushButton>
-#include <QSignalMapper>
-#include <QVariantMap>
+#include <QHBoxLayout>
+#include <QWebFrame>
+#include <QWebView>
+#include "MapMarker.h"
 #include <QDebug>
-#include <qjson/parser.h>
-#include "Globals.h"
-#include "Location.h"
-#include "Silo.h"
-#include "NodeLine.h"
-#include "Node.h"
 
-MapView::MapView(QWidget *parent) :
-    QWidget(parent)
+MapView::MapView(QWidget *parent)
+    : QWidget(parent)
 {
-    setFixedWidth(300 * W_SCALE);
-    QPalette p(palette());
-    p.setColor(QPalette::Background, Qt::white);
-    setPalette(p);
-    setAutoFillBackground(true);
+    _webView = new QWebView();
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->setMargin(0);
+    layout->addWidget(_webView);
+    setLayout(layout);
 
-    QJson::Parser parser;
-    bool success = false;
-
-    QFile *dbFile = new QFile(":/data/databases.json");
-    QVariantMap dbInfo = parser.parse(dbFile, &success).toMap();
-    if (!success)
-    {
-        qFatal("Database JSON cannot be parsed");
-        return;
-    }
-    QString defaultAddress = dbInfo["default"].toString();
-    delete dbFile;
-
-    QFile *json = new QFile(":/data/locations.json");
-    QVariantMap result = parser.parse(json, &success).toMap();
-    if (!success)
-    {
-        qFatal("Location JSON cannot be parsed");
-        return;
-    }
-
-    QSignalMapper *mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)),
-            this, SLOT(switchToLocation(QString)));
-    foreach(QVariant item, result["locations"].toList())
-    {
-        QVariantMap info = item.toMap();
-        QString address = defaultAddress;
-        if (info.contains("databaseAddress"))
-            address = info["databaseAddress"].toString();
-
-        Location *location = new Location(this);
-        location->setName(info["name"].toString());
-        location->setDatabaseAddress(address);
-        location->setLatitude(info["latitude"].toDouble());
-        location->setLongitude(info["longitude"].toDouble());
-        foreach (QVariant siloItem, info["silos"].toList())
-        {
-            Silo *silo = new Silo(location);
-            info = siloItem.toMap();
-            silo->setName(info["name"].toString());
-            foreach (QVariant lineItem, info["lines"].toList())
-            {
-                NodeLine *line = new NodeLine(silo);
-                info = lineItem.toMap();
-                line->setName(info["name"].toString());
-                for (int i = 0; i < info["nodesCount"].toInt(); i++)
-                {
-                    Node *node = new Node(line);
-                    node->setName(QString("s%1").arg(QString::number(i + 1)));
-                    line->addNode(node);
-                }
-                silo->addLine(line);
-            }
-            location->addSilo(silo);
-        }
-        _locations.insert(location->name(), location);
-
-        QPushButton *button = new QPushButton(location->name(), this);
-        button->move((location->longitude() - 121.0) * 100.0,
-                     (location->latitude() - 24.0) * 100.0);
-
-        connect(button, SIGNAL(clicked()), mapper, SLOT(map()));
-        mapper->setMapping(button, location->name());
-    }
-    delete json;
+    _webView->load(QUrl("qrc:///web/map.html"));
+    connect(_webView, SIGNAL(loadFinished(bool)), this, SIGNAL(mapLoaded()));
+    connect(_webView->page()->mainFrame(),
+            SIGNAL(javaScriptWindowObjectCleared()),
+            this, SLOT(addObjectReference()));
 }
 
-void MapView::switchToLocation(QString title)
+void MapView::addObjectReference()
 {
-    emit locationChanged(_locations[title]);
+    _webView->page()->mainFrame()->addToJavaScriptWindowObject("qMapView",
+                                                               this);
+}
+
+QWebFrame *MapView::frame()
+{
+    return _webView->page()->mainFrame();
+}
+
+void MapView::appendMarker(MapMarker *marker)
+{
+    marker->setParent(this);
+
+    QString script = QString("appendMarker(\"%1\", %2, %3);")
+            .arg(marker->name(),
+                 QString::number(marker->latitude()),
+                 QString::number(marker->longitude()));
+    int index = frame()->evaluateJavaScript(script).toInt();
+
+    _markers[index] = marker;
+}
+
+void MapView::onMarkerClicked(int index)
+{
+    if (_markers.contains(index))
+        emit markerClicked(_markers[index]);
 }

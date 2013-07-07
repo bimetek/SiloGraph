@@ -1,7 +1,7 @@
 /*****************************************************************************
- * MainWidget.h
+ * MapMarker.cpp
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 07/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -13,28 +13,9 @@
  * this file belongs to.
  *****************************************************************************/
 
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#include "MapMarker.h"
 
-#include <QWidget>
-
-class GraphContainer;
-class MapContainer;
-class SiloListView;
-class DatabaseConnector;
-
-class MainWidget : public QWidget
+MapMarker::MapMarker(QObject *parent) :
+    QObject(parent)
 {
-    Q_OBJECT
-
-public:
-    explicit MainWidget(QWidget *parent = 0);
-
-private:
-    GraphContainer *_plotContainer;
-    MapContainer *_mapContainer;
-    SiloListView *_siloListView;
-    DatabaseConnector *_dbc;
-};
-
-#endif // MAINWIDGET_H
+}

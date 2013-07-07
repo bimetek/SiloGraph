@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="initial-scale=1.0, user-scalable=yes" />
+
+<style>
+* {
+  margin: 0; padding: 0;
+}
+html, body, #map_canvas {
+  width: 100%; height: 100%;
+}
+#map_canvas {
+  background-color: #ddd;
+}
+</style>
+
+<script src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+<script src="qrc:///web/map.js"></script>
+
+</head>
+
+<body>
+
+<div id="map_canvas"></div>
+
+<script>
+initialize(122.0, 120.0, 21.8, 25.3);
+</script>
+
+</body>
+
+</html>

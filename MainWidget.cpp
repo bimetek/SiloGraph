@@ -18,14 +18,14 @@
 #include <QVBoxLayout>
 #include "DatabaseConnector.h"
 #include "GraphContainer.h"
-#include "MapView.h"
+#include "MapContainer.h"
 #include "SiloListView.h"
 
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent)
 {
     _dbc = new DatabaseConnector(this);
-    _mapView = new MapView();
+    _mapContainer = new MapContainer();
     _siloListView = new SiloListView();
     _plotContainer = new GraphContainer();
 
@@ -35,11 +35,11 @@ MainWidget::MainWidget(QWidget *parent) :
     detailLayout->addWidget(_plotContainer, 1);
 
     QHBoxLayout *mainLayout = new QHBoxLayout();
-    mainLayout->addWidget(_mapView, 0);
+    mainLayout->addWidget(_mapContainer, 0);
     mainLayout->addLayout(detailLayout, 1);
     setLayout(mainLayout);
 
-    connect(_mapView, SIGNAL(locationChanged(Location *)),
+    connect(_mapContainer, SIGNAL(locationChanged(Location *)),
             _siloListView, SLOT(setLocation(Location *)));
     connect(_siloListView, SIGNAL(targetSwitched(Node *,Silo *)),
             _dbc, SLOT(fetchData(Node *,Silo *)));

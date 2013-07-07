@@ -1,7 +1,7 @@
 /*****************************************************************************
- * MainWidget.h
+ * MapContainer.h
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 07/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -13,28 +13,32 @@
  * this file belongs to.
  *****************************************************************************/
 
-#ifndef MAINWIDGET_H
-#define MAINWIDGET_H
+#ifndef MAPCONTAINER_H
+#define MAPCONTAINER_H
 
 #include <QWidget>
+#include <QHash>
+class MapMarker;
+class MapView;
+class Location;
 
-class GraphContainer;
-class MapContainer;
-class SiloListView;
-class DatabaseConnector;
-
-class MainWidget : public QWidget
+class MapContainer : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit MainWidget(QWidget *parent = 0);
+    explicit MapContainer(QWidget *parent = 0);
+
+signals:
+    void locationChanged(Location *location);
+
+private slots:
+    void loadMapContents();
+    void switchToMarkerLocation(MapMarker *marker);
 
 private:
-    GraphContainer *_plotContainer;
-    MapContainer *_mapContainer;
-    SiloListView *_siloListView;
-    DatabaseConnector *_dbc;
+    QHash<QString, Location *> _locations;
+    MapView *_mapView;
 };
 
-#endif // MAINWIDGET_H
+#endif // MAPCONTAINER_H

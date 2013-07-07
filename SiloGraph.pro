@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql webkit
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,7 +28,9 @@ SOURCES += main.cpp\
     SiloView.cpp \
     Globals.cpp \
     DatabaseConnector.cpp \
-    NodeData.cpp
+    NodeData.cpp \
+    MapContainer.cpp \
+    MapMarker.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
@@ -42,12 +44,16 @@ HEADERS  += MainWindow.h \
     NodeLine.h \
     SiloView.h \
     DatabaseConnector.h \
-    NodeData.h
+    NodeData.h \
+    MapContainer.h \
+    MapMarker.h
 
 OTHER_FILES += \
     locations.json \
     README.md \
-    databases.json
+    databases.json \
+    map.html \
+    map.js
 
 RESOURCES += \
     Resources.qrc
