@@ -32,13 +32,14 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     connect(mapper, SIGNAL(mapped(QObject *)),
             this, SLOT(switchToNode(QObject *)));
 
-    int lineWidth = 30 * W_SCALE;
-    int lineMargin = 10 * W_SCALE;
+    const int lineWidth = 30 * W_SCALE;
+    const int lineMargin = 10 * W_SCALE;
 
-    QHBoxLayout *layout = new QHBoxLayout();
     QPushButton *averageButton = new QPushButton(tr("Average"));
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, 0);
+
+    QHBoxLayout *siloLayout = new QHBoxLayout();
     foreach (NodeLine *line, silo->lines())
     {
         QVBoxLayout *lineLayout = new QVBoxLayout();
@@ -50,12 +51,17 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
             mapper->setMapping(button, node);
             lineLayout->addWidget(button);
         }
-        layout->addLayout(lineLayout);
+        siloLayout->addLayout(lineLayout);
     }
-    setLayout(layout);
 
     int lineCount = silo->lines().size();
     setFixedWidth(lineWidth * lineCount + lineMargin * (lineCount + 1));
+    averageButton->setFixedWidth((lineWidth + lineMargin) * lineCount);
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->addWidget(averageButton);
+    layout->addLayout(siloLayout);
+    setLayout(layout);
 }
 
 void SiloView::switchToNode(QObject *obj)
