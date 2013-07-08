@@ -37,7 +37,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
 
     QPushButton *averageButton = new QPushButton(tr("Average"));
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
-    mapper->setMapping(averageButton, 0);
+    mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
 
     QHBoxLayout *siloLayout = new QHBoxLayout();
     foreach (NodeLine *line, silo->lines())
