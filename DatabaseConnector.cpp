@@ -64,40 +64,53 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
     QString queryString;
     QDateTime now = QDateTime::currentDateTime();
     QString oneWeekAgo = now.addDays(-7).toString(Qt::ISODate);
+    uint dataCount = 0;
     if (node)
     {
         QString queryFormat =
-                "SELECT %1, date FROM rawdata "
+                "SELECT date, %1 FROM rawdata "
                 "WHERE silo_cable=\"%2\" AND date > \"%3\" "
                 "ORDER BY date DESC";
         queryString = queryFormat.arg(
                     node->name(),
                     node->line()->name(),
                     oneWeekAgo);
+        dataCount = 1;
     }
     else
     {
         QString queryFormat =
-                "SELECT Full, date FROM average "
+                "SELECT date, Full, Empty FROM average "
                 "WHERE silo=\"%1\" AND date > \"%2\" "
                 "ORDER BY date DESC";
         queryString = queryFormat.arg(silo->name(), oneWeekAgo);
+        dataCount = 2;
     }
 
     QSqlQuery query = db.exec(queryString);
     if (query.size())
     {
-        QList<NodeData *> dataSet;
+        QList< QList<NodeData *> > dataSets;
+        for (int i = 0; i < dataCount; i++)
+        {
+            QList<NodeData *> dataSet;
+            dataSets.append(dataSet);
+        }
         while (query.next())
         {
-            if (query.value(0).isNull())    // NULL temperature; ignore it
-                continue;
-            NodeData *data = new NodeData(this);
-            data->setTemperature(query.value(0).toDouble());
-            data->setDateTime(query.value(1).toDateTime());
-            dataSet.insert(0, data);
+            QDateTime *dateTime = query.value(0).toDateTime();
+            for (uint i = 0; i < dataCount; i++)
+            {
+                NodeData *data = new NodeData(this);
+                data->setDateTime(dateTime);
+                bool ok = false;
+                double temperature = query.value(i).toDouble(&ok);
+                if (!ok)
+                    temperature = -1 * std::numeric_limits<double>::max();
+                data->setTemperature(temperature);
+                dataSets[i].append(data);
+            }
         }
-        if (dataSet.size())
-            emit dataFetched(node, silo, dataSet);
+        emit dataFetched(node, silo, dataSets);
     }
 }

@@ -32,11 +32,11 @@ public:
     explicit GraphContainer(QWidget *parent = 0);
 
 public slots:
-    void updatePlot(Node *node, Silo *silo, QList<NodeData *> dataSet);
+    void updatePlot(Node *node, Silo *silo,
+                    QList <QList<NodeData *> > dataSets);
 
 private:
     QwtPlot *_plot;
-    QwtPlotCurve *_temperatureCurve;
 };
 
 #endif // GRAPHCONTAINER_H

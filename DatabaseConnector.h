@@ -33,7 +33,8 @@ public slots:
     void fetchData(Node *node, Silo *silo);
 
 signals:
-    void dataFetched(Node *node, Silo *silo, QList<NodeData *> dataSet);
+    void dataFetched(Node *node, Silo *silo,
+                     QList <QList<NodeData *> > dataSets);
 };
 
 #endif // DATABASECONNECTOR_H

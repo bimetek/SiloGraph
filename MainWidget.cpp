@@ -43,7 +43,8 @@ MainWidget::MainWidget(QWidget *parent) :
             _siloListView, SLOT(setLocation(Location *)));
     connect(_siloListView, SIGNAL(targetSwitched(Node *,Silo *)),
             _dbc, SLOT(fetchData(Node *,Silo *)));
-    connect(_dbc, SIGNAL(dataFetched(Node *, Silo *, QList<NodeData *>)),
+    connect(_dbc,
+            SIGNAL(dataFetched(Node *, Silo *, QList< QList<NodeData *> >)),
             _plotContainer,
-            SLOT(updatePlot(Node *, Silo *, QList<NodeData *>)));
+            SLOT(updatePlot(Node *, Silo *, QList <QList<NodeData *> >)));
 }

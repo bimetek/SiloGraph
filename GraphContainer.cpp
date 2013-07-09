@@ -57,32 +57,37 @@ GraphContainer::GraphContainer(QWidget *parent) :
     QwtScaleEngine *engine = _plot->axisScaleEngine(QwtPlot::xBottom);
     engine->setAttribute(QwtScaleEngine::Floating, true);
 
-    _temperatureCurve = new QwtPlotCurve("temperature");
-    _temperatureCurve->setYAxis(QwtPlot::yLeft);
-    _temperatureCurve->attach(_plot);
-
     QGridLayout *mainLayout = new QGridLayout();
     mainLayout->addWidget(_plot, 0, 0);
     setLayout(mainLayout);
 }
 
 void GraphContainer::updatePlot(Node *node, Silo *silo,
-                                QList<NodeData *> dataSet)
+                                QList <QList<NodeData *> > dataSets)
 {
     Q_UNUSED(node);
     Q_UNUSED(silo);
-    QDateTime firstDateTime = dataSet.first()->dateTime();
 
-    QVector<QPointF> points;
-    foreach (NodeData *data, dataSet)
+    _plot->detachItems();   // Clear old drawings
+
+    foreach (QList<NodeData *> dataSet, dataSets)
     {
-        QPointF point(firstDateTime.secsTo(data->dateTime()),
-                      data->temperature());
-        points.append(point);
-    }
-    qDeleteAll(dataSet);
+        QDateTime firstDateTime = dataSet.first()->dateTime();
+        QVector<QPointF> points;
+        foreach (NodeData *data, dataSet)
+        {
+            QPointF point(firstDateTime.secsTo(data->dateTime()),
+                          data->temperature());
+            points.append(point);
+        }
+        qDeleteAll(dataSet);
 
-    _temperatureCurve->setSamples(points);
+        QwtPlotCurve *curve = new QwtPlotCurve();
+        curve->setYAxis(QwtPlot::yLeft);
+        curve->attach(_plot);
+        curve->setSamples(points);
+    }
+
     _plot->setAxisScaleDraw(QwtPlot::xBottom,
                             new DateTimeDraw(firstDateTime));
     _plot->replot();
