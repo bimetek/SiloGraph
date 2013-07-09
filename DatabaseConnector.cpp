@@ -62,19 +62,26 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
     QSqlDatabase db = QSqlDatabase::database(address);
 
     QString queryString;
+    QDateTime now = QDateTime::currentDateTime();
+    QString oneWeekAgo = now.addDays(-7).toString(Qt::ISODate);
     if (node)
     {
         QString queryFormat =
-                "SELECT %1, date FROM rawdata WHERE silo_cable=\"%2\" "
-                "ORDER BY date DESC LIMIT 50";
-        queryString = queryFormat.arg(node->name(), node->line()->name());
+                "SELECT %1, date FROM rawdata "
+                "WHERE silo_cable=\"%2\" AND date > \"%3\" "
+                "ORDER BY date DESC";
+        queryString = queryFormat.arg(
+                    node->name(),
+                    node->line()->name(),
+                    oneWeekAgo);
     }
     else
     {
         QString queryFormat =
-                "SELECT Full, date FROM average WHERE silo=\"%1\" "
-                "ORDER BY date DESC LIMIT 50";
-        queryString = queryFormat.arg(silo->name());
+                "SELECT Full, date FROM average "
+                "WHERE silo=\"%1\" AND date > \"%2\" "
+                "ORDER BY date DESC";
+        queryString = queryFormat.arg(silo->name(), oneWeekAgo);
     }
 
     QSqlQuery query = db.exec(queryString);
