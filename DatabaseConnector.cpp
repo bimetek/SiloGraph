@@ -91,14 +91,14 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
     if (query.size())
     {
         QList< QList<NodeData *> > dataSets;
-        for (int i = 0; i < dataCount; i++)
+        for (uint i = 0; i < dataCount; i++)
         {
             QList<NodeData *> dataSet;
             dataSets.append(dataSet);
         }
         while (query.next())
         {
-            QDateTime *dateTime = query.value(0).toDateTime();
+            QDateTime dateTime = query.value(0).toDateTime();
             for (uint i = 0; i < dataCount; i++)
             {
                 NodeData *data = new NodeData(this);

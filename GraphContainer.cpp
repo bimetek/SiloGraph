@@ -70,9 +70,12 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 
     _plot->detachItems();   // Clear old drawings
 
+    QDateTime startDateTime = QDateTime::currentDateTime();
     foreach (QList<NodeData *> dataSet, dataSets)
     {
         QDateTime firstDateTime = dataSet.first()->dateTime();
+        if (firstDateTime < startDateTime)
+            startDateTime = firstDateTime;
         QVector<QPointF> points;
         foreach (NodeData *data, dataSet)
         {
@@ -89,6 +92,6 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     }
 
     _plot->setAxisScaleDraw(QwtPlot::xBottom,
-                            new DateTimeDraw(firstDateTime));
+                            new DateTimeDraw(startDateTime));
     _plot->replot();
 }
