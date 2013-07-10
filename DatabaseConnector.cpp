@@ -14,6 +14,7 @@
  *****************************************************************************/
 
 #include "DatabaseConnector.h"
+#include <limits>
 #include <QFile>
 #include <QSqlQuery>
 #include <QSqlRecord>
