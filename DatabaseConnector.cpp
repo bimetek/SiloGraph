@@ -86,7 +86,6 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
         queryString = queryFormat.arg(silo->name(), oneWeekAgo);
         dataCount = 2;
     }
-
     QSqlQuery query = db.exec(queryString);
     if (query.size())
     {
@@ -104,7 +103,7 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
                 NodeData *data = new NodeData(this);
                 data->setDateTime(dateTime);
                 bool ok = false;
-                double temperature = query.value(i).toDouble(&ok);
+                double temperature = query.value(i + 1).toDouble(&ok);
                 if (!ok)
                     temperature = -1 * std::numeric_limits<double>::max();
                 data->setTemperature(temperature);
