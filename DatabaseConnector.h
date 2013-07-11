@@ -18,6 +18,8 @@
 
 #include <QObject>
 #include <QList>
+#include <QMutex>
+class QSqlQuery;
 class Node;
 class Silo;
 class NodeData;
@@ -35,6 +37,12 @@ public slots:
 signals:
     void dataFetched(Node *node, Silo *silo,
                      QList <QList<NodeData *> > dataSets);
+
+private slots:
+    void processNodeDataQuery();
+
+private:
+    QMutex _databaseMutex;
 };
 
 #endif // DATABASECONNECTOR_H

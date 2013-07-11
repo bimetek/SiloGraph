@@ -15,7 +15,10 @@
 
 #include "DatabaseConnector.h"
 #include <limits>
+#include <QtConcurrentRun>
 #include <QFile>
+#include <QFuture>
+#include <QFutureWatcher>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QVariantMap>
@@ -26,6 +29,25 @@
 #include "Node.h"
 #include "NodeData.h"
 #include <QDebug>
+
+struct NodeQueryContext
+{
+    QSqlQuery query;
+    Silo *silo;
+    Node *node;
+    uint dataCount;
+};
+
+NodeQueryContext executeNodeQuery(QSqlDatabase &db, QString &queryString,
+                                  Silo *silo, Node *node, uint dataCount)
+{
+    NodeQueryContext context;
+    context.query = db.exec(queryString);
+    context.silo = silo;
+    context.node = node;
+    context.dataCount = dataCount;
+    return context;
+}
 
 DatabaseConnector::DatabaseConnector(QObject *parent) :
     QObject(parent)
@@ -87,30 +109,48 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
         queryString = queryFormat.arg(silo->name(), oneWeekAgo);
         dataCount = 2;
     }
-    QSqlQuery query = db.exec(queryString);
-    if (query.size())
+    QFuture<NodeQueryContext> future = QtConcurrent::run(
+                executeNodeQuery, db, queryString, silo, node, dataCount);
+    QFutureWatcher<NodeQueryContext> *watcher =
+            new QFutureWatcher<NodeQueryContext>();
+    connect(watcher, SIGNAL(finished()), this, SLOT(processNodeDataQuery()));
+    watcher->setFuture(future);
+}
+
+void DatabaseConnector::processNodeDataQuery()
+{
+    QFutureWatcher<NodeQueryContext> *watcher =
+            reinterpret_cast<QFutureWatcher<NodeQueryContext> *>(sender());
+
+    NodeQueryContext context = watcher->result();
+
+    QSqlQuery &query = context.query;
+    if (!query.size())
+        return;
+
+    Silo *&silo = context.silo;
+    Node *&node = context.node;
+    uint &dataCount = context.dataCount;
+    QList< QList<NodeData *> > dataSets;
+    for (uint i = 0; i < dataCount; i++)
     {
-        QList< QList<NodeData *> > dataSets;
+        QList<NodeData *> dataSet;
+        dataSets.append(dataSet);
+    }
+    while (query.next())
+    {
+        QDateTime dateTime = query.value(0).toDateTime();
         for (uint i = 0; i < dataCount; i++)
         {
-            QList<NodeData *> dataSet;
-            dataSets.append(dataSet);
+            NodeData *data = new NodeData(this);
+            data->setDateTime(dateTime);
+            bool ok = false;
+            double temperature = query.value(i + 1).toDouble(&ok);
+            if (!ok)
+                temperature = -1 * std::numeric_limits<double>::max();
+            data->setTemperature(temperature);
+            dataSets[i].append(data);
         }
-        while (query.next())
-        {
-            QDateTime dateTime = query.value(0).toDateTime();
-            for (uint i = 0; i < dataCount; i++)
-            {
-                NodeData *data = new NodeData(this);
-                data->setDateTime(dateTime);
-                bool ok = false;
-                double temperature = query.value(i + 1).toDouble(&ok);
-                if (!ok)
-                    temperature = -1 * std::numeric_limits<double>::max();
-                data->setTemperature(temperature);
-                dataSets[i].append(data);
-            }
-        }
-        emit dataFetched(node, silo, dataSets);
     }
+    emit dataFetched(node, silo, dataSets);
 }
