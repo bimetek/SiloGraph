@@ -24,3 +24,4 @@ after a new checkout, as it is set to be *assumed unchanged* in Git.
   See [documentation](http://qt-project.org/doc/qt-4.8/sql-driver.html) for
   details.
 * [QJson](http://qjson.sourceforge.net)
+* [Qwt](http://qwt.sourceforge.net) 6.1.0 or greater.
