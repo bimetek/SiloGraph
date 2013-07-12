@@ -21,6 +21,7 @@
 #include <QFutureWatcher>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QStringList>
 #include <QVariantMap>
 #include <qjson/parser.h>
 #include "Location.h"
@@ -79,7 +80,7 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
     }
 }
 
-void DatabaseConnector::fetchData(Node *node, Silo *silo)
+void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
 {
     QString address = silo->location()->databaseAddress();
     QSqlDatabase db = QSqlDatabase::database(address);
@@ -113,11 +114,11 @@ void DatabaseConnector::fetchData(Node *node, Silo *silo)
                 executeNodeQuery, db, queryString, silo, node, dataCount);
     QFutureWatcher<NodeQueryContext> *watcher =
             new QFutureWatcher<NodeQueryContext>();
-    connect(watcher, SIGNAL(finished()), this, SLOT(processNodeDataQuery()));
+    connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
     watcher->setFuture(future);
 }
 
-void DatabaseConnector::processNodeDataQuery()
+void DatabaseConnector::processWeekDataQuery()
 {
     QFutureWatcher<NodeQueryContext> *watcher =
             reinterpret_cast<QFutureWatcher<NodeQueryContext> *>(sender());
@@ -153,4 +154,20 @@ void DatabaseConnector::processNodeDataQuery()
         }
     }
     emit dataFetched(node, silo, dataSets);
+}
+
+void DatabaseConnector::fetchLatestData(Location *location)
+{
+//    QString address = location->databaseAddress();
+//    QSqlDatabase db = QSqlDatabase::database(address);
+
+//    QStringList names;
+//    foreach (Silo *silo, location->silos())
+//    {
+//        foreach (NodeLine *line, silo->lines())
+//            names << QString("\"%1\"").arg(line->name());
+//    }
+//    QString lineNames = names.join(", ");
+//    QString query =
+//            "SELECT date, silo_cable, %1 FROM"
 }

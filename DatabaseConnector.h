@@ -20,6 +20,7 @@
 #include <QList>
 #include <QMutex>
 class QSqlQuery;
+class Location;
 class Node;
 class Silo;
 class NodeData;
@@ -32,14 +33,15 @@ public:
     explicit DatabaseConnector(QObject *parent = 0);
 
 public slots:
-    void fetchData(Node *node, Silo *silo);
+    void fetchWeekData(Node *node, Silo *silo);
+    void fetchLatestData(Location *location);
 
 signals:
     void dataFetched(Node *node, Silo *silo,
                      QList <QList<NodeData *> > dataSets);
 
 private slots:
-    void processNodeDataQuery();
+    void processWeekDataQuery();
 
 private:
     QMutex _databaseMutex;

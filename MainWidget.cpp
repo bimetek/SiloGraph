@@ -42,7 +42,7 @@ MainWidget::MainWidget(QWidget *parent) :
     connect(_mapContainer, SIGNAL(locationChanged(Location *)),
             _siloListView, SLOT(setLocation(Location *)));
     connect(_siloListView, SIGNAL(targetSwitched(Node *,Silo *)),
-            _dbc, SLOT(fetchData(Node *,Silo *)));
+            _dbc, SLOT(fetchWeekData(Node *,Silo *)));
     connect(_dbc,
             SIGNAL(dataFetched(Node *, Silo *, QList< QList<NodeData *> >)),
             _plotContainer,
