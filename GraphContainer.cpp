@@ -49,7 +49,6 @@ GraphContainer::GraphContainer(QWidget *parent) :
     QWidget(parent)
 {
     _plot = new QwtPlot();
-    _plot->setAxisAutoScale(QwtPlot::yLeft);
     _plot->setAxisScaleDraw(QwtPlot::xBottom,
                             new DateTimeDraw(QDateTime::currentDateTime()));
 
