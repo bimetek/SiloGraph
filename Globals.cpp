@@ -14,6 +14,7 @@
  *****************************************************************************/
 
 #include "Globals.h"
+#include <QApplication>
 #include <QWidget>
 
 void clearLayout(QLayout *layout)
@@ -44,4 +45,12 @@ QLocale::Country getCurrentCountry()
 QLocale getCurrentLocale()
 {
     return QLocale(getCurrentLanguage(), getCurrentCountry());
+}
+
+QFont defaultFontForSize(uint pointSize)
+{
+    QFont font = QApplication::font();
+    if (pointSize > 0)
+        font.setPointSize(pointSize);
+    return font;
 }

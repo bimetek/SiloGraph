@@ -35,6 +35,7 @@ private:
     MapContainer *_mapContainer;
     SiloListView *_siloListView;
     DatabaseConnector *_dbc;
+    int _pollingTimerIdentifier;
 };
 
 #endif // MAINWIDGET_H

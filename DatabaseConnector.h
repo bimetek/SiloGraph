@@ -20,9 +20,10 @@
 #include <QList>
 #include <QMutex>
 class QSqlQuery;
-class Location;
 class Node;
+class NodeLine;
 class Silo;
+class Location;
 class NodeData;
 
 class DatabaseConnector : public QObject
@@ -39,9 +40,11 @@ public slots:
 signals:
     void dataFetched(Node *node, Silo *silo,
                      QList <QList<NodeData *> > dataSets);
+    void dataPolled(NodeLine *line, QList<double> data);
 
 private slots:
     void processWeekDataQuery();
+    void processLatestDataQuery();
 
 private:
     QMutex _databaseMutex;

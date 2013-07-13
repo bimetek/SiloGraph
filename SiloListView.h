@@ -17,24 +17,34 @@
 #define SILOLISTVIEW_H
 
 #include <QWidget>
+#include <QList>
 class Location;
 class Node;
+class NodeLine;
 class Silo;
+class SiloView;
 
 class SiloListView : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit SiloListView(QWidget *parent = 0);
 
 public slots:
     void setLocation(Location *location);
+    void updateLatestData(NodeLine *line, QList<double> data);
+
+protected:
+    void timerEvent(QTimerEvent *);
 
 signals:
     void targetSwitched(Node *node, Silo *silo);
+    void shouldPollForLocation(Location *location);
 
 private:
     Location *_currentLocation;
+    int _pollingTimerId;
 };
 
 #endif // SILOLISTVIEW_H

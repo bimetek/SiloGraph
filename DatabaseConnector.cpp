@@ -39,6 +39,12 @@ struct NodeQueryContext
     uint dataCount;
 };
 
+struct LineQueryContext
+{
+    QSqlQuery query;
+    NodeLine *line;
+};
+
 NodeQueryContext executeNodeQuery(QSqlDatabase &db, QString &queryString,
                                   Silo *silo, Node *node, uint dataCount)
 {
@@ -48,6 +54,33 @@ NodeQueryContext executeNodeQuery(QSqlDatabase &db, QString &queryString,
     context.node = node;
     context.dataCount = dataCount;
     return context;
+}
+
+QList<LineQueryContext> executePollForLocation(Location *location)
+{
+    QString address = location->databaseAddress();
+    QSqlDatabase db = QSqlDatabase::database(address);
+
+    QList<LineQueryContext> contexts;
+    foreach (Silo *silo, location->silos())
+    {
+        foreach (NodeLine *line, silo->lines())
+        {
+            QString queryStringFormat =
+                    "SELECT %1 FROM rawdata WHERE silo_cable = \"%2\" "
+                    "ORDER BY date DESC LIMIT 1";
+            QStringList names;
+            foreach (Node *node, line->nodes())
+                names << node->name();
+            QString queryString = queryStringFormat.arg(names.join(", "),
+                                                        line->name());
+            LineQueryContext context;
+            context.query = db.exec(queryString);
+            context.line = line;
+            contexts.append(context);
+        }
+    }
+    return contexts;
 }
 
 DatabaseConnector::DatabaseConnector(QObject *parent) :
@@ -93,7 +126,7 @@ void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
     {
         QString queryFormat =
                 "SELECT date, %1 FROM rawdata "
-                "WHERE silo_cable=\"%2\" AND date > \"%3\" "
+                "WHERE silo_cable = \"%2\" AND date > \"%3\" "
                 "ORDER BY date DESC";
         queryString = queryFormat.arg(
                     node->name(),
@@ -105,7 +138,7 @@ void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
     {
         QString queryFormat =
                 "SELECT date, Full, Empty FROM average "
-                "WHERE silo=\"%1\" AND date > \"%2\" "
+                "WHERE silo = \"%1\" AND date > \"%2\" "
                 "ORDER BY date DESC";
         queryString = queryFormat.arg(silo->name(), oneWeekAgo);
         dataCount = 2;
@@ -122,6 +155,7 @@ void DatabaseConnector::processWeekDataQuery()
 {
     QFutureWatcher<NodeQueryContext> *watcher =
             reinterpret_cast<QFutureWatcher<NodeQueryContext> *>(sender());
+    watcher->deleteLater();
 
     NodeQueryContext context = watcher->result();
 
@@ -158,16 +192,38 @@ void DatabaseConnector::processWeekDataQuery()
 
 void DatabaseConnector::fetchLatestData(Location *location)
 {
-//    QString address = location->databaseAddress();
-//    QSqlDatabase db = QSqlDatabase::database(address);
+    QFuture< QList<LineQueryContext> > future =
+            QtConcurrent::run(executePollForLocation, location);
+    QFutureWatcher< QList<LineQueryContext> > *watcher =
+            new QFutureWatcher< QList<LineQueryContext> >();
+    connect(watcher, SIGNAL(finished()), this, SLOT(processLatestDataQuery()));
+    watcher->setFuture(future);
+}
 
-//    QStringList names;
-//    foreach (Silo *silo, location->silos())
-//    {
-//        foreach (NodeLine *line, silo->lines())
-//            names << QString("\"%1\"").arg(line->name());
-//    }
-//    QString lineNames = names.join(", ");
-//    QString query =
-//            "SELECT date, silo_cable, %1 FROM"
+void DatabaseConnector::processLatestDataQuery()
+{
+    QFutureWatcher< QList<LineQueryContext> > *watcher =
+        reinterpret_cast<QFutureWatcher< QList<LineQueryContext> > *>(sender());
+    watcher->deleteLater();
+
+    QList<LineQueryContext> contexts = watcher->result();
+
+    foreach (LineQueryContext context, contexts)
+    {
+        QSqlQuery &query = context.query;
+        bool toLast = query.last();
+        if (toLast)    // Successfully moved cursor to last row
+        {
+            QList<double> temperatures;
+            for (int i = 0; i < context.line->nodes().size(); i++)
+            {
+                bool ok = false;
+                double temperature = query.value(i).toDouble(&ok);
+                if (!ok)
+                    temperature = -1 * std::numeric_limits<double>::max();
+                temperatures.append(temperature);
+            }
+            emit dataPolled(context.line, temperatures);
+        }
+    }
 }

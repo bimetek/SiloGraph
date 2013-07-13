@@ -15,11 +15,13 @@
 
 #include "MainWidget.h"
 #include <QHBoxLayout>
+#include <QTimerEvent>
 #include <QVBoxLayout>
 #include "DatabaseConnector.h"
 #include "GraphContainer.h"
 #include "MapContainer.h"
 #include "SiloListView.h"
+#include <QDebug>
 
 MainWidget::MainWidget(QWidget *parent) :
     QWidget(parent)
@@ -31,7 +33,8 @@ MainWidget::MainWidget(QWidget *parent) :
 
     // Right side
     QVBoxLayout *detailLayout = new QVBoxLayout();
-    detailLayout->addWidget(_siloListView, 1);
+    detailLayout->setMargin(0);
+    detailLayout->addWidget(_siloListView, 2);
     detailLayout->addWidget(_plotContainer, 1);
 
     QHBoxLayout *mainLayout = new QHBoxLayout();
@@ -43,8 +46,12 @@ MainWidget::MainWidget(QWidget *parent) :
             _siloListView, SLOT(setLocation(Location *)));
     connect(_siloListView, SIGNAL(targetSwitched(Node *,Silo *)),
             _dbc, SLOT(fetchWeekData(Node *,Silo *)));
+    connect(_siloListView, SIGNAL(shouldPollForLocation(Location *)),
+            _dbc, SLOT(fetchLatestData(Location *)));
     connect(_dbc,
             SIGNAL(dataFetched(Node *, Silo *, QList< QList<NodeData *> >)),
             _plotContainer,
             SLOT(updatePlot(Node *, Silo *, QList <QList<NodeData *> >)));
+    connect(_dbc, SIGNAL(dataPolled(NodeLine *, QList<double>)),
+            _siloListView, SLOT(updateLatestData(NodeLine *, QList<double>)));
 }

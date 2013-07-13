@@ -26,5 +26,6 @@ void clearLayout(QLayout *layout);
 QLocale::Language getCurrentLanguage();
 QLocale::Country getCurrentCountry();
 QLocale getCurrentLocale();
+QFont defaultFontForSize(uint pointSize = 0);
 
 #endif // GLOBALS_H

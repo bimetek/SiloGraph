@@ -19,6 +19,7 @@
 #include <QWidget>
 class Silo;
 class Node;
+class NodeLine;
 
 class SiloView : public QWidget
 {
@@ -26,6 +27,9 @@ class SiloView : public QWidget
 
 public:
     explicit SiloView(Silo *silo, QWidget *parent = 0);
+
+public slots:
+    void updateLatestData(NodeLine *line, QList<double> &data);
 
 signals:
     void targetSwitched(Node *node, Silo *silo);
