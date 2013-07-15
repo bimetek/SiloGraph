@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     setCentralWidget(new MainWidget(this));
-    setFixedSize(1020 * W_SCALE, 480 * W_SCALE);
 }
 
 MainWindow::~MainWindow()

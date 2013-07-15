@@ -32,8 +32,6 @@
 MapContainer::MapContainer(QWidget *parent) :
     QWidget(parent)
 {
-    setFixedWidth(300 * W_SCALE);
-
     _mapView = new MapView();
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget(_mapView);

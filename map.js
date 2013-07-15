@@ -1,6 +1,8 @@
 var map;
 var markers = {};
 var markerIndex = 0;
+var initialBounds = {};
+var initialCenter = {};
 
 function initialize(east, west, south, north)
 {
@@ -17,7 +19,8 @@ function initialize(east, west, south, north)
                               mapOptions);
     var sw = new google.maps.LatLng(south, west);
     var ne = new google.maps.LatLng(north, east);
-    map.fitBounds(new google.maps.LatLngBounds(sw, ne));
+    initialBounds = new google.maps.LatLngBounds(sw, ne);
+    refit();
 }
 
 function appendMarker(name, latitude, longitude)
@@ -46,4 +49,9 @@ function appendMarker(name, latitude, longitude)
     markerIndex++;
 
     return markerIndex - 1;
+}
+
+function refit(reposition)
+{
+    map.fitBounds(initialBounds);
 }

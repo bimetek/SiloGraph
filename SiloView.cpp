@@ -34,9 +34,6 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     connect(mapper, SIGNAL(mapped(QObject *)),
             this, SLOT(switchToNode(QObject *)));
 
-    const int lineWidth = 30 * W_SCALE;
-    const int lineMargin = 10 * W_SCALE;
-
     QPushButton *averageButton = new QPushButton(tr("Average"));
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
@@ -55,8 +52,6 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
         foreach (Node *node, line->nodes())
         {
             QPushButton *button = new QPushButton(node->name());
-            button->setFixedSize(lineWidth, 15 * W_SCALE);
-            button->setFont(defaultFontForSize(10 * W_SCALE));
             button->setObjectName(node->name());
             connect(button, SIGNAL(clicked()), mapper, SLOT(map()));
             mapper->setMapping(button, node);
@@ -65,10 +60,6 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
         lineView->setLayout(lineLayout);
         siloLayout->addWidget(lineView);
     }
-
-    int lineCount = silo->lines().size();
-    setFixedWidth(lineWidth * lineCount + lineMargin * (lineCount + 1));
-    averageButton->setFixedWidth((lineWidth + lineMargin) * lineCount);
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setMargin(0);
@@ -90,13 +81,19 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data)
     QList<Node *> &nodes = line->nodes();
     for (int i = 0; i < data.size(); i++)
     {
-        QPushButton *nodeButton =
-                lineView->findChild<QPushButton *>(nodes[i]->name());
+        QString name = nodes[i]->name();
+        QPushButton *nodeButton = lineView->findChild<QPushButton *>(name);
         if (nodeButton)
-            nodeButton->setText(QString::number(data[i], 'f', 1));
+        {
+            QString newText = QString("%1: %2\xb0").arg(
+                        name, QString::number(data[i], 'f', 1));
+            nodeButton->setText(newText);
+        }
         else
+        {
             qDebug() << "Node button" << nodes[i]->name() <<
                         "not found in line" << lineView->objectName() <<
                         "of silo" << objectName();
+        }
     }
 }

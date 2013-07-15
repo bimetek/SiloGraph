@@ -37,6 +37,9 @@ signals:
     void mapLoaded();
     void markerClicked(MapMarker *marker);
 
+protected:
+    virtual void resizeEvent(QResizeEvent *);
+
 private slots:
     void addObjectReference();
 

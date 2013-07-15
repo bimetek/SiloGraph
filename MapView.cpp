@@ -42,6 +42,11 @@ void MapView::addObjectReference()
                                                                this);
 }
 
+void MapView::resizeEvent(QResizeEvent *)
+{
+    frame()->evaluateJavaScript("refit();");
+}
+
 QWebFrame *MapView::frame()
 {
     return _webView->page()->mainFrame();

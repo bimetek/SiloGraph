@@ -38,8 +38,8 @@ MainWidget::MainWidget(QWidget *parent) :
     detailLayout->addWidget(_plotContainer, 1);
 
     QHBoxLayout *mainLayout = new QHBoxLayout();
-    mainLayout->addWidget(_mapContainer, 0);
-    mainLayout->addLayout(detailLayout, 1);
+    mainLayout->addWidget(_mapContainer, 1);
+    mainLayout->addLayout(detailLayout, 2);
     setLayout(mainLayout);
 
     connect(_mapContainer, SIGNAL(locationChanged(Location *)),
