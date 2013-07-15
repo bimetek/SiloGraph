@@ -18,6 +18,7 @@
 #include <QFile>
 #include <QFuture>
 #include <QFutureWatcher>
+#include <QMutexLocker>
 #include <QSqlQuery>
 #include <QSqlRecord>
 #include <QStringList>
@@ -45,19 +46,55 @@ struct LineQueryContext
     NodeLine *line;
 };
 
-NodeQueryContext executeNodeQuery(QSqlDatabase &db, QString &queryString,
-                                  Silo *silo, Node *node, uint dataCount)
+NodeQueryContext executeNodeQuery(Silo *silo, Node *node, QMutex *m)
 {
+    QMutexLocker locker(m);
+    Q_UNUSED(locker);
+
+    QString address = silo->location()->databaseAddress();
+    QSqlDatabase db = QSqlDatabase::database(address);
+
+    QString queryString;
+    QDateTime now = QDateTime::currentDateTime();
+    QString oneWeekAgo = now.addDays(-7).toString(Qt::ISODate);
+    uint dataCount = 0;
+    if (node)
+    {
+        QString queryFormat =
+                "SELECT date, %1 FROM rawdata "
+                "WHERE silo_cable = \"%2\" AND date > \"%3\" "
+                "ORDER BY date DESC";
+        queryString = queryFormat.arg(
+                    node->name(),
+                    node->line()->name(),
+                    oneWeekAgo);
+        dataCount = 1;
+    }
+    else
+    {
+        QString queryFormat =
+                "SELECT date, Full, Empty FROM average "
+                "WHERE silo = \"%1\" AND date > \"%2\" "
+                "ORDER BY date DESC";
+        queryString = queryFormat.arg(silo->name(), oneWeekAgo);
+        dataCount = 2;
+    }
+
     NodeQueryContext context;
     context.query = db.exec(queryString);
     context.silo = silo;
     context.node = node;
     context.dataCount = dataCount;
+
+    db.close();
     return context;
 }
 
-QList<LineQueryContext> executePollForLocation(Location *location)
+QList<LineQueryContext> executePollForLocation(Location *location, QMutex *m)
 {
+    QMutexLocker locker(m);
+    Q_UNUSED(locker);
+
     QString address = location->databaseAddress();
     QSqlDatabase db = QSqlDatabase::database(address);
 
@@ -80,6 +117,8 @@ QList<LineQueryContext> executePollForLocation(Location *location)
             contexts.append(context);
         }
     }
+
+    db.close();
     return contexts;
 }
 
@@ -113,38 +152,16 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
     }
 }
 
+DatabaseConnector::~DatabaseConnector()
+{
+    foreach (QString name, QSqlDatabase::connectionNames())
+        QSqlDatabase::removeDatabase(name);
+}
+
 void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
 {
-    QString address = silo->location()->databaseAddress();
-    QSqlDatabase db = QSqlDatabase::database(address);
-
-    QString queryString;
-    QDateTime now = QDateTime::currentDateTime();
-    QString oneWeekAgo = now.addDays(-7).toString(Qt::ISODate);
-    uint dataCount = 0;
-    if (node)
-    {
-        QString queryFormat =
-                "SELECT date, %1 FROM rawdata "
-                "WHERE silo_cable = \"%2\" AND date > \"%3\" "
-                "ORDER BY date DESC";
-        queryString = queryFormat.arg(
-                    node->name(),
-                    node->line()->name(),
-                    oneWeekAgo);
-        dataCount = 1;
-    }
-    else
-    {
-        QString queryFormat =
-                "SELECT date, Full, Empty FROM average "
-                "WHERE silo = \"%1\" AND date > \"%2\" "
-                "ORDER BY date DESC";
-        queryString = queryFormat.arg(silo->name(), oneWeekAgo);
-        dataCount = 2;
-    }
-    QFuture<NodeQueryContext> future = QtConcurrent::run(
-                executeNodeQuery, db, queryString, silo, node, dataCount);
+    QFuture<NodeQueryContext> future =
+            QtConcurrent::run(executeNodeQuery, silo, node, &_databaseMutex);
     QFutureWatcher<NodeQueryContext> *watcher =
             new QFutureWatcher<NodeQueryContext>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
@@ -193,7 +210,7 @@ void DatabaseConnector::processWeekDataQuery()
 void DatabaseConnector::fetchLatestData(Location *location)
 {
     QFuture< QList<LineQueryContext> > future =
-            QtConcurrent::run(executePollForLocation, location);
+            QtConcurrent::run(executePollForLocation, location, &_databaseMutex);
     QFutureWatcher< QList<LineQueryContext> > *watcher =
             new QFutureWatcher< QList<LineQueryContext> >();
     connect(watcher, SIGNAL(finished()), this, SLOT(processLatestDataQuery()));

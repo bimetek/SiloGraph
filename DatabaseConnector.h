@@ -33,6 +33,7 @@ class DatabaseConnector : public QObject
 
 public:
     explicit DatabaseConnector(QObject *parent = 0);
+    virtual ~DatabaseConnector();
 
 public slots:
     void fetchWeekData(Node *node, Silo *silo);
