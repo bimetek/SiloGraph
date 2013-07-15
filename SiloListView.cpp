@@ -37,7 +37,7 @@ SiloListView::SiloListView(QWidget *parent) :
     topLayout->addStretch(1);
     topLayout->addWidget(_lastUpdate);
     mainLayout->addLayout(topLayout);
-    mainLayout->addLayout(_siloListLayout);
+    mainLayout->addLayout(_siloListLayout, 1);
     setLayout(mainLayout);
 }
 
