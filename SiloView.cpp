@@ -85,8 +85,16 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data)
         QPushButton *nodeButton = lineView->findChild<QPushButton *>(name);
         if (nodeButton)
         {
-            QString newText = QString("%1: %2\xb0").arg(
-                        name, QString::number(data[i], 'f', 1));
+            QString newText;
+            if (data[i] != D_NO_DATA)
+            {
+                newText = QString("%1: %2\xb0").arg(
+                            name, QString::number(data[i], 'f', 1));
+            }
+            else
+            {
+                newText = QString("%1 : --").arg(name);
+            }
             nodeButton->setText(newText);
         }
         else

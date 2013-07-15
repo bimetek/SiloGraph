@@ -14,7 +14,6 @@
  *****************************************************************************/
 
 #include "DatabaseConnector.h"
-#include <limits>
 #include <QtConcurrentRun>
 #include <QFile>
 #include <QFuture>
@@ -24,6 +23,7 @@
 #include <QStringList>
 #include <QVariantMap>
 #include <qjson/parser.h>
+#include "Globals.h"
 #include "Location.h"
 #include "Silo.h"
 #include "NodeLine.h"
@@ -177,12 +177,12 @@ void DatabaseConnector::processWeekDataQuery()
         QDateTime dateTime = query.value(0).toDateTime();
         for (uint i = 0; i < dataCount; i++)
         {
-            NodeData *data = new NodeData(this);
-            data->setDateTime(dateTime);
             bool ok = false;
             double temperature = query.value(i + 1).toDouble(&ok);
             if (!ok)
-                temperature = -1 * std::numeric_limits<double>::max();
+                continue;
+            NodeData *data = new NodeData(this);
+            data->setDateTime(dateTime);
             data->setTemperature(temperature);
             dataSets[i].append(data);
         }
@@ -220,7 +220,7 @@ void DatabaseConnector::processLatestDataQuery()
                 bool ok = false;
                 double temperature = query.value(i).toDouble(&ok);
                 if (!ok)
-                    temperature = -1 * std::numeric_limits<double>::max();
+                    temperature = D_NO_DATA;
                 temperatures.append(temperature);
             }
             emit dataPolled(context.line, temperatures);

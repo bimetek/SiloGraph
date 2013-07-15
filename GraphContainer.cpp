@@ -36,7 +36,7 @@ public:
     virtual QwtText label(double v) const
     {
         QDateTime dt = _datetime.addSecs(v);
-        return getCurrentLocale().toString(dt, "HH:mm:ss");
+        return getCurrentLocale().toString(dt, "yyyy-MM-dd\n   HH:mm:ss");
     }
     void setDateTime(QDateTime dt) { _datetime = dt; }
 

@@ -16,9 +16,12 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+#include <limits>
 #include <QLayout>
 
 #define W_SCALE 1       // Scale everything in UI
+
+#define D_NO_DATA (-1 * std::numeric_limits<double>::max())
 
 #include <QLocale>
 
