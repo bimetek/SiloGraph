@@ -77,6 +77,8 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
         if (dateTime < firstDateTime)
             firstDateTime = dateTime;
     }
+    int i = 0;
+    double dataCount = dataSets.size();
     foreach (QList<NodeData *> dataSet, dataSets)
     {
         QVector<QPointF> points;
@@ -90,6 +92,7 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 
         QwtPlotCurve *curve = new QwtPlotCurve();
         curve->setYAxis(QwtPlot::yLeft);
+        curve->setPen(QPen(QColor::fromHsvF(i++ / dataCount, 1.0, 1.0)));
         curve->attach(_plot);
         curve->setSamples(points);
     }
