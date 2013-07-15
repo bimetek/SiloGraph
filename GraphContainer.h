@@ -20,6 +20,8 @@
 #include <QList>
 class QwtPlot;
 class QwtPlotCurve;
+class QwtPlotMagnifier;
+class QwtPlotPanner;
 class Node;
 class Silo;
 class NodeData;
@@ -37,6 +39,8 @@ public slots:
 
 private:
     QwtPlot *_plot;
+    QwtPlotPanner *_panner;
+    QwtPlotMagnifier *_magnifier;
 };
 
 #endif // GRAPHCONTAINER_H

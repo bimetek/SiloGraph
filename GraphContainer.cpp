@@ -20,6 +20,8 @@
 #include <QVector>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
+#include <qwt_plot_magnifier.h>
+#include <qwt_plot_panner.h>
 #include <qwt_scale_draw.h>
 #include <qwt_scale_engine.h>
 #include "Globals.h"
@@ -44,9 +46,90 @@ private:
     QDateTime _datetime;
 };
 
+class LimitedPanner : public QwtPlotPanner
+{
+public:
+    LimitedPanner(QWidget *canvas) : QwtPlotPanner(canvas)
+    {
+        QwtScaleMap xBottom = plot()->canvasMap(QwtPlot::xBottom);
+        QwtScaleMap yLeft = plot()->canvasMap(QwtPlot::yLeft);
+
+        _initials.left = xBottom.s1();
+        _initials.right = xBottom.s2();
+        _initials.bottom = yLeft.s1();
+        _initials.top = yLeft.s2();
+
+        _transformed.left = xBottom.p1();
+        _transformed.right = xBottom.p2();
+        _transformed.bottom = yLeft.p1();
+        _transformed.top = yLeft.p2();
+    }
+
+protected:
+    virtual void moveCanvas(int dx, int dy)
+    {
+        double oldLeft = plot()->transform(QwtPlot::xBottom, _initials.left);
+        double oldRight = plot()->transform(QwtPlot::xBottom, _initials.right);
+        double oldBottom = plot()->transform(QwtPlot::yLeft, _initials.bottom);
+        double oldTop = plot()->transform(QwtPlot::yLeft, _initials.top);
+
+        if (oldLeft + dx > _transformed.left)       // Left overflow
+            dx = _transformed.left - oldLeft;
+        if (oldRight + dx < _transformed.right)     // Right overflow
+            dx = _transformed.right - oldRight;
+        if (oldBottom + dy < _transformed.bottom)   // Bottom overflow
+            dy = _transformed.bottom - oldBottom;
+        if (oldTop + dy > _transformed.top)         // Top overflow
+            dy = _transformed.top - oldTop;
+
+        return QwtPlotPanner::moveCanvas(dx, dy);
+    }
+
+private:
+    struct {
+        double left;
+        double right;
+        double top;
+        double bottom;
+    } _initials;
+    struct {
+        double left;
+        double right;
+        double top;
+        double bottom;
+    } _transformed;
+};
+
+
+class LimitedMagnifier : public QwtPlotMagnifier
+{
+public:
+    LimitedMagnifier(QWidget *canvas)
+        : QwtPlotMagnifier(canvas), _zoom(1.0)
+    {
+        setWheelFactor(1.0 / wheelFactor());    // Inverse scrolling direction
+    }
+
+protected:
+    void rescale(double factor)
+    {
+        double nextZoom = factor * _zoom;
+        if (nextZoom > 1.0)   // Overly zoomed out
+        {
+            nextZoom = 1.0;
+            factor = 1.0 / _zoom;
+        }
+        _zoom = nextZoom;
+        QwtPlotMagnifier::rescale(factor);
+    }
+
+private:
+    double _zoom;
+};
+
 
 GraphContainer::GraphContainer(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent), _panner(0), _magnifier(0)
 {
     _plot = new QwtPlot();
     _plot->setAxisScaleDraw(QwtPlot::xBottom,
@@ -98,5 +181,14 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     }
 
     _plot->setAxisScaleDraw(QwtPlot::xBottom, new DateTimeDraw(firstDateTime));
+    _plot->setAxisAutoScale(QwtPlot::xBottom);
+    _plot->setAxisAutoScale(QwtPlot::yLeft);
     _plot->replot();
+
+    if (_panner)
+        delete _panner;
+    _panner = new LimitedPanner(_plot->canvas());
+    if (_magnifier)
+        delete _magnifier;
+    _magnifier = new LimitedMagnifier(_plot->canvas());
 }
