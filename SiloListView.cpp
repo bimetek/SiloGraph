@@ -33,6 +33,9 @@ SiloListView::SiloListView(QWidget *parent) :
 
 void SiloListView::setLocation(Location *location)
 {
+    if (_currentLocation == location)
+        return;
+
     _currentLocation = location;
 
     QHBoxLayout *newLayout = 0;
