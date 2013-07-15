@@ -97,7 +97,6 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
         curve->setSamples(points);
     }
 
-    _plot->setAxisScaleDraw(QwtPlot::xBottom,
-                            new DateTimeDraw(firstDateTime));
+    _plot->setAxisScaleDraw(QwtPlot::xBottom, new DateTimeDraw(firstDateTime));
     _plot->replot();
 }
