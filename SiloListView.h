@@ -17,7 +17,10 @@
 #define SILOLISTVIEW_H
 
 #include <QWidget>
+#include <QDateTime>
 #include <QList>
+class QHBoxLayout;
+class QLabel;
 class Location;
 class Node;
 class NodeLine;
@@ -33,7 +36,8 @@ public:
 
 public slots:
     void setLocation(Location *location);
-    void updateLatestData(NodeLine *line, QList<double> data);
+    void updateLatestData(NodeLine *line, QList<double> data,
+                          QDateTime dateTime);
 
 protected:
     void timerEvent(QTimerEvent *);
@@ -45,6 +49,9 @@ signals:
 private:
     Location *_currentLocation;
     int _pollingTimerId;
+    QHBoxLayout *_siloListLayout;
+    QLabel *_lastUpdate;
+    void refreshLastUpdate(QDateTime &dateTime);
 };
 
 #endif // SILOLISTVIEW_H

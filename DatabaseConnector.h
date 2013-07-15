@@ -17,6 +17,7 @@
 #define DATABASECONNECTOR_H
 
 #include <QObject>
+#include <QDateTime>
 #include <QList>
 #include <QMutex>
 class QSqlQuery;
@@ -40,7 +41,7 @@ public slots:
 signals:
     void dataFetched(Node *node, Silo *silo,
                      QList <QList<NodeData *> > dataSets);
-    void dataPolled(NodeLine *line, QList<double> data);
+    void dataPolled(NodeLine *line, QList<double> data, QDateTime dateTime);
 
 private slots:
     void processWeekDataQuery();

@@ -52,6 +52,8 @@ MainWidget::MainWidget(QWidget *parent) :
             SIGNAL(dataFetched(Node *, Silo *, QList< QList<NodeData *> >)),
             _plotContainer,
             SLOT(updatePlot(Node *, Silo *, QList <QList<NodeData *> >)));
-    connect(_dbc, SIGNAL(dataPolled(NodeLine *, QList<double>)),
-            _siloListView, SLOT(updateLatestData(NodeLine *, QList<double>)));
+    connect(_dbc,
+            SIGNAL(dataPolled(NodeLine *, QList<double>, QDateTime)),
+            _siloListView,
+            SLOT(updateLatestData(NodeLine *, QList<double>, QDateTime)));
 }

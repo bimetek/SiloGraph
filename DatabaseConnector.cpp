@@ -67,7 +67,7 @@ QList<LineQueryContext> executePollForLocation(Location *location)
         foreach (NodeLine *line, silo->lines())
         {
             QString queryStringFormat =
-                    "SELECT %1 FROM rawdata WHERE silo_cable = \"%2\" "
+                    "SELECT date, %1 FROM rawdata WHERE silo_cable = \"%2\" "
                     "ORDER BY date DESC LIMIT 1";
             QStringList names;
             foreach (Node *node, line->nodes())
@@ -218,12 +218,13 @@ void DatabaseConnector::processLatestDataQuery()
             for (int i = 0; i < context.line->nodes().size(); i++)
             {
                 bool ok = false;
-                double temperature = query.value(i).toDouble(&ok);
+                double temperature = query.value(i + 1).toDouble(&ok);
                 if (!ok)
                     temperature = D_NO_DATA;
                 temperatures.append(temperature);
             }
-            emit dataPolled(context.line, temperatures);
+            QDateTime dateTime = query.value(0).toDateTime();
+            emit dataPolled(context.line, temperatures, dateTime);
         }
     }
 }
