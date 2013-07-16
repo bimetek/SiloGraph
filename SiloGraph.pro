@@ -55,7 +55,9 @@ OTHER_FILES += \
     README.md \
     databases.json \
     map.html \
-    map.js
+    map.js \
+    logo.png \
+    silo_background.png
 
 RESOURCES += \
     Resources.qrc

@@ -32,7 +32,7 @@ MainWidget::MainWidget(QWidget *parent) :
     _siloListView = new SiloListView();
     _plotContainer = new GraphContainer();
 
-    LogoHolder *logo = new LogoHolder(":/img/logo.jpg");
+    LogoHolder *logo = new LogoHolder(":/img/logo.png");
 
     // Right side
     QVBoxLayout *detailLayout = new QVBoxLayout();

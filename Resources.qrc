@@ -9,6 +9,6 @@
     </qresource>
     <qresource prefix="/img">
         <file>silo_background.png</file>
-        <file>logo.jpg</file>
+        <file>logo.png</file>
     </qresource>
 </RCC>
