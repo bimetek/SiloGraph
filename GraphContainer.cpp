@@ -156,6 +156,8 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     QDateTime firstDateTime = QDateTime::currentDateTime();
     foreach (QList<NodeData *> dataSet, dataSets)
     {
+        if (dataSet.isEmpty())
+            continue;
         QDateTime dateTime = dataSet.first()->dateTime();
         if (dateTime < firstDateTime)
             firstDateTime = dateTime;
@@ -164,6 +166,9 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     double dataCount = dataSets.size();
     foreach (QList<NodeData *> dataSet, dataSets)
     {
+        if (dataSet.isEmpty())
+            continue;
+
         QVector<QPointF> points;
         foreach (NodeData *data, dataSet)
         {
@@ -186,9 +191,9 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     _plot->replot();
 
     if (_panner)
-        delete _panner;
+        _panner->deleteLater();
     _panner = new LimitedPanner(_plot->canvas());
     if (_magnifier)
-        delete _magnifier;
+        _magnifier->deleteLater();
     _magnifier = new LimitedMagnifier(_plot->canvas());
 }
