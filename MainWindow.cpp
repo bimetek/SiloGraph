@@ -20,7 +20,10 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setCentralWidget(new MainWidget(this));
+    MainWidget *mainWidget = new MainWidget(this);
+    setCentralWidget(mainWidget);
+    setWindowIcon(QIcon(":/img/logo.jpg"));
+    setWindowTitle("Silo Graph");
 }
 
 MainWindow::~MainWindow()

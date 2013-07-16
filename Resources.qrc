@@ -7,4 +7,8 @@
         <file>map.html</file>
         <file>map.js</file>
     </qresource>
+    <qresource prefix="/img">
+        <file>silo_background.png</file>
+        <file>logo.jpg</file>
+    </qresource>
 </RCC>

@@ -30,7 +30,8 @@ SOURCES += main.cpp\
     DatabaseConnector.cpp \
     NodeData.cpp \
     MapContainer.cpp \
-    MapMarker.cpp
+    MapMarker.cpp \
+    LogoHolder.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
@@ -46,7 +47,8 @@ HEADERS  += MainWindow.h \
     DatabaseConnector.h \
     NodeData.h \
     MapContainer.h \
-    MapMarker.h
+    MapMarker.h \
+    LogoHolder.h
 
 OTHER_FILES += \
     locations.json \

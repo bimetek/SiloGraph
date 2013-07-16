@@ -21,6 +21,7 @@
 #include "GraphContainer.h"
 #include "MapContainer.h"
 #include "SiloListView.h"
+#include "LogoHolder.h"
 #include <QDebug>
 
 MainWidget::MainWidget(QWidget *parent) :
@@ -31,14 +32,21 @@ MainWidget::MainWidget(QWidget *parent) :
     _siloListView = new SiloListView();
     _plotContainer = new GraphContainer();
 
+    LogoHolder *logo = new LogoHolder(":/img/logo.jpg");
+
     // Right side
     QVBoxLayout *detailLayout = new QVBoxLayout();
     detailLayout->setMargin(0);
     detailLayout->addWidget(_siloListView, 0);
     detailLayout->addWidget(_plotContainer, 1);
 
+    // Left side
+    QVBoxLayout *overviewLayout = new QVBoxLayout();
+    overviewLayout->addWidget(_mapContainer, 1);
+    overviewLayout->addWidget(logo, 0);
+
     QHBoxLayout *mainLayout = new QHBoxLayout();
-    mainLayout->addWidget(_mapContainer, 1);
+    mainLayout->addLayout(overviewLayout, 1);
     mainLayout->addLayout(detailLayout, 2);
     setLayout(mainLayout);
 

@@ -35,6 +35,7 @@ MapContainer::MapContainer(QWidget *parent) :
     _mapView = new MapView();
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget(_mapView);
+    layout->setContentsMargins(0, 0, 0, 0);
     setLayout(layout);
     connect(_mapView, SIGNAL(mapLoaded()), this, SLOT(loadMapContents()));
     connect(_mapView, SIGNAL(markerClicked(MapMarker *)),
