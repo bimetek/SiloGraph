@@ -30,13 +30,8 @@ SiloListView::SiloListView(QWidget *parent) :
     _currentLocation(0),
     _pollingTimerId(0)
 {
-    _lastUpdate = new QLabel();
     _siloListLayout = new QHBoxLayout();
     QVBoxLayout *mainLayout = new QVBoxLayout();
-    QHBoxLayout *topLayout = new QHBoxLayout();
-    topLayout->addStretch(1);
-    topLayout->addWidget(_lastUpdate);
-    mainLayout->addLayout(topLayout);
     mainLayout->addLayout(_siloListLayout, 1);
     setLayout(mainLayout);
 }
@@ -46,7 +41,6 @@ void SiloListView::setLocation(Location *location)
     if (_currentLocation == location)
         return;
 
-    _lastUpdate->setText("");
     _currentLocation = location;
 
     clearLayout(_siloListLayout);
@@ -56,6 +50,8 @@ void SiloListView::setLocation(Location *location)
         _siloListLayout->addWidget(sv);
         connect(sv, SIGNAL(targetSwitched(Node *,Silo *)),
                 this, SIGNAL(targetSwitched(Node *,Silo *)));
+        connect(this, SIGNAL(shouldPollForLocation(Location *)),
+                sv, SLOT(invalidateLastUpdate()));
     }
 
     if (_pollingTimerId)
@@ -80,12 +76,5 @@ void SiloListView::updateLatestData(NodeLine *line, QList<double> data,
 {
     Silo *silo = line->silo();
     SiloView *sv = findChild<SiloView *>(silo->name());
-    sv->updateLatestData(line, data);
-    refreshLastUpdate(dateTime);
-}
-
-void SiloListView::refreshLastUpdate(QDateTime &dateTime)
-{
-    QString dts = getCurrentLocale().toString(dateTime, "yyyy-MM-dd HH:mm:ss");
-    _lastUpdate->setText(QString("Last update: %1").arg(dts));
+    sv->updateLatestData(line, data, dateTime);
 }

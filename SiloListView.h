@@ -20,7 +20,6 @@
 #include <QDateTime>
 #include <QList>
 class QHBoxLayout;
-class QLabel;
 class Location;
 class Node;
 class NodeLine;
@@ -50,8 +49,6 @@ private:
     Location *_currentLocation;
     int _pollingTimerId;
     QHBoxLayout *_siloListLayout;
-    QLabel *_lastUpdate;
-    void refreshLastUpdate(QDateTime &dateTime);
 };
 
 #endif // SILOLISTVIEW_H

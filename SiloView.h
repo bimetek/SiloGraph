@@ -17,6 +17,8 @@
 #define SILOVIEW_H
 
 #include <QWidget>
+#include <QDateTime>
+class QLabel;
 class Silo;
 class Node;
 class NodeLine;
@@ -29,7 +31,11 @@ public:
     explicit SiloView(Silo *silo, QWidget *parent = 0);
 
 public slots:
-    void updateLatestData(NodeLine *line, QList<double> &data);
+    void updateLatestData(NodeLine *line, QList<double> &data,
+                          QDateTime dateTime);
+    void refreshLastUpdate(QDateTime &dateTime);
+    void refreshLastUpdate(QString text, bool clearAll = false);
+    void invalidateLastUpdate();
 
 signals:
     void targetSwitched(Node *node, Silo *silo);
@@ -39,6 +45,7 @@ private slots:
 
 private:
     Silo *_silo;
+    QLabel *_lastUpdate;
 };
 
 #endif // SILOVIEW_H

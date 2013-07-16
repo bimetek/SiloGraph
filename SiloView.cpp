@@ -15,6 +15,7 @@
 
 #include "SiloView.h"
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QPushButton>
 #include <QSignalMapper>
 #include <QVBoxLayout>
@@ -37,6 +38,8 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     QPushButton *averageButton = new QPushButton(tr("Average"));
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
+
+    _lastUpdate = new QLabel();
 
     QHBoxLayout *siloLayout = new QHBoxLayout();
     siloLayout->setMargin(0);
@@ -61,12 +64,17 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
         siloLayout->addWidget(lineView);
     }
 
-    QVBoxLayout *layout = new QVBoxLayout();
-    layout->setMargin(0);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(averageButton);
-    layout->addLayout(siloLayout);
-    setLayout(layout);
+    QVBoxLayout *buttonsLayout = new QVBoxLayout();
+    buttonsLayout->setMargin(0);
+    buttonsLayout->setContentsMargins(0, 0, 0, 0);
+    buttonsLayout->addWidget(averageButton);
+    buttonsLayout->addLayout(siloLayout);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout();
+    mainLayout->addWidget(_lastUpdate);
+    mainLayout->addLayout(buttonsLayout);
+
+    setLayout(mainLayout);
 }
 
 void SiloView::switchToNode(QObject *obj)
@@ -75,7 +83,8 @@ void SiloView::switchToNode(QObject *obj)
     emit targetSwitched(node, _silo);
 }
 
-void SiloView::updateLatestData(NodeLine *line, QList<double> &data)
+void SiloView::updateLatestData(NodeLine *line, QList<double> &data,
+                                QDateTime dateTime)
 {
     QWidget *lineView = findChild<QWidget *>(line->name());
     QList<Node *> &nodes = line->nodes();
@@ -104,4 +113,32 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data)
                         "of silo" << objectName();
         }
     }
+    refreshLastUpdate(dateTime);
+}
+
+void SiloView::refreshLastUpdate(QDateTime &dateTime)
+{
+    if (dateTime.isValid())
+    {
+        QString dts =
+                getCurrentLocale().toString(dateTime, "yyyy-MM-dd HH:mm:ss");
+        refreshLastUpdate(dts);
+    }
+    else
+    {
+        refreshLastUpdate("--");
+    }
+}
+
+void SiloView::refreshLastUpdate(QString text, bool clearAll)
+{
+    if (clearAll)
+        _lastUpdate->setText(text);
+    else
+        _lastUpdate->setText(QString("Last update: %1").arg(text));
+}
+
+void SiloView::invalidateLastUpdate()
+{
+    refreshLastUpdate("Loading...", true);
 }
