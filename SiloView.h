@@ -40,12 +40,18 @@ public slots:
 signals:
     void targetSwitched(Node *node, Silo *silo);
 
+protected:
+    void resizeEvent(QResizeEvent *);
+
 private slots:
     void switchToNode(QObject *obj);
 
 private:
     Silo *_silo;
     QLabel *_lastUpdate;
+    QLabel *_backgroundHolder;
+    QWidget *_topPlaceholder;
+    QWidget *_bottomPlaceholder;
 };
 
 #endif // SILOVIEW_H

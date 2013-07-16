@@ -28,53 +28,88 @@
 SiloView::SiloView(Silo *silo, QWidget *parent) :
     QWidget(parent)
 {
+    // Data initialization
     _silo = silo;
     setObjectName(silo->name());
 
+    // Misc. UI initialization
+    _lastUpdate = new QLabel();
+    _backgroundHolder = new QLabel(this);
+    QString styleSheet =
+        "border-image: url(:/img/silo_background.png) 0 0 0 0 stretch stretch;";
+    _backgroundHolder->setStyleSheet(styleSheet);
+    _topPlaceholder = new QWidget();
+    _bottomPlaceholder = new QWidget();
+    QString buttonStyle = "border: none; color: #fff; font-weight: bold";
+
+    // Setup signal mapper for silo buttons
     QSignalMapper *mapper = new QSignalMapper(this);
     connect(mapper, SIGNAL(mapped(QObject *)),
             this, SLOT(switchToNode(QObject *)));
 
+    // Silo average button
     QPushButton *averageButton = new QPushButton(tr("Average"));
+    averageButton->setStyleSheet(buttonStyle);
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
 
-    _lastUpdate = new QLabel();
-
+    // Silo cables' buttons; also lay them out at the same time
     QHBoxLayout *siloLayout = new QHBoxLayout();
-    siloLayout->setMargin(0);
     siloLayout->setContentsMargins(0, 0, 0, 0);
+    siloLayout->addStretch(1);
     foreach (NodeLine *line, silo->lines())
     {
         QWidget *lineView = new QWidget();
         lineView->setObjectName(line->name());
 
         QVBoxLayout *lineLayout = new QVBoxLayout();
-        lineLayout->setMargin(0);
         lineLayout->setContentsMargins(0, 0, 0, 0);
         foreach (Node *node, line->nodes())
         {
             QPushButton *button = new QPushButton(node->name());
             button->setObjectName(node->name());
+            button->setStyleSheet(buttonStyle);
             connect(button, SIGNAL(clicked()), mapper, SLOT(map()));
             mapper->setMapping(button, node);
             lineLayout->addWidget(button);
         }
         lineView->setLayout(lineLayout);
-        siloLayout->addWidget(lineView);
+        siloLayout->addWidget(lineView, 1);
     }
+    siloLayout->addStretch(1);
 
+    // Lay out the whole silo
     QVBoxLayout *buttonsLayout = new QVBoxLayout();
-    buttonsLayout->setMargin(0);
     buttonsLayout->setContentsMargins(0, 0, 0, 0);
     buttonsLayout->addWidget(averageButton);
     buttonsLayout->addLayout(siloLayout);
 
-    QVBoxLayout *mainLayout = new QVBoxLayout();
-    mainLayout->addWidget(_lastUpdate);
-    mainLayout->addLayout(buttonsLayout);
-
+    // Lay out the silo with silo info UI
+    QVBoxLayout *siloInfoLayout = new QVBoxLayout();
+    siloInfoLayout->addWidget(_topPlaceholder);
+    siloInfoLayout->addWidget(_lastUpdate);
+    siloInfoLayout->addLayout(buttonsLayout);
+    siloInfoLayout->addWidget(_bottomPlaceholder);
+    QHBoxLayout *mainLayout = new QHBoxLayout();
+    mainLayout->addStretch(1);
+    mainLayout->addLayout(siloInfoLayout);
+    mainLayout->addStretch(1);
     setLayout(mainLayout);
+}
+
+void SiloView::resizeEvent(QResizeEvent *)
+{
+    // Recalculate the background holder's geometry. The new height should fill
+    // the parent, width calculated by keeping aspect. Left and right margins
+    // are so that the holder is horizontally centered.
+    int h = size().height();
+    int w = h * 392 / 905;  // 392x905 is silo_background.png's size
+    int left = (size().width() - w) / 2;
+    _backgroundHolder->setGeometry(left, 0, w, h);
+
+    // Resize placeholders
+    _topPlaceholder->setFixedHeight(h * 0.07);
+    _bottomPlaceholder->setFixedHeight(h * 0.20);
 }
 
 void SiloView::switchToNode(QObject *obj)
