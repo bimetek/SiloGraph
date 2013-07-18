@@ -48,7 +48,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
             this, SLOT(switchToNode(QObject *)));
 
     // Silo average button
-    QPushButton *averageButton = new QPushButton(tr("Average"));
+    QPushButton *averageButton = new QPushButton(silo->name());
     averageButton->setStyleSheet(buttonStyle);
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
@@ -64,6 +64,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
 
         QVBoxLayout *lineLayout = new QVBoxLayout();
         lineLayout->setContentsMargins(0, 0, 0, 0);
+        lineLayout->setAlignment(Qt::AlignTop);
         foreach (Node *node, line->nodes())
         {
             QPushButton *button = new QPushButton(node->name());
