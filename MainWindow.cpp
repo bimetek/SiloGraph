@@ -24,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(mainWidget);
     setWindowIcon(QIcon(":/img/logo.png"));
     setWindowTitle("Silo Graph");
+
+    showMaximized();
 }
 
 MainWindow::~MainWindow()

@@ -40,10 +40,9 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     QString styleSheet =
         "border-image: url(:/img/silo_background.png) 0 0 0 0 stretch stretch;";
     _backgroundHolder->setStyleSheet(styleSheet);
-    _bottomPlaceholder = new QWidget();
     QString buttonStyle =
             "border: 1px solid black; border-radius: 5px; background: #87b4ff; "
-            "color: black; font-weight: bold; font-size: 11pt";
+            "color: black; font-weight: bold; font-size: 11pt;";
 
     // Setup signal mapper for silo buttons
     QSignalMapper *mapper = new QSignalMapper(this);
@@ -54,7 +53,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     QString averageButtonTitle =
             silo->name().replace('s', "Silo ", Qt::CaseInsensitive);
     QPushButton *averageButton = new QPushButton(averageButtonTitle);
-    averageButton->setStyleSheet(buttonStyle);
+    averageButton->setStyleSheet(buttonStyle + "padding: 0 0.5em;");
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
 
@@ -91,7 +90,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     // Lay out the whole silo
     QHBoxLayout *averageLayout = new QHBoxLayout();
     averageLayout->addStretch(1);
-    averageLayout->addWidget(averageButton, 2);
+    averageLayout->addWidget(averageButton);
     averageLayout->addStretch(1);
 
     QVBoxLayout *buttonsLayout = new QVBoxLayout();
@@ -101,9 +100,12 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
 
     // Lay out the silo with silo info UI
     QVBoxLayout *siloInfoLayout = new QVBoxLayout();
+    siloInfoLayout->addSpacing(1);
     siloInfoLayout->addLayout(buttonsLayout);
-    siloInfoLayout->addWidget(_bottomPlaceholder);
+    siloInfoLayout->addStretch(5);
     siloInfoLayout->addWidget(_lastUpdate);
+
+    // Add paddings to left and right of silo content
     QHBoxLayout *mainLayout = new QHBoxLayout();
     mainLayout->addStretch(1);
     mainLayout->addLayout(siloInfoLayout);
@@ -120,9 +122,6 @@ void SiloView::resizeEvent(QResizeEvent *)
     int w = (_silo->lines().size() + 1) * 60;
     int left = (size().width() - w) / 2;
     _backgroundHolder->setGeometry(left, 0, w, h);
-
-    // Resize placeholders
-    _bottomPlaceholder->setFixedHeight(h * 0.22);
 }
 
 void SiloView::switchToNode(QObject *obj)

@@ -50,7 +50,6 @@ private:
     Silo *_silo;
     QLabel *_lastUpdate;
     QLabel *_backgroundHolder;
-    QWidget *_bottomPlaceholder;
 };
 
 #endif // SILOVIEW_H
