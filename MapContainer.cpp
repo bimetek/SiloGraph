@@ -97,6 +97,8 @@ MapContainer::MapContainer(QWidget *parent) :
         _locations.insert(location->name(), location);
     }
     delete json;
+
+    setMinimumWidth(100);
 }
 
 void MapContainer::switchToMarkerLocation(MapMarker *marker)
