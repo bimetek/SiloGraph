@@ -74,6 +74,11 @@ void SiloListView::timerEvent(QTimerEvent *e)
 void SiloListView::updateLatestData(NodeLine *line, QList<double> data,
                                     QDateTime dateTime)
 {
+    // If the fetched data is out of date and is from some previous location,
+    // ignore it.
+    if (_currentLocation != line->silo()->location())
+        return;
+
     Silo *silo = line->silo();
     SiloView *sv = findChild<SiloView *>(silo->name());
     sv->updateLatestData(line, data, dateTime);

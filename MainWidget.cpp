@@ -37,8 +37,8 @@ MainWidget::MainWidget(QWidget *parent) :
     // Right side
     QVBoxLayout *detailLayout = new QVBoxLayout();
     detailLayout->setMargin(0);
-    detailLayout->addWidget(_siloListView, 1);
-    detailLayout->addWidget(_plotContainer, 1);
+    detailLayout->addWidget(_siloListView);
+    detailLayout->addWidget(_plotContainer);
 
     // Left side
     QVBoxLayout *overviewLayout = new QVBoxLayout();

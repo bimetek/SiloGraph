@@ -140,8 +140,10 @@ GraphContainer::GraphContainer(QWidget *parent) :
     engine->setAttribute(QwtScaleEngine::Floating, true);
 
     QGridLayout *mainLayout = new QGridLayout();
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(_plot, 0, 0);
     setLayout(mainLayout);
+    setMinimumHeight(150);
 }
 
 void GraphContainer::updatePlot(Node *node, Silo *silo,
@@ -180,7 +182,9 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 
         QwtPlotCurve *curve = new QwtPlotCurve();
         curve->setYAxis(QwtPlot::yLeft);
-        curve->setPen(QPen(QColor::fromHsvF(i++ / dataCount, 1.0, 1.0)));
+        QPen pen(QColor::fromHsvF(i++ / dataCount, 1.0, 1.0));
+        pen.setWidth(2);
+        curve->setPen(pen);
         curve->attach(_plot);
         curve->setSamples(points);
     }
