@@ -78,8 +78,8 @@ void SiloListView::timerEvent(QTimerEvent *e)
 
 void SiloListView::resizeEvent(QResizeEvent *)
 {
-    qreal width = size().width() * 0.90;
-    qreal height = size().height() * 0.90;
+    qreal width = size().width() * 0.5;
+    qreal height = size().height() * 0.5;
     if (width / height > _logo->aspect())   // too wide
         width = height * _logo->aspect();
     else                                    // too tall
