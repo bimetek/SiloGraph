@@ -34,6 +34,8 @@ SiloListView::SiloListView(QWidget *parent) :
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->addLayout(_siloListLayout, 1);
     setLayout(mainLayout);
+
+    setMinimumHeight(340);
 }
 
 void SiloListView::setLocation(Location *location)

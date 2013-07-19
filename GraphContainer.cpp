@@ -143,7 +143,9 @@ GraphContainer::GraphContainer(QWidget *parent) :
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(_plot, 0, 0);
     setLayout(mainLayout);
-    setMinimumHeight(150);
+
+    setMinimumSize(200, 150);
+    _plot->setMinimumSize(200, 150);
 }
 
 void GraphContainer::updatePlot(Node *node, Silo *silo,
