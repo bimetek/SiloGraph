@@ -10,5 +10,6 @@
     <qresource prefix="/img">
         <file>silo_background.png</file>
         <file>logo.png</file>
+        <file>logo_transparent.png</file>
     </qresource>
 </RCC>

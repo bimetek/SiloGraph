@@ -57,6 +57,7 @@ OTHER_FILES += \
     map.html \
     map.js \
     logo.png \
+    logo_transparent.png \
     silo_background.png
 
 RESOURCES += \

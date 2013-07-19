@@ -32,8 +32,6 @@ MainWidget::MainWidget(QWidget *parent) :
     _siloListView = new SiloListView();
     _plotContainer = new GraphContainer();
 
-    LogoHolder *logo = new LogoHolder(":/img/logo.png");
-
     // Right side
     QVBoxLayout *detailLayout = new QVBoxLayout();
     detailLayout->setMargin(0);
@@ -43,11 +41,10 @@ MainWidget::MainWidget(QWidget *parent) :
     // Left side
     QVBoxLayout *overviewLayout = new QVBoxLayout();
     overviewLayout->addWidget(_mapContainer, 1);
-    overviewLayout->addWidget(logo, 0);
 
     QHBoxLayout *mainLayout = new QHBoxLayout();
     mainLayout->addLayout(overviewLayout, 1);
-    mainLayout->addLayout(detailLayout, 2);
+    mainLayout->addLayout(detailLayout, 4);
     setLayout(mainLayout);
 
     connect(_mapContainer, SIGNAL(locationChanged(Location *)),

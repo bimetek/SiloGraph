@@ -23,6 +23,7 @@
 #include "NodeLine.h"
 #include "Node.h"
 #include "SiloView.h"
+#include "LogoHolder.h"
 #include <QDebug>
 
 SiloListView::SiloListView(QWidget *parent) :
@@ -30,6 +31,8 @@ SiloListView::SiloListView(QWidget *parent) :
     _currentLocation(0),
     _pollingTimerId(0)
 {
+    _logo = new LogoHolder(":/img/logo_transparent.png", this);
+
     _siloListLayout = new QHBoxLayout();
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->addLayout(_siloListLayout, 1);
@@ -71,6 +74,19 @@ void SiloListView::timerEvent(QTimerEvent *e)
         if (_currentLocation)
             emit shouldPollForLocation(_currentLocation);
     }
+}
+
+void SiloListView::resizeEvent(QResizeEvent *)
+{
+    qreal width = size().width() * 0.90;
+    qreal height = size().height() * 0.90;
+    if (width / height > _logo->aspect())   // too wide
+        width = height * _logo->aspect();
+    else                                    // too tall
+        height = width / _logo->aspect();
+    _logo->setGeometry((size().width() - width) / 2,
+                       (size().height() - height) / 2,
+                       width, height);
 }
 
 void SiloListView::updateLatestData(NodeLine *line, QList<double> data,

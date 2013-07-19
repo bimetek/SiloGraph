@@ -27,6 +27,7 @@ class LogoHolder : public QLabel
 
 public:
     explicit LogoHolder(QString filePath, QWidget *parent = 0);
+    inline qreal aspect() const { return _aspect; }
 
 protected:
     virtual bool hasHeightForWidth() const;

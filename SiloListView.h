@@ -25,6 +25,7 @@ class Node;
 class NodeLine;
 class Silo;
 class SiloView;
+class LogoHolder;
 
 class SiloListView : public QWidget
 {
@@ -39,7 +40,8 @@ public slots:
                           QDateTime dateTime);
 
 protected:
-    void timerEvent(QTimerEvent *);
+    virtual void timerEvent(QTimerEvent *e);
+    virtual void resizeEvent(QResizeEvent *);
 
 signals:
     void targetSwitched(Node *node, Silo *silo);
@@ -49,6 +51,7 @@ private:
     Location *_currentLocation;
     int _pollingTimerId;
     QHBoxLayout *_siloListLayout;
+    LogoHolder *_logo;
 };
 
 #endif // SILOLISTVIEW_H
