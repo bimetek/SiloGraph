@@ -44,7 +44,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     QFormLayout *formLayout = new QFormLayout();
     formLayout->addRow(new QLabel(tr("Logo size")), _logoRatio);
 
-    _okButton = new QPushButton(tr("OK"));
+    _okButton = new QPushButton(tr("Close"));
     connect(_okButton, SIGNAL(clicked()), this, SLOT(accept()));
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout();

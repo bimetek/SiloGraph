@@ -154,13 +154,25 @@ QSize GraphContainer::sizeHint() const
     return QSize(200, 150);
 }
 
+void GraphContainer::clearPlot()
+{
+    clearPlot(true);
+}
+
+void GraphContainer::clearPlot(bool replot)
+{
+    _plot->detachItems();
+    if (replot)
+        _plot->replot();
+}
+
 void GraphContainer::updatePlot(Node *node, Silo *silo,
                                 QList <QList<NodeData *> > dataSets)
 {
     Q_UNUSED(node);
     Q_UNUSED(silo);
 
-    _plot->detachItems();   // Clear old drawings
+    clearPlot(false);
 
     // Find the earliest date time as x axis's zero
     QDateTime firstDateTime = QDateTime::currentDateTime();

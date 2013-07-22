@@ -30,7 +30,7 @@
 #include <QDebug>
 
 MapContainer::MapContainer(QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent), _currentLocation(0)
 {
     _mapView = new MapView();
     QHBoxLayout *layout = new QHBoxLayout();
@@ -105,7 +105,14 @@ void MapContainer::switchToMarkerLocation(MapMarker *marker)
 {
     QString name = marker->name();
     if (_locations.contains(name))
-        emit locationChanged(_locations[name]);
+    {
+        Location *nextLocation = _locations[name];
+        if (_currentLocation != nextLocation)
+        {
+            _currentLocation = nextLocation;
+            emit locationChanged(_locations[name]);
+        }
+    }
 }
 
 void MapContainer::loadMapContents()

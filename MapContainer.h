@@ -38,6 +38,7 @@ private slots:
 
 private:
     QHash<QString, Location *> _locations;
+    Location *_currentLocation;
     MapView *_mapView;
 };
 

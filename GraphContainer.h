@@ -35,6 +35,8 @@ public:
     explicit GraphContainer(QWidget *parent = 0);
 
 public slots:
+    void clearPlot();               // Default replot = true
+    void clearPlot(bool replot);
     void updatePlot(Node *node, Silo *silo,
                     QList <QList<NodeData *> > dataSets);
 
