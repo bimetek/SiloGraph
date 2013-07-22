@@ -17,6 +17,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+class SettingsWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -25,6 +26,13 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+private slots:
+    void showSettings();
+    void cleanSettings();
+
+private:
+    SettingsWindow *_settings;
 };
 
 #endif // MAINWINDOW_H

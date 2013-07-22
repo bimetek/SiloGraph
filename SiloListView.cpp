@@ -24,6 +24,7 @@
 #include "Node.h"
 #include "SiloView.h"
 #include "LogoHolder.h"
+#include "SharedSettings.h"
 #include <QDebug>
 
 SiloListView::SiloListView(QWidget *parent) :
@@ -39,6 +40,11 @@ SiloListView::SiloListView(QWidget *parent) :
     setLayout(mainLayout);
 
     setMinimumHeight(340);
+
+    connect(SharedSettings::sharedSettings(),
+            SIGNAL(logoSizeRatioChanged(qreal)),
+            this,
+            SLOT(resizeLogo(qreal)));
 }
 
 void SiloListView::setLocation(Location *location)
@@ -78,15 +84,7 @@ void SiloListView::timerEvent(QTimerEvent *e)
 
 void SiloListView::resizeEvent(QResizeEvent *)
 {
-    qreal width = size().width() * 0.5;
-    qreal height = size().height() * 0.5;
-    if (width / height > _logo->aspect())   // too wide
-        width = height * _logo->aspect();
-    else                                    // too tall
-        height = width / _logo->aspect();
-    _logo->setGeometry((size().width() - width) / 2,
-                       (size().height() - height) / 2,
-                       width, height);
+    resizeLogo(SharedSettings::sharedSettings()->logoSizeRatio());
 }
 
 void SiloListView::updateLatestData(NodeLine *line, QList<double> data,
@@ -100,4 +98,17 @@ void SiloListView::updateLatestData(NodeLine *line, QList<double> data,
     Silo *silo = line->silo();
     SiloView *sv = findChild<SiloView *>(silo->name());
     sv->updateLatestData(line, data, dateTime);
+}
+
+void SiloListView::resizeLogo(qreal ratio)
+{
+    qreal width = size().width() * ratio;
+    qreal height = size().height() * ratio;
+    if (width / height > _logo->aspect())   // too wide
+        width = height * _logo->aspect();
+    else                                    // too tall
+        height = width / _logo->aspect();
+    _logo->setGeometry((size().width() - width) / 2,
+                       (size().height() - height) / 2,
+                       width, height);
 }

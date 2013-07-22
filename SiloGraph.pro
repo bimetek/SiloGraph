@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     NodeData.cpp \
     MapContainer.cpp \
     MapMarker.cpp \
-    LogoHolder.cpp
+    LogoHolder.cpp \
+    SharedSettings.cpp \
+    SettingsWindow.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
@@ -48,7 +50,9 @@ HEADERS  += MainWindow.h \
     NodeData.h \
     MapContainer.h \
     MapMarker.h \
-    LogoHolder.h
+    LogoHolder.h \
+    SharedSettings.h \
+    SettingsWindow.h
 
 OTHER_FILES += \
     locations.json \

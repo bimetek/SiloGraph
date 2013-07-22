@@ -47,6 +47,9 @@ signals:
     void targetSwitched(Node *node, Silo *silo);
     void shouldPollForLocation(Location *location);
 
+private slots:
+    void resizeLogo(qreal ratio);
+
 private:
     Location *_currentLocation;
     int _pollingTimerId;
