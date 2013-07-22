@@ -53,8 +53,8 @@ void SiloListView::setLocation(Location *location)
     {
         SiloView *sv = new SiloView(silo);
         _siloListLayout->addWidget(sv);
-        connect(sv, SIGNAL(targetSwitched(Node *,Silo *)),
-                this, SIGNAL(targetSwitched(Node *,Silo *)));
+        connect(sv, SIGNAL(targetSwitched(Node *, Silo *)),
+                this, SIGNAL(targetSwitched(Node *, Silo *)));
         connect(this, SIGNAL(shouldPollForLocation(Location *)),
                 sv, SLOT(invalidateLastUpdate()));
     }

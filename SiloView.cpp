@@ -42,7 +42,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     _backgroundHolder->setStyleSheet(styleSheet);
     QString buttonStyle =
             "border: 1px solid black; border-radius: 5px; background: #87b4ff; "
-            "color: black; font-weight: bold; font-size: 11pt;";
+            "color: black; font-weight: bold; font-size: 11pt; min-width: 4em;";
 
     // Setup signal mapper for silo buttons
     QSignalMapper *mapper = new QSignalMapper(this);
