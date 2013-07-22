@@ -6,14 +6,19 @@
 
 QT       += core gui sql webkit
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets webkitwidgets
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets webkitwidgets
+    LIBS += -lQt5Concurrent
+}
+!greaterThan(QT_MAJOR_VERSION, 4) {
+    LIBS += -lqjson
+}
+
 
 TARGET = SiloGraph
 TEMPLATE = app
 
 CONFIG += qwt
-
-LIBS += -lqjson
 
 SOURCES += main.cpp\
         MainWindow.cpp \

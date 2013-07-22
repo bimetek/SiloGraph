@@ -19,7 +19,13 @@
 #include <QPushButton>
 #include <QSignalMapper>
 #include <QVariantMap>
-#include <qjson/parser.h>
+#if QT_VERSION >= 0x050000
+    #include <QJsonDocument>
+    #include <QJsonObject>
+    #include <QJsonArray>
+#else
+    #include <qjson/parser.h>
+#endif
 #include "Globals.h"
 #include "MapView.h"
 #include "MapMarker.h"
@@ -41,21 +47,80 @@ MapContainer::MapContainer(QWidget *parent) :
     connect(_mapView, SIGNAL(markerClicked(MapMarker *)),
             this, SLOT(switchToMarkerLocation(MapMarker *)));
 
+    QFile dbFile(":/data/databases.json");
+    QFile json(":/data/locations.json");
+
+
+#if QT_VERSION >= 0x050000
+    dbFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QJsonParseError parseError;
+    QJsonDocument doc;
+    doc.fromJson(dbFile.readAll(), &parseError);
+    dbFile.close();
+    if (parseError.error != QJsonParseError::NoError)
+    {
+        qFatal(parseError.errorString().toUtf8().data());
+        return;
+    }
+    QJsonObject dbInfo = doc.object();
+    QString defaultAddress = dbInfo["default"].toString();
+
+    json.open(QIODevice::ReadOnly | QIODevice::Text);
+    doc.fromJson(json.readAll(), &parseError);
+    json.close();
+    if (parseError.error != QJsonParseError::NoError)
+    {
+        qFatal(parseError.errorString().toUtf8().data());
+        return;
+    }
+    QJsonObject result = doc.object();
+    foreach(QJsonValue item, result["locations"].toArray())
+    {
+        QJsonObject info = item.toObject();
+        QString address = defaultAddress;
+        if (info.contains("databaseAddress"))
+            address = info["databaseAddress"].toString();
+
+        Location *location = new Location(this);
+        location->setName(info["name"].toString());
+        location->setDatabaseAddress(address);
+        location->setLatitude(info["latitude"].toDouble());
+        location->setLongitude(info["longitude"].toDouble());
+        foreach (QJsonValue siloItem, info["silos"].toArray())
+        {
+            Silo *silo = new Silo(location);
+            info = siloItem.toObject();
+            silo->setName(info["name"].toString());
+            foreach (QJsonValue lineItem, info["lines"].toArray())
+            {
+                NodeLine *line = new NodeLine(silo);
+                info = lineItem.toObject();
+                line->setName(info["name"].toString());
+                for (int i = 0; i < info["nodesCount"].toDouble(); i++)
+                {
+                    Node *node = new Node(line);
+                    node->setName(QString("s%1").arg(QString::number(i + 1)));
+                    line->addNode(node);
+                }
+                silo->addLine(line);
+            }
+            location->addSilo(silo);
+        }
+        _locations.insert(location->name(), location);
+    }
+#else
     QJson::Parser parser;
     bool success = false;
 
-    QFile *dbFile = new QFile(":/data/databases.json");
-    QVariantMap dbInfo = parser.parse(dbFile, &success).toMap();
+    QVariantMap dbInfo = parser.parse(&dbFile, &success).toMap();
     if (!success)
     {
         qFatal("Database JSON cannot be parsed");
         return;
     }
     QString defaultAddress = dbInfo["default"].toString();
-    delete dbFile;
 
-    QFile *json = new QFile(":/data/locations.json");
-    QVariantMap result = parser.parse(json, &success).toMap();
+    QVariantMap result = parser.parse(&json, &success).toMap();
     if (!success)
     {
         qFatal("Location JSON cannot be parsed");
@@ -96,8 +161,7 @@ MapContainer::MapContainer(QWidget *parent) :
         }
         _locations.insert(location->name(), location);
     }
-    delete json;
-
+#endif
     setMinimumWidth(100);
 }
 

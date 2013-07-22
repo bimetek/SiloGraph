@@ -14,7 +14,11 @@
  *****************************************************************************/
 
 #include "DatabaseConnector.h"
-#include <QtConcurrentRun>
+#if QT_VERSION >= 0x050000
+    #include <QtConcurrent/QtConcurrent>
+#else
+    #include <QtConcurrentRun>
+#endif
 #include <QFile>
 #include <QFuture>
 #include <QFutureWatcher>
@@ -23,7 +27,11 @@
 #include <QSqlRecord>
 #include <QStringList>
 #include <QVariantMap>
-#include <qjson/parser.h>
+#if QT_VERSION >= 0x050000
+    #include <QJsonDocument>
+#else
+    #include <qjson/parser.h>
+#endif
 #include "Globals.h"
 #include "Location.h"
 #include "Silo.h"
@@ -125,11 +133,37 @@ QList<LineQueryContext> executePollForLocation(Location *location, QMutex *m)
 DatabaseConnector::DatabaseConnector(QObject *parent) :
     QObject(parent)
 {
+    QFile dbFile(":/data/databases.json");
+
+#if QT_VERSION >= 0x050000
+    QJsonDocument doc;
+    dbFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QJsonParseError parseError;
+    doc.fromJson(dbFile.readAll(), &parseError);
+    dbFile.close();
+    if (parseError.error != QJsonParseError::NoError)
+    {
+        qFatal(parseError.errorString().toUtf8().data());
+        return;
+    }
+    QJsonObject dbs = doc.object()["databases"].toObject();
+    foreach (QString key, dbs.keys())
+    {
+        QJsonObject info = dbs[key].toObject();
+        QString address = info["address"].toString();
+        QSqlDatabase db = QSqlDatabase::addDatabase(info["driver"].toString(),
+                                                    address);
+        db.setHostName(address);
+        db.setUserName(info["username"].toString());
+        db.setPassword(info["password"].toString());
+        db.setDatabaseName("almin");
+        if (info.contains("port"))
+            db.setPort(info["port"].toDouble());
+    }
+#else
     QJson::Parser parser;
     bool success = false;
-    QFile *dbFile = new QFile(":/data/databases.json");
-    QVariant result = parser.parse(dbFile, &success);
-    delete dbFile;
+    QVariant result = parser.parse(&dbFile, &success);
 
     if (!success)
     {
@@ -150,6 +184,7 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
         if (info.contains("port"))
             db.setPort(info["port"].toInt());
     }
+#endif
 }
 
 DatabaseConnector::~DatabaseConnector()
