@@ -11,5 +11,6 @@
         <file>silo_background.png</file>
         <file>logo.png</file>
         <file>logo_transparent.png</file>
+        <file>silo_marker.png</file>
     </qresource>
 </RCC>

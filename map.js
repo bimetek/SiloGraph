@@ -26,10 +26,11 @@ function initialize(east, west, south, north)
 function appendMarker(name, latitude, longitude)
 {
     var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(latitude, longitude),
-        map: map,
-        title: name,
-        animation: google.maps.Animation.DROP
+        "position": new google.maps.LatLng(latitude, longitude),
+        "map": map,
+        "title": name,
+        "icon": "qrc:///img/silo_marker.png",
+        "animation": google.maps.Animation.DROP
     });
 
      google.maps.event.addListener(marker, "click", function() {
