@@ -145,7 +145,7 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data,
             if (data[i] != D_NO_DATA)
             {
                 QString number = QString::number(data[i], 'f', 1);
-                newText = QString("%1\xb0").arg(number);
+                newText = QString("%1°").arg(number);
             }
             else
             {
