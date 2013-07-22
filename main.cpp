@@ -19,6 +19,7 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setStyleSheet("* { font-family: sans-sarif; }");
     MainWindow w;
     w.show();
 

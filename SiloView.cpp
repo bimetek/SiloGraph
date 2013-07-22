@@ -42,7 +42,8 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     _backgroundHolder->setStyleSheet(styleSheet);
     QString buttonStyle =
             "border: 1px solid black; border-radius: 5px; background: #87b4ff; "
-            "color: black; font-weight: bold; font-size: 11pt; min-width: 4em;";
+            "color: black; font-weight: bold; font-size: 11pt; "
+            "min-width: 65px;";
 
     // Setup signal mapper for silo buttons
     QSignalMapper *mapper = new QSignalMapper(this);
@@ -145,7 +146,9 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data,
             if (data[i] != D_NO_DATA)
             {
                 QString number = QString::number(data[i], 'f', 1);
-                newText = QString("%1°").arg(number);
+                newText = QString("%1%2")
+                        .arg(number,
+                             QString::fromLatin1("\xba", 1));   // degree sign
             }
             else
             {
