@@ -18,6 +18,7 @@
 
 #include <QWidget>
 #include <QList>
+#include <QSize>
 class QwtPlot;
 class QwtPlotCurve;
 class QwtPlotMagnifier;
@@ -36,6 +37,9 @@ public:
 public slots:
     void updatePlot(Node *node, Silo *silo,
                     QList <QList<NodeData *> > dataSets);
+
+protected:
+    virtual QSize sizeHint() const;
 
 private:
     QwtPlot *_plot;

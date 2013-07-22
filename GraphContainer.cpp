@@ -144,8 +144,14 @@ GraphContainer::GraphContainer(QWidget *parent) :
     mainLayout->addWidget(_plot, 0, 0);
     setLayout(mainLayout);
 
+    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMinimumSize(200, 150);
     _plot->setMinimumSize(200, 150);
+}
+
+QSize GraphContainer::sizeHint() const
+{
+    return QSize(200, 150);
 }
 
 void GraphContainer::updatePlot(Node *node, Silo *silo,
