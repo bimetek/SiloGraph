@@ -136,10 +136,9 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
     QFile dbFile(":/data/databases.json");
 
 #if QT_VERSION >= 0x050000
-    QJsonDocument doc;
     dbFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QJsonParseError parseError;
-    doc.fromJson(dbFile.readAll(), &parseError);
+    QJsonDocument doc = QJsonDocument::fromJson(dbFile.readAll(), &parseError);
     dbFile.close();
     if (parseError.error != QJsonParseError::NoError)
     {

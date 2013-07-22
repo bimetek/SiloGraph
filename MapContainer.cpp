@@ -54,8 +54,7 @@ MapContainer::MapContainer(QWidget *parent) :
 #if QT_VERSION >= 0x050000
     dbFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QJsonParseError parseError;
-    QJsonDocument doc;
-    doc.fromJson(dbFile.readAll(), &parseError);
+    QJsonDocument doc = QJsonDocument::fromJson(dbFile.readAll(), &parseError);
     dbFile.close();
     if (parseError.error != QJsonParseError::NoError)
     {
@@ -66,7 +65,7 @@ MapContainer::MapContainer(QWidget *parent) :
     QString defaultAddress = dbInfo["default"].toString();
 
     json.open(QIODevice::ReadOnly | QIODevice::Text);
-    doc.fromJson(json.readAll(), &parseError);
+    doc = QJsonDocument::fromJson(json.readAll(), &parseError);
     json.close();
     if (parseError.error != QJsonParseError::NoError)
     {
