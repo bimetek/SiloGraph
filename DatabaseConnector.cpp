@@ -133,7 +133,7 @@ QList<LineQueryContext> executePollForLocation(Location *location, QMutex *m)
 DatabaseConnector::DatabaseConnector(QObject *parent) :
     QObject(parent)
 {
-    QFile dbFile(":/data/databases.json");
+    QFile dbFile("databases.json");
 
 #if QT_VERSION >= 0x050000
     dbFile.open(QIODevice::ReadOnly | QIODevice::Text);

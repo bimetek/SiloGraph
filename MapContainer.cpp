@@ -47,8 +47,8 @@ MapContainer::MapContainer(QWidget *parent) :
     connect(_mapView, SIGNAL(markerClicked(MapMarker *)),
             this, SLOT(switchToMarkerLocation(MapMarker *)));
 
-    QFile dbFile(":/data/databases.json");
-    QFile json(":/data/locations.json");
+    QFile dbFile("databases.json");
+    QFile json("locations.json");
 
 
 #if QT_VERSION >= 0x050000
