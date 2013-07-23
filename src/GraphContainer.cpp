@@ -234,10 +234,10 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 
     _plot->replot();
 
-    if (_panner)
-        _panner->deleteLater();
-    _panner = new LimitedPanner(_plot->canvas());
-    if (_magnifier)
-        _magnifier->deleteLater();
-    _magnifier = new LimitedMagnifier(_plot->canvas());
+//    if (_panner)
+//        _panner->deleteLater();
+//    _panner = new LimitedPanner(_plot->canvas());
+//    if (_magnifier)
+//        _magnifier->deleteLater();
+//    _magnifier = new LimitedMagnifier(_plot->canvas());
 }
