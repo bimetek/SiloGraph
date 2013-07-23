@@ -22,6 +22,7 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_magnifier.h>
 #include <qwt_plot_panner.h>
+#include <qwt_scale_div.h>
 #include <qwt_scale_draw.h>
 #include <qwt_scale_engine.h>
 #include "Globals.h"
@@ -34,7 +35,7 @@
 class DateTimeDraw : public QwtScaleDraw
 {
 public:
-    DateTimeDraw(QDateTime dt) { setDateTime(dt); }
+    DateTimeDraw(QDateTime dt) : QwtScaleDraw() { setDateTime(dt); }
     virtual QwtText label(double v) const
     {
         QDateTime dt = _datetime.addSecs(v);
@@ -132,12 +133,29 @@ GraphContainer::GraphContainer(QWidget *parent) :
     QWidget(parent), _panner(0), _magnifier(0)
 {
     _plot = new QwtPlot();
-    _plot->setAxisScaleDraw(QwtPlot::xBottom,
-                            new DateTimeDraw(QDateTime::currentDateTime()));
 
-    // Enable float-ending to make curve "fit" to plot's right
-    QwtScaleEngine *engine = _plot->axisScaleEngine(QwtPlot::xBottom);
-    engine->setAttribute(QwtScaleEngine::Floating, true);
+    QDateTime oneWeekAgo(QDate::currentDate().addDays(-6));
+    _plot->setAxisScaleDraw(QwtPlot::xBottom,
+                            new DateTimeDraw(oneWeekAgo));
+
+    double oneHour = 60 * 60 * 1.0;     // 1 hour in seconds
+    QList<double> majorTicks;
+    QList<double> mediumTicks;
+    QList<double> minorTicks;
+    for (int i = 0; i <= 7 * 24; i++)
+    {
+        double current = i * oneHour;
+        if (i % 24 == 0)        // Full day
+            majorTicks << current;
+        else if (i % 12 == 0)   // Half day
+            mediumTicks << current;
+        else if (i % 6 == 0)    // Quarter dour
+            minorTicks << current;
+    }
+    QwtScaleDiv scaleDiv(0.0, 7 * 24 * oneHour,
+                         minorTicks, mediumTicks, majorTicks);
+    _plot->setAxisScaleDiv(QwtPlot::xBottom, scaleDiv);
+    _plot->setAxisScaleDiv(QwtPlot::yLeft, QwtScaleDiv(10.0, 40.0));
 
     QGridLayout *mainLayout = new QGridLayout();
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -184,6 +202,11 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
         if (dateTime < firstDateTime)
             firstDateTime = dateTime;
     }
+    QDateTime cutoff(firstDateTime.date());
+
+    _plot->setAxisScaleDraw(QwtPlot::xBottom, new DateTimeDraw(cutoff));
+    _plot->setAxisAutoScale(QwtPlot::yLeft);
+
     int i = 0;
     double dataCount = dataSets.size();
     foreach (QList<NodeData *> dataSet, dataSets)
@@ -194,7 +217,7 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
         QVector<QPointF> points;
         foreach (NodeData *data, dataSet)
         {
-            QPointF point(firstDateTime.secsTo(data->dateTime()),
+            QPointF point(cutoff.secsTo(data->dateTime()),
                           data->temperature());
             points.append(point);
         }
@@ -209,9 +232,6 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
         curve->setSamples(points);
     }
 
-    _plot->setAxisScaleDraw(QwtPlot::xBottom, new DateTimeDraw(firstDateTime));
-    _plot->setAxisAutoScale(QwtPlot::xBottom);
-    _plot->setAxisAutoScale(QwtPlot::yLeft);
     _plot->replot();
 
     if (_panner)

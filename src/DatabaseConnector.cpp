@@ -63,15 +63,15 @@ NodeQueryContext executeNodeQuery(Silo *silo, Node *node, QMutex *m)
     QSqlDatabase db = QSqlDatabase::database(address);
 
     QString queryString;
-    QDateTime now = QDateTime::currentDateTime();
-    QString oneWeekAgo = now.addDays(-7).toString(Qt::ISODate);
+    QString oneWeekAgo =
+            QDateTime(QDate::currentDate().addDays(-7)).toString(Qt::ISODate);
     uint dataCount = 0;
     if (node)
     {
         QString queryFormat =
                 "SELECT date, %1 FROM rawdata "
                 "WHERE silo_cable = \"%2\" AND date > \"%3\" "
-                "ORDER BY date DESC";
+                "ORDER BY date ASC";
         queryString = queryFormat.arg(
                     node->name(),
                     node->line()->name(),
@@ -83,7 +83,7 @@ NodeQueryContext executeNodeQuery(Silo *silo, Node *node, QMutex *m)
         QString queryFormat =
                 "SELECT date, Full, Empty FROM average "
                 "WHERE silo = \"%1\" AND date > \"%2\" "
-                "ORDER BY date DESC";
+                "ORDER BY date ASC";
         queryString = queryFormat.arg(silo->name(), oneWeekAgo);
         dataCount = 2;
     }
