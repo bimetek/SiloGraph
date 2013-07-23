@@ -42,7 +42,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     _backgroundHolder->setStyleSheet(styleSheet);
     QString buttonStyle =
             "border: 1px solid black; border-radius: 5px; background: #87b4ff; "
-            "color: black; font-weight: bold; font-size: 11pt; "
+            "color: black; font-weight: bold; font-size: 10pt; "
             "min-width: 65px;";
 
     // Setup signal mapper for silo buttons
@@ -120,7 +120,7 @@ void SiloView::resizeEvent(QResizeEvent *)
     // the parent, width calculated by keeping aspect. Left and right margins
     // are so that the holder is horizontally centered.
     int h = size().height() - 25;   // Minus height for _lastUpdate
-    int w = (_silo->lines().size() + 1) * 60;
+    int w = (_silo->lines().size() + 1) * 65;
     int left = (size().width() - w) / 2;
     _backgroundHolder->setGeometry(left, 0, w, h);
 }

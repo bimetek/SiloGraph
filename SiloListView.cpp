@@ -39,7 +39,7 @@ SiloListView::SiloListView(QWidget *parent) :
     mainLayout->addLayout(_siloListLayout, 1);
     setLayout(mainLayout);
 
-    setMinimumHeight(340);
+    setMinimumHeight(400);
 
     connect(SharedSettings::sharedSettings(),
             SIGNAL(logoSizeRatioChanged(qreal)),
