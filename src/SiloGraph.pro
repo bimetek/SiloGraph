@@ -21,7 +21,7 @@ TEMPLATE = app
 CONFIG += qwt
 
 SOURCES += main.cpp\
-        MainWindow.cpp \
+    MainWindow.cpp \
     MainWidget.cpp \
     MapView.cpp \
     SiloListView.cpp \
