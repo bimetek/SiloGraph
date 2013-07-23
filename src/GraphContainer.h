@@ -19,10 +19,12 @@
 #include <QWidget>
 #include <QList>
 #include <QSize>
+#include <qwt_scale_div.h>
 class QwtPlot;
 class QwtPlotCurve;
 class QwtPlotMagnifier;
 class QwtPlotPanner;
+class QwtPlotPicker;
 class Node;
 class Silo;
 class NodeData;
@@ -47,6 +49,8 @@ private:
     QwtPlot *_plot;
     QwtPlotPanner *_panner;
     QwtPlotMagnifier *_magnifier;
+    QwtPlotPicker *_picker;
+    QwtScaleDiv _weekDiv;
 };
 
 #endif // GRAPHCONTAINER_H

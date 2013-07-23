@@ -14,22 +14,114 @@
  *****************************************************************************/
 
 #include "GraphContainer.h"
+#include <cmath>
+#include <limits>
 #include <QDateTime>
 #include <QGridLayout>
+#include <QMouseEvent>
 #include <QPointF>
 #include <QVector>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_magnifier.h>
 #include <qwt_plot_panner.h>
+#include <qwt_plot_picker.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_draw.h>
 #include <qwt_scale_engine.h>
+#include <qwt_series_data.h>
 #include "Globals.h"
 #include "Node.h"
 #include "Silo.h"
 #include "NodeData.h"
 #include <QDebug>
+
+
+class CurveTrackingPicker : public QwtPlotPicker
+{
+public:
+    CurveTrackingPicker(int xAxis, int yAxis, RubberBand rubberBand,
+                        DisplayMode trackerMode, QWidget *canvas, QDateTime dt)
+        : QwtPlotPicker(xAxis, yAxis, rubberBand, trackerMode, canvas),
+          _grapped(false)
+    {
+        setReferenceDateTime(dt);
+    }
+    void setReferenceDateTime(QDateTime dt) { _datetime = dt; }
+
+protected:
+    virtual QwtText trackerTextF(const QPointF &p) const
+    {
+        if (!_grapped)
+            return QwtText();
+
+        QDateTime dt = _datetime.addSecs(p.x());
+        return QwtText(QString("%1\n%3%2")
+                       .arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
+                            QString::fromLatin1("\xba", 1),     // degree sign
+                            QString::number(p.y(), 'f', 3)));
+    }
+    virtual void widgetMousePressEvent(QMouseEvent *e)
+    {
+        QwtPlotPicker::widgetMousePressEvent(e);
+        _grapped = !_grapped;
+        moveToNearest(e->posF());
+    }
+    virtual void widgetLeaveEvent(QEvent *e)
+    {
+        QwtPlotPicker::widgetLeaveEvent(e);
+        _grapped = false;
+    }
+    virtual void widgetMouseMoveEvent(QMouseEvent *e)
+    {
+        QwtPlotPicker::widgetMouseMoveEvent(e);
+        if (!_grapped)
+            return;
+        moveToNearest(e->posF());
+    }
+
+private:
+    bool _grapped;
+    QDateTime _datetime;
+
+    inline QPointF findNearest(const QPointF &p) const
+    {
+        QPointF nearest(std::numeric_limits<qreal>::max(),
+                        std::numeric_limits<qreal>::max());
+        foreach (QwtPlotItem *i, plot()->itemList(QwtPlotItem::Rtti_PlotCurve))
+        {
+            QPointF current(std::numeric_limits<qreal>::max(),
+                            std::numeric_limits<qreal>::max());
+            QwtPlotCurve *curve = dynamic_cast<QwtPlotCurve *>(i);
+            for (size_t i = 1; i < curve->dataSize(); i++)
+            {
+                QPointF s1 = curve->sample(i - 1);
+                QPointF s2 = curve->sample(i);
+                if (s1.x() < p.x() && s2.x() >= p.x())
+                {
+                    if (fabs(s1.x() - p.x()) <= fabs(s2.x() - p.x()))
+                        current = s1;
+                    else
+                        current = s2;
+                    if (fabs(current.y() - p.y()) < fabs(nearest.y() - p.y()))
+                        nearest = current;
+                    break;
+                }
+            }
+        }
+        return nearest;
+    }
+    inline void moveToNearest(QPointF p)
+    {
+        double vx = plot()->invTransform(QwtPlot::xBottom, p.x());
+        double vy = plot()->invTransform(QwtPlot::yLeft, p.y());
+        QPointF nearest = findNearest(QPointF(vx, vy));
+        int x = round(plot()->transform(QwtPlot::xBottom, nearest.x()));
+        int y = round(plot()->transform(QwtPlot::yLeft, nearest.y()));
+
+        QCursor::setPos(canvas()->mapToGlobal(QPoint(x, y)));
+    }
+};
 
 
 class DateTimeDraw : public QwtScaleDraw
@@ -130,7 +222,7 @@ private:
 
 
 GraphContainer::GraphContainer(QWidget *parent) :
-    QWidget(parent), _panner(0), _magnifier(0)
+    QWidget(parent), _panner(0), _magnifier(0), _picker(0)
 {
     _plot = new QwtPlot();
 
@@ -152,9 +244,9 @@ GraphContainer::GraphContainer(QWidget *parent) :
         else if (i % 6 == 0)    // Quarter dour
             minorTicks << current;
     }
-    QwtScaleDiv scaleDiv(0.0, 7 * 24 * oneHour,
-                         minorTicks, mediumTicks, majorTicks);
-    _plot->setAxisScaleDiv(QwtPlot::xBottom, scaleDiv);
+    _weekDiv = QwtScaleDiv(0.0, 7 * 24 * oneHour,
+                           minorTicks, mediumTicks, majorTicks);
+    _plot->setAxisScaleDiv(QwtPlot::xBottom, _weekDiv);
     _plot->setAxisScaleDiv(QwtPlot::yLeft, QwtScaleDiv(10.0, 40.0));
 
     QGridLayout *mainLayout = new QGridLayout();
@@ -205,6 +297,7 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     QDateTime cutoff(firstDateTime.date());
 
     _plot->setAxisScaleDraw(QwtPlot::xBottom, new DateTimeDraw(cutoff));
+    _plot->setAxisScaleDiv(QwtPlot::xBottom, _weekDiv);
     _plot->setAxisAutoScale(QwtPlot::yLeft);
 
     int i = 0;
@@ -240,4 +333,10 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 //    if (_magnifier)
 //        _magnifier->deleteLater();
 //    _magnifier = new LimitedMagnifier(_plot->canvas());
+    if (_picker)
+        _picker->deleteLater();
+    _picker = new CurveTrackingPicker(
+                QwtPlot::xBottom, QwtPlot::yLeft,
+                QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn,
+                _plot->canvas(), cutoff);
 }
