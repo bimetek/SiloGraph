@@ -64,11 +64,7 @@ protected:
     {
         QwtPlotPicker::widgetMousePressEvent(e);
         _grapped = !_grapped;
-#if QT_VERSION >= 0x050000
-        moveToNearest(e->localPos());
-#else
-        moveToNearest(e->posF());
-#endif
+        moveToNearest(mousePosition(e));
     }
     virtual void widgetLeaveEvent(QEvent *e)
     {
@@ -80,16 +76,18 @@ protected:
         QwtPlotPicker::widgetMouseMoveEvent(e);
         if (!_grapped)
             return;
-#if QT_VERSION >= 0x050000
-        moveToNearest(e->localPos());
-#else
-        moveToNearest(e->posF());
-#endif
+        moveToNearest(mousePosition(e));
     }
 
 private:
     bool _grapped;
     QDateTime _datetime;
+
+#if QT_VERSION >= 0x050000
+    inline QPointF mousePosition(QMouseEvent *e) { return e->localPos(); }
+#else
+    inline QPointF mousePosition(QMouseEvent *e) { return e->posF(); }
+#endif
 
     inline QPointF findNearest(const QPointF &p) const
     {
