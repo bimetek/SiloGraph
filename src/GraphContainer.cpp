@@ -31,7 +31,9 @@
 #include <qwt_series_data.h>
 #include "Globals.h"
 #include "Node.h"
+#include "NodeLine.h"
 #include "Silo.h"
+#include "Location.h"
 #include "NodeData.h"
 #include <QDebug>
 
@@ -303,9 +305,6 @@ void GraphContainer::clearPlot(bool replot)
 void GraphContainer::updatePlot(Node *node, Silo *silo,
                                 QList <QList<NodeData *> > dataSets)
 {
-    Q_UNUSED(node);
-    Q_UNUSED(silo);
-
     clearPlot(false);
 
     // Find the earliest date time as x axis's zero
@@ -350,6 +349,23 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     }
 
     _plot->replot();
+
+    Location *location = silo->location();
+    QString title;
+    if (node)
+    {
+        QString format("%1, %2, Sensor %3");
+        title = format.arg(location->name(),
+                           node->line()->name(),
+                           node->name().mid(1));
+    }
+    else
+    {
+        QString format("%1, Averages for Silo %2");
+        title = format.arg(location->name(), silo->name().mid(1));
+    }
+    _plot->setTitle(title);
+
 
 //    if (_panner)
 //        _panner->deleteLater();
