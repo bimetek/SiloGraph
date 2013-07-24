@@ -58,7 +58,7 @@ protected:
         return QwtText(QString("%1\n%3%2")
                        .arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
                             QString::fromLatin1("\xba", 1),     // degree sign
-                            QString::number(p.y(), 'f', 3)));
+                            QString::number(p.y(), 'f', 2)));
     }
     virtual void widgetMousePressEvent(QMouseEvent *e)
     {
@@ -97,32 +97,39 @@ private:
                         std::numeric_limits<qreal>::max());
         foreach (QwtPlotItem *it, plot()->itemList(QwtPlotItem::Rtti_PlotCurve))
         {
+            QwtPlotCurve *curve = dynamic_cast<QwtPlotCurve *>(it);
             QPointF current(std::numeric_limits<qreal>::max(),
                             std::numeric_limits<qreal>::max());
-            QwtPlotCurve *curve = dynamic_cast<QwtPlotCurve *>(it);
-            QPointF last = curve->sample((int)curve->dataSize() - 1);
-            if (last.x() < p.x())
+
+            // Try to find the best point on this curve, fill it into "current"
+            if (curve->sample(0).x() >= p.x())
             {
-                current = last;
-                if (fabs(current.y() - p.y()) < fabs(nearest.y() - p.y()))
-                    nearest = current;
-                continue;
+                current = curve->sample(0);
             }
-            for (size_t i = 1; i < curve->dataSize(); i++)
+            else if (curve->sample((int)curve->dataSize() - 1).x() < p.x())
             {
-                QPointF s1 = curve->sample(static_cast<int>(i - 1));
-                QPointF s2 = curve->sample(static_cast<int>(i));
-                if (s1.x() < p.x() && s2.x() >= p.x())
+                current = curve->sample((int)curve->dataSize() - 1);
+            }
+            else
+            {
+                for (size_t i = 1; i < curve->dataSize(); i++)
                 {
-                    if (fabs(s1.x() - p.x()) <= fabs(s2.x() - p.x()))
-                        current = s1;
-                    else
-                        current = s2;
-                    if (fabs(current.y() - p.y()) < fabs(nearest.y() - p.y()))
-                        nearest = current;
-                    break;
+                    QPointF s1 = curve->sample(static_cast<int>(i - 1));
+                    QPointF s2 = curve->sample(static_cast<int>(i));
+                    if (s1.x() < p.x() && s2.x() >= p.x())
+                    {
+                        if (fabs(s1.x() - p.x()) <= fabs(s2.x() - p.x()))
+                            current = s1;
+                        else
+                            current = s2;
+                        break;
+                    }
                 }
             }
+
+            // Update global nearest if "current" is better
+            if (fabs(current.y() - p.y()) < fabs(nearest.y() - p.y()))
+                nearest = current;
         }
         return nearest;
     }
