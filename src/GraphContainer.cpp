@@ -14,7 +14,6 @@
  *****************************************************************************/
 
 #include "GraphContainer.h"
-#include <cmath>
 #include <limits>
 #include <QDateTime>
 #include <QGridLayout>
@@ -65,7 +64,11 @@ protected:
     {
         QwtPlotPicker::widgetMousePressEvent(e);
         _grapped = !_grapped;
+#if QT_VERSION >= 0x050000
+        moveToNearest(e->localPos());
+#else
         moveToNearest(e->posF());
+#endif
     }
     virtual void widgetLeaveEvent(QEvent *e)
     {
@@ -77,7 +80,11 @@ protected:
         QwtPlotPicker::widgetMouseMoveEvent(e);
         if (!_grapped)
             return;
+#if QT_VERSION >= 0x050000
+        moveToNearest(e->localPos());
+#else
         moveToNearest(e->posF());
+#endif
     }
 
 private:
@@ -88,15 +95,23 @@ private:
     {
         QPointF nearest(std::numeric_limits<qreal>::max(),
                         std::numeric_limits<qreal>::max());
-        foreach (QwtPlotItem *i, plot()->itemList(QwtPlotItem::Rtti_PlotCurve))
+        foreach (QwtPlotItem *it, plot()->itemList(QwtPlotItem::Rtti_PlotCurve))
         {
             QPointF current(std::numeric_limits<qreal>::max(),
                             std::numeric_limits<qreal>::max());
-            QwtPlotCurve *curve = dynamic_cast<QwtPlotCurve *>(i);
+            QwtPlotCurve *curve = dynamic_cast<QwtPlotCurve *>(it);
+            QPointF last = curve->sample((int)curve->dataSize() - 1);
+            if (last.x() < p.x())
+            {
+                current = last;
+                if (fabs(current.y() - p.y()) < fabs(nearest.y() - p.y()))
+                    nearest = current;
+                continue;
+            }
             for (size_t i = 1; i < curve->dataSize(); i++)
             {
-                QPointF s1 = curve->sample(i - 1);
-                QPointF s2 = curve->sample(i);
+                QPointF s1 = curve->sample(static_cast<int>(i - 1));
+                QPointF s2 = curve->sample(static_cast<int>(i));
                 if (s1.x() < p.x() && s2.x() >= p.x())
                 {
                     if (fabs(s1.x() - p.x()) <= fabs(s2.x() - p.x()))
@@ -111,13 +126,14 @@ private:
         }
         return nearest;
     }
+
     inline void moveToNearest(QPointF p)
     {
         double vx = plot()->invTransform(QwtPlot::xBottom, p.x());
         double vy = plot()->invTransform(QwtPlot::yLeft, p.y());
         QPointF nearest = findNearest(QPointF(vx, vy));
-        int x = round(plot()->transform(QwtPlot::xBottom, nearest.x()));
-        int y = round(plot()->transform(QwtPlot::yLeft, nearest.y()));
+        int x = roundTo(plot()->transform(QwtPlot::xBottom, nearest.x()));
+        int y = roundTo(plot()->transform(QwtPlot::yLeft, nearest.y()));
 
         QCursor::setPos(canvas()->mapToGlobal(QPoint(x, y)));
     }

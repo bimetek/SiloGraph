@@ -25,6 +25,7 @@
 
 #include <QLocale>
 
+double roundTo(double value);
 void clearLayout(QLayout *layout);
 QLocale::Language getCurrentLanguage();
 QLocale::Country getCurrentCountry();

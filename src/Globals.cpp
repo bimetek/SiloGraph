@@ -14,8 +14,14 @@
  *****************************************************************************/
 
 #include "Globals.h"
+#include <cmath>
 #include <QApplication>
 #include <QWidget>
+
+double roundTo(double value)
+{
+    return value < 0.0 ? ceil(value - 0.5) : floor(value + 0.5);
+}
 
 void clearLayout(QLayout *layout)
 {
