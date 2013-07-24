@@ -55,10 +55,14 @@ protected:
             return QwtText();
 
         QDateTime dt = _datetime.addSecs(p.x());
-        return QwtText(QString("%1\n%3%2")
-                       .arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
-                            QString::fromLatin1("\xba", 1),     // degree sign
-                            QString::number(p.y(), 'f', 2)));
+        QString format = QString(" %1 \n%2%3");
+
+        QwtText result(format.arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
+                                  QString::number(p.y(), 'f', 2),
+                                  DEGREE_SIGN));
+        QBrush whiteBrush(Qt::white);
+        result.setBackgroundBrush(whiteBrush);
+        return result;
     }
     virtual void widgetMousePressEvent(QMouseEvent *e)
     {
