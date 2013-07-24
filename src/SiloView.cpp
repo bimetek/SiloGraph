@@ -146,9 +146,7 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data,
             if (data[i] != D_NO_DATA)
             {
                 QString number = QString::number(data[i], 'f', 1);
-                newText = QString("%1%2")
-                        .arg(number,
-                             QString::fromLatin1("\xba", 1));   // degree sign
+                newText = QString("%1%2").arg(number, DEGREE_SIGN);
             }
             else
             {
@@ -169,15 +167,9 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data,
 void SiloView::refreshLastUpdate(QDateTime &dateTime)
 {
     if (dateTime.isValid())
-    {
-        QString dts =
-                getCurrentLocale().toString(dateTime, "yyyy-MM-dd HH:mm:ss");
-        refreshLastUpdate(dts);
-    }
+        refreshLastUpdate(dateTime.toString("yyyy-MM-dd HH:mm:ss"));
     else
-    {
         refreshLastUpdate("--");
-    }
 }
 
 void SiloView::refreshLastUpdate(QString text, bool clearAll)

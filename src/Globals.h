@@ -21,7 +21,9 @@
 
 #define W_SCALE 1       // Scale everything in UI
 
+
 #define D_NO_DATA (-1 * std::numeric_limits<double>::max())
+#define DEGREE_SIGN (QString::fromLatin1("\xba", 1))
 
 #include <QLocale>
 

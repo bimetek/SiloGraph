@@ -153,8 +153,7 @@ public:
     DateTimeDraw(QDateTime dt) : QwtScaleDraw() { setDateTime(dt); }
     virtual QwtText label(double v) const
     {
-        QDateTime dt = _datetime.addSecs(v);
-        return getCurrentLocale().toString(dt, "yyyy-MM-dd\n   HH:mm:ss");
+        return _datetime.addSecs(v).toString("yyyy-MM-dd\n   HH:mm:ss");
     }
     void setDateTime(QDateTime dt) { _datetime = dt; }
 
