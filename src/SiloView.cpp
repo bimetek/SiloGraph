@@ -14,10 +14,13 @@
  *****************************************************************************/
 
 #include "SiloView.h"
+#include <QFile>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPainter>
 #include <QPushButton>
 #include <QSignalMapper>
+#include <QStyleOption>
 #include <QVBoxLayout>
 #include "Globals.h"
 #include "NodeLine.h"
@@ -40,10 +43,6 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     QString styleSheet =
         "border-image: url(:/img/silo_background.png) 0 0 0 0 stretch stretch;";
     _backgroundHolder->setStyleSheet(styleSheet);
-    QString buttonStyle =
-            "border: 1px solid black; border-radius: 5px; background: #87b4ff; "
-            "color: black; font-weight: bold; font-size: 10pt; "
-            "min-width: 65px;";
 
     // Setup signal mapper for silo buttons
     QSignalMapper *mapper = new QSignalMapper(this);
@@ -51,9 +50,11 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
             this, SLOT(switchToNode(QObject *)));
 
     // Silo average button
+    QString buttonStyle = textFromFile(":/assets/silo_button_styles.css");
     QString averageButtonTitle =
             silo->name().replace('s', "Silo ", Qt::CaseInsensitive);
     QPushButton *averageButton = new QPushButton(averageButtonTitle);
+    averageButton->setObjectName("averageButton");
     averageButton->setStyleSheet(buttonStyle + "padding: 0 0.5em;");
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));

@@ -33,5 +33,6 @@ QLocale::Language getCurrentLanguage();
 QLocale::Country getCurrentCountry();
 QLocale getCurrentLocale();
 QFont defaultFontForSize(uint pointSize = 0);
+QString textFromFile(QString filename);
 
 #endif // GLOBALS_H

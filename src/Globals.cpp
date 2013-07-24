@@ -16,6 +16,7 @@
 #include "Globals.h"
 #include <cmath>
 #include <QApplication>
+#include <QFile>
 #include <QWidget>
 
 double roundTo(double value)
@@ -59,4 +60,13 @@ QFont defaultFontForSize(uint pointSize)
     if (pointSize > 0)
         font.setPointSize(pointSize);
     return font;
+}
+
+QString textFromFile(QString filename)
+{
+    QFile file(filename);
+    file.open(QIODevice::ReadOnly);
+    QString text(file.readAll());
+    file.close();
+    return text;
 }

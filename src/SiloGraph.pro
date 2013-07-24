@@ -67,7 +67,8 @@ OTHER_FILES += \
     map.js \
     logo.png \
     logo_transparent.png \
-    silo_background.png
+    silo_background.png \
+    silo_button_styles.css
 
 RESOURCES += \
     Resources.qrc
