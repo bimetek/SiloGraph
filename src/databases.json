@@ -4,14 +4,8 @@
         "61.221.43.43": {
             "driver": "QMYSQL",
             "address": "61.221.43.43",
-            "username": "root",
-            "password": "alminalmin"
-        },
-        "192.168.1.121": {
-            "driver": "QMYSQL",
-            "address": "192.168.1.121",
-            "username": "root",
-            "password": "alminalmin"
+            "username": "__INSERT_USERNAME_HERE__",
+            "password": "__INSERT_PASSWORD_HERE__"
         }
     }
 }
