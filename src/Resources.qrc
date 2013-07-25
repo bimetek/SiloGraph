@@ -9,4 +9,7 @@
         <file>logo_transparent.png</file>
         <file>silo_marker.png</file>
     </qresource>
+    <qresource prefix="/assets">
+        <file>silo_button_styles.css</file>
+    </qresource>
 </RCC>

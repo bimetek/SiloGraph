@@ -5,8 +5,11 @@
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
- * This file is published under the Creative Commons 3.0.
- * http://creativecommons.org/licenses/by/3.0/
+ * This file may be distributed under the terms of GNU Public License version
+ * 3 (GPL v3) as defined by the Free Software Foundation (FSF). A copy of the
+ * license should have been included with this file, or the project in which
+ * this file belongs to. You may also find the details of GPL v3 at:
+ * http://www.gnu.org/licenses/gpl-3.0.txt
  *
  * If you have any questions regarding the use of this file, feel free to
  * contact the author of this file, or the owner of the project in which
@@ -14,10 +17,13 @@
  *****************************************************************************/
 
 #include "SiloView.h"
+#include <QFile>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPainter>
 #include <QPushButton>
 #include <QSignalMapper>
+#include <QStyleOption>
 #include <QVBoxLayout>
 #include "Globals.h"
 #include "NodeLine.h"
@@ -40,10 +46,6 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     QString styleSheet =
         "border-image: url(:/img/silo_background.png) 0 0 0 0 stretch stretch;";
     _backgroundHolder->setStyleSheet(styleSheet);
-    QString buttonStyle =
-            "border: 1px solid black; border-radius: 5px; background: #87b4ff; "
-            "color: black; font-weight: bold; font-size: 10pt; "
-            "min-width: 65px;";
 
     // Setup signal mapper for silo buttons
     QSignalMapper *mapper = new QSignalMapper(this);
@@ -51,9 +53,11 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
             this, SLOT(switchToNode(QObject *)));
 
     // Silo average button
+    QString buttonStyle = textFromFile(":/assets/silo_button_styles.css");
     QString averageButtonTitle =
             silo->name().replace('s', "Silo ", Qt::CaseInsensitive);
     QPushButton *averageButton = new QPushButton(averageButtonTitle);
+    averageButton->setObjectName("averageButton");
     averageButton->setStyleSheet(buttonStyle + "padding: 0 0.5em;");
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
@@ -146,9 +150,7 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data,
             if (data[i] != D_NO_DATA)
             {
                 QString number = QString::number(data[i], 'f', 1);
-                newText = QString("%1%2")
-                        .arg(number,
-                             QString::fromLatin1("\xba", 1));   // degree sign
+                newText = QString("%1%2").arg(number, DEGREE_SIGN);
             }
             else
             {
@@ -169,15 +171,9 @@ void SiloView::updateLatestData(NodeLine *line, QList<double> &data,
 void SiloView::refreshLastUpdate(QDateTime &dateTime)
 {
     if (dateTime.isValid())
-    {
-        QString dts =
-                getCurrentLocale().toString(dateTime, "yyyy-MM-dd HH:mm:ss");
-        refreshLastUpdate(dts);
-    }
+        refreshLastUpdate(dateTime.toString("yyyy-MM-dd HH:mm:ss"));
     else
-    {
         refreshLastUpdate("--");
-    }
 }
 
 void SiloView::refreshLastUpdate(QString text, bool clearAll)

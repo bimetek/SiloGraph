@@ -5,8 +5,11 @@
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
- * This file is published under the Creative Commons 3.0.
- * http://creativecommons.org/licenses/by/3.0/
+ * This file may be distributed under the terms of GNU Public License version
+ * 3 (GPL v3) as defined by the Free Software Foundation (FSF). A copy of the
+ * license should have been included with this file, or the project in which
+ * this file belongs to. You may also find the details of GPL v3 at:
+ * http://www.gnu.org/licenses/gpl-3.0.txt
  *
  * If you have any questions regarding the use of this file, feel free to
  * contact the author of this file, or the owner of the project in which
@@ -150,6 +153,7 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
     {
         QJsonObject info = dbs[key].toObject();
         QString address = info["address"].toString();
+        _databaseMutexes.insert(address, new QMutex());
         QSqlDatabase db = QSqlDatabase::addDatabase(info["driver"].toString(),
                                                     address);
         db.setHostName(address);
@@ -174,6 +178,7 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
     {
         QVariantMap info = dbs[key].toMap();
         QString address = info["address"].toString();
+        _databaseMutexes.insert(address, new QMutex());
         QSqlDatabase db = QSqlDatabase::addDatabase(info["driver"].toString(),
                                                     address);
         db.setHostName(address);
@@ -189,17 +194,22 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
 DatabaseConnector::~DatabaseConnector()
 {
     foreach (QString name, QSqlDatabase::connectionNames())
+    {
         QSqlDatabase::removeDatabase(name);
+        _databaseMutexes.remove(name);
+    }
 }
 
 void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
 {
-    QFuture<NodeQueryContext> future =
-            QtConcurrent::run(executeNodeQuery, silo, node, &_databaseMutex);
+    QMutex *m = _databaseMutexes[silo->location()->databaseAddress()];
+    QFuture<NodeQueryContext> future = QtConcurrent::run(executeNodeQuery,
+                                                         silo, node, m);
     QFutureWatcher<NodeQueryContext> *watcher =
             new QFutureWatcher<NodeQueryContext>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
     watcher->setFuture(future);
+    emit fetchingStarted(node, silo);
 }
 
 void DatabaseConnector::processWeekDataQuery()
@@ -243,8 +253,9 @@ void DatabaseConnector::processWeekDataQuery()
 
 void DatabaseConnector::fetchLatestData(Location *location)
 {
+    QMutex *m = _databaseMutexes[location->databaseAddress()];
     QFuture< QList<LineQueryContext> > future =
-            QtConcurrent::run(executePollForLocation, location, &_databaseMutex);
+            QtConcurrent::run(executePollForLocation, location, m);
     QFutureWatcher< QList<LineQueryContext> > *watcher =
             new QFutureWatcher< QList<LineQueryContext> >();
     connect(watcher, SIGNAL(finished()), this, SLOT(processLatestDataQuery()));

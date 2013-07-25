@@ -5,8 +5,11 @@
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
- * This file is published under the Creative Commons 3.0.
- * http://creativecommons.org/licenses/by/3.0/
+ * This file may be distributed under the terms of GNU Public License version
+ * 3 (GPL v3) as defined by the Free Software Foundation (FSF). A copy of the
+ * license should have been included with this file, or the project in which
+ * this file belongs to. You may also find the details of GPL v3 at:
+ * http://www.gnu.org/licenses/gpl-3.0.txt
  *
  * If you have any questions regarding the use of this file, feel free to
  * contact the author of this file, or the owner of the project in which
@@ -17,11 +20,15 @@
 #define GLOBALS_H
 
 #include <limits>
+#include <QtGlobal>
 #include <QLayout>
 
 #define W_SCALE 1       // Scale everything in UI
 
-#define D_NO_DATA (-1 * std::numeric_limits<double>::max())
+
+#define D_NO_DATA (std::numeric_limits<double>::max())
+#define R_NO_DATA (std::numeric_limits<qreal>::max())
+#define DEGREE_SIGN (QString::fromLatin1("\xba", 1))
 
 #include <QLocale>
 
@@ -31,5 +38,6 @@ QLocale::Language getCurrentLanguage();
 QLocale::Country getCurrentCountry();
 QLocale getCurrentLocale();
 QFont defaultFontForSize(uint pointSize = 0);
+QString textFromFile(QString filename);
 
 #endif // GLOBALS_H

@@ -5,8 +5,11 @@
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
- * This file is published under the Creative Commons 3.0.
- * http://creativecommons.org/licenses/by/3.0/
+ * This file may be distributed under the terms of GNU Public License version
+ * 3 (GPL v3) as defined by the Free Software Foundation (FSF). A copy of the
+ * license should have been included with this file, or the project in which
+ * this file belongs to. You may also find the details of GPL v3 at:
+ * http://www.gnu.org/licenses/gpl-3.0.txt
  *
  * If you have any questions regarding the use of this file, feel free to
  * contact the author of this file, or the owner of the project in which
@@ -19,6 +22,7 @@
 #include <QGridLayout>
 #include <QMouseEvent>
 #include <QPointF>
+#include <QResizeEvent>
 #include <QVector>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -31,8 +35,11 @@
 #include <qwt_series_data.h>
 #include "Globals.h"
 #include "Node.h"
+#include "NodeLine.h"
 #include "Silo.h"
+#include "Location.h"
 #include "NodeData.h"
+#include "ProgressLayer.h"
 #include <QDebug>
 
 
@@ -55,20 +62,20 @@ protected:
             return QwtText();
 
         QDateTime dt = _datetime.addSecs(p.x());
-        return QwtText(QString("%1\n%3%2")
-                       .arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
-                            QString::fromLatin1("\xba", 1),     // degree sign
-                            QString::number(p.y(), 'f', 2)));
+        QString format = QString(" %1 \n%2%3");
+
+        QwtText result(format.arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
+                                  QString::number(p.y(), 'f', 2),
+                                  DEGREE_SIGN));
+        QBrush whiteBrush(Qt::white);
+        result.setBackgroundBrush(whiteBrush);
+        return result;
     }
     virtual void widgetMousePressEvent(QMouseEvent *e)
     {
         QwtPlotPicker::widgetMousePressEvent(e);
         _grapped = !_grapped;
-#if QT_VERSION >= 0x050000
-        moveToNearest(e->localPos());
-#else
-        moveToNearest(e->posF());
-#endif
+        moveToNearest(mousePosition(e));
     }
     virtual void widgetLeaveEvent(QEvent *e)
     {
@@ -80,26 +87,26 @@ protected:
         QwtPlotPicker::widgetMouseMoveEvent(e);
         if (!_grapped)
             return;
-#if QT_VERSION >= 0x050000
-        moveToNearest(e->localPos());
-#else
-        moveToNearest(e->posF());
-#endif
+        moveToNearest(mousePosition(e));
     }
 
 private:
     bool _grapped;
     QDateTime _datetime;
 
+#if QT_VERSION >= 0x050000
+    inline QPointF mousePosition(QMouseEvent *e) { return e->localPos(); }
+#else
+    inline QPointF mousePosition(QMouseEvent *e) { return e->posF(); }
+#endif
+
     inline QPointF findNearest(const QPointF &p) const
     {
-        QPointF nearest(std::numeric_limits<qreal>::max(),
-                        std::numeric_limits<qreal>::max());
+        QPointF nearest(R_NO_DATA, R_NO_DATA);
         foreach (QwtPlotItem *it, plot()->itemList(QwtPlotItem::Rtti_PlotCurve))
         {
             QwtPlotCurve *curve = dynamic_cast<QwtPlotCurve *>(it);
-            QPointF current(std::numeric_limits<qreal>::max(),
-                            std::numeric_limits<qreal>::max());
+            QPointF current(R_NO_DATA, R_NO_DATA);
 
             // Try to find the best point on this curve, fill it into "current"
             if (curve->sample(0).x() >= p.x())
@@ -139,10 +146,12 @@ private:
         double vx = plot()->invTransform(QwtPlot::xBottom, p.x());
         double vy = plot()->invTransform(QwtPlot::yLeft, p.y());
         QPointF nearest = findNearest(QPointF(vx, vy));
-        int x = roundTo(plot()->transform(QwtPlot::xBottom, nearest.x()));
-        int y = roundTo(plot()->transform(QwtPlot::yLeft, nearest.y()));
-
-        QCursor::setPos(canvas()->mapToGlobal(QPoint(x, y)));
+        if (nearest.x() != R_NO_DATA && nearest.y() != R_NO_DATA)
+        {
+            int x = roundTo(plot()->transform(QwtPlot::xBottom, nearest.x()));
+            int y = roundTo(plot()->transform(QwtPlot::yLeft, nearest.y()));
+            QCursor::setPos(canvas()->mapToGlobal(QPoint(x, y)));
+        }
     }
 };
 
@@ -153,8 +162,7 @@ public:
     DateTimeDraw(QDateTime dt) : QwtScaleDraw() { setDateTime(dt); }
     virtual QwtText label(double v) const
     {
-        QDateTime dt = _datetime.addSecs(v);
-        return getCurrentLocale().toString(dt, "yyyy-MM-dd\n   HH:mm:ss");
+        return _datetime.addSecs(v).toString("yyyy-MM-dd\n   HH:mm:ss");
     }
     void setDateTime(QDateTime dt) { _datetime = dt; }
 
@@ -271,6 +279,10 @@ GraphContainer::GraphContainer(QWidget *parent) :
                            minorTicks, mediumTicks, majorTicks);
     _plot->setAxisScaleDiv(QwtPlot::xBottom, _weekDiv);
     _plot->setAxisScaleDiv(QwtPlot::yLeft, QwtScaleDiv(10.0, 40.0));
+    _picker = new CurveTrackingPicker(
+                QwtPlot::xBottom, QwtPlot::yLeft,
+                QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn,
+                _plot->canvas(), oneWeekAgo);
 
     QGridLayout *mainLayout = new QGridLayout();
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -280,6 +292,14 @@ GraphContainer::GraphContainer(QWidget *parent) :
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setMinimumSize(200, 150);
     _plot->setMinimumSize(200, 150);
+}
+
+void GraphContainer::resizeEvent(QResizeEvent *e)
+{
+    QList<ProgressLayer *> layers = findChildren<ProgressLayer *>();
+    foreach (ProgressLayer *layer, layers)
+        layer->resize(e->size());
+    e->accept();
 }
 
 QSize GraphContainer::sizeHint() const
@@ -295,16 +315,30 @@ void GraphContainer::clearPlot()
 void GraphContainer::clearPlot(bool replot)
 {
     _plot->detachItems();
+    _plot->setTitle("");
     if (replot)
         _plot->replot();
+}
+
+void GraphContainer::blockPlot()
+{
+    // Add one progress layer
+    ProgressLayer *layer = new ProgressLayer(this);
+    layer->startAnimation();
+    layer->show();
+    layer->raise();
+}
+
+void GraphContainer::unblockPlot()
+{
+    // Find and remove topmost progress layer
+    findChild<ProgressLayer *>()->deleteLater();
 }
 
 void GraphContainer::updatePlot(Node *node, Silo *silo,
                                 QList <QList<NodeData *> > dataSets)
 {
-    Q_UNUSED(node);
-    Q_UNUSED(silo);
-
+    unblockPlot();
     clearPlot(false);
 
     // Find the earliest date time as x axis's zero
@@ -350,16 +384,30 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 
     _plot->replot();
 
+    Location *location = silo->location();
+    QString title;
+    if (node)
+    {
+        QString format(tr("%1, %2, Sensor %3"));
+        title = format.arg(location->name(),
+                           node->line()->name(),
+                           node->name().mid(1));
+    }
+    else
+    {
+        QString format(tr("%1, Averages for Silo %2"));
+        title = format.arg(location->name(), silo->name().mid(1));
+    }
+    _plot->setTitle(title);
+
+
 //    if (_panner)
 //        _panner->deleteLater();
 //    _panner = new LimitedPanner(_plot->canvas());
 //    if (_magnifier)
 //        _magnifier->deleteLater();
 //    _magnifier = new LimitedMagnifier(_plot->canvas());
-    if (_picker)
-        _picker->deleteLater();
-    _picker = new CurveTrackingPicker(
-                QwtPlot::xBottom, QwtPlot::yLeft,
-                QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn,
-                _plot->canvas(), cutoff);
+    CurveTrackingPicker *picker = dynamic_cast<CurveTrackingPicker *>(_picker);
+    if (picker)
+        picker->setReferenceDateTime(cutoff);
 }

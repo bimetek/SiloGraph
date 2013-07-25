@@ -1,7 +1,7 @@
 /*****************************************************************************
- * MapMarker.cpp
+ * ProgressLayer.h
  *
- * Created: 07/7 2013 by uranusjr
+ * Created: 25/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -16,9 +16,31 @@
  * this file belongs to.
  *****************************************************************************/
 
-#include "MapMarker.h"
+#ifndef PROGRESSLAYER_H
+#define PROGRESSLAYER_H
 
-MapMarker::MapMarker(QObject *parent) :
-    QObject(parent)
+#include <QWidget>
+class QProgressIndicator;
+
+class ProgressLayer : public QWidget
 {
-}
+    Q_OBJECT
+
+public:
+    explicit ProgressLayer(QWidget *parent = 0);
+    void startAnimation();
+    void stopAnimation();
+    inline void setAnimated(bool value)
+    {
+        if (value)
+            startAnimation();
+        else
+            stopAnimation();
+    }
+    bool isAnimated() const;
+
+private:
+    QProgressIndicator *_indicator;
+};
+
+#endif // PROGRESSLAYER_H
