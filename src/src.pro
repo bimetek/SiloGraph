@@ -14,11 +14,17 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     LIBS += -lqjson
 }
 
-
 TARGET = SiloGraph
 TEMPLATE = app
 
+DESTDIR = ../bin
+
 CONFIG += qwt
+
+INCLUDEPATH += ../3rdparty
+
+unix:LIBS += -L../lib -lQProgressIndicator
+win32:LIBS += ../lib/QProgressIndicator.lib
 
 SOURCES += main.cpp\
     MainWindow.cpp \
@@ -38,7 +44,7 @@ SOURCES += main.cpp\
     MapMarker.cpp \
     LogoHolder.cpp \
     SharedSettings.cpp \
-    SettingsWindow.cpp
+    SettingsWindow.cpp \
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
