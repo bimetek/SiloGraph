@@ -150,6 +150,7 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
     {
         QJsonObject info = dbs[key].toObject();
         QString address = info["address"].toString();
+        _databaseMutexes.insert(address, new QMutex());
         QSqlDatabase db = QSqlDatabase::addDatabase(info["driver"].toString(),
                                                     address);
         db.setHostName(address);
@@ -174,6 +175,7 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
     {
         QVariantMap info = dbs[key].toMap();
         QString address = info["address"].toString();
+        _databaseMutexes.insert(address, new QMutex());
         QSqlDatabase db = QSqlDatabase::addDatabase(info["driver"].toString(),
                                                     address);
         db.setHostName(address);
@@ -189,13 +191,17 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
 DatabaseConnector::~DatabaseConnector()
 {
     foreach (QString name, QSqlDatabase::connectionNames())
+    {
         QSqlDatabase::removeDatabase(name);
+        _databaseMutexes.remove(name);
+    }
 }
 
 void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
 {
-    QFuture<NodeQueryContext> future =
-            QtConcurrent::run(executeNodeQuery, silo, node, &_databaseMutex);
+    QMutex *m = _databaseMutexes[silo->location()->databaseAddress()];
+    QFuture<NodeQueryContext> future = QtConcurrent::run(executeNodeQuery,
+                                                         silo, node, m);
     QFutureWatcher<NodeQueryContext> *watcher =
             new QFutureWatcher<NodeQueryContext>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
@@ -243,8 +249,9 @@ void DatabaseConnector::processWeekDataQuery()
 
 void DatabaseConnector::fetchLatestData(Location *location)
 {
+    QMutex *m = _databaseMutexes[location->databaseAddress()];
     QFuture< QList<LineQueryContext> > future =
-            QtConcurrent::run(executePollForLocation, location, &_databaseMutex);
+            QtConcurrent::run(executePollForLocation, location, m);
     QFutureWatcher< QList<LineQueryContext> > *watcher =
             new QFutureWatcher< QList<LineQueryContext> >();
     connect(watcher, SIGNAL(finished()), this, SLOT(processLatestDataQuery()));

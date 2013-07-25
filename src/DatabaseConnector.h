@@ -18,6 +18,7 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QHash>
 #include <QList>
 #include <QMutex>
 class QSqlQuery;
@@ -41,7 +42,7 @@ public slots:
 
 signals:
     void dataFetched(Node *node, Silo *silo,
-                     QList <QList<NodeData *> > dataSets);
+                     QList< QList<NodeData *> > dataSets);
     void dataPolled(NodeLine *line, QList<double> data, QDateTime dateTime);
 
 private slots:
@@ -49,7 +50,7 @@ private slots:
     void processLatestDataQuery();
 
 private:
-    QMutex _databaseMutex;
+    QHash<QString, QMutex *> _databaseMutexes;
 };
 
 #endif // DATABASECONNECTOR_H
