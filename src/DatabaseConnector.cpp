@@ -209,6 +209,7 @@ void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
             new QFutureWatcher<NodeQueryContext>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
     watcher->setFuture(future);
+    emit fetchingStarted(node, silo);
 }
 
 void DatabaseConnector::processWeekDataQuery()

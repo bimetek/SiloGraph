@@ -22,6 +22,7 @@
 #include <QGridLayout>
 #include <QMouseEvent>
 #include <QPointF>
+#include <QResizeEvent>
 #include <QVector>
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -38,6 +39,7 @@
 #include "Silo.h"
 #include "Location.h"
 #include "NodeData.h"
+#include "ProgressLayer.h"
 #include <QDebug>
 
 
@@ -292,6 +294,14 @@ GraphContainer::GraphContainer(QWidget *parent) :
     _plot->setMinimumSize(200, 150);
 }
 
+void GraphContainer::resizeEvent(QResizeEvent *e)
+{
+    QList<ProgressLayer *> layers = findChildren<ProgressLayer *>();
+    foreach (ProgressLayer *layer, layers)
+        layer->resize(e->size());
+    e->accept();
+}
+
 QSize GraphContainer::sizeHint() const
 {
     return QSize(200, 150);
@@ -310,9 +320,25 @@ void GraphContainer::clearPlot(bool replot)
         _plot->replot();
 }
 
+void GraphContainer::blockPlot()
+{
+    // Add one progress layer
+    ProgressLayer *layer = new ProgressLayer(this);
+    layer->startAnimation();
+    layer->show();
+    layer->raise();
+}
+
+void GraphContainer::unblockPlot()
+{
+    // Find and remove topmost progress layer
+    findChild<ProgressLayer *>()->deleteLater();
+}
+
 void GraphContainer::updatePlot(Node *node, Silo *silo,
                                 QList <QList<NodeData *> > dataSets)
 {
+    unblockPlot();
     clearPlot(false);
 
     // Find the earliest date time as x axis's zero

@@ -44,6 +44,7 @@ public slots:
     void fetchLatestData(Location *location);
 
 signals:
+    void fetchingStarted(Node *node, Silo *silo);
     void dataFetched(Node *node, Silo *silo,
                      QList< QList<NodeData *> > dataSets);
     void dataPolled(NodeLine *line, QList<double> data, QDateTime dateTime);

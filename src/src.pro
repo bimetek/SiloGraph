@@ -17,7 +17,7 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 TARGET = SiloGraph
 TEMPLATE = app
 
-DESTDIR = ../bin
+DESTDIR = ../../bin
 
 CONFIG += qwt
 
@@ -45,6 +45,7 @@ SOURCES += main.cpp\
     LogoHolder.cpp \
     SharedSettings.cpp \
     SettingsWindow.cpp \
+    ProgressLayer.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
@@ -63,7 +64,8 @@ HEADERS  += MainWindow.h \
     MapMarker.h \
     LogoHolder.h \
     SharedSettings.h \
-    SettingsWindow.h
+    SettingsWindow.h \
+    ProgressLayer.h
 
 OTHER_FILES += \
     locations.json \

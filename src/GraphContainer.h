@@ -44,8 +44,11 @@ public slots:
     void clearPlot(bool replot);
     void updatePlot(Node *node, Silo *silo,
                     QList <QList<NodeData *> > dataSets);
+    void blockPlot();
+    void unblockPlot();
 
 protected:
+    virtual void resizeEvent(QResizeEvent *);
     virtual QSize sizeHint() const;
 
 private:
