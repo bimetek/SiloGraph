@@ -388,14 +388,14 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     QString title;
     if (node)
     {
-        QString format("%1, %2, Sensor %3");
+        QString format(tr("%1, %2, Sensor %3"));
         title = format.arg(location->name(),
                            node->line()->name(),
                            node->name().mid(1));
     }
     else
     {
-        QString format("%1, Averages for Silo %2");
+        QString format(tr("%1, Averages for Silo %2"));
         title = format.arg(location->name(), silo->name().mid(1));
     }
     _plot->setTitle(title);
