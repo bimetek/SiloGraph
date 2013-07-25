@@ -302,6 +302,7 @@ void GraphContainer::clearPlot()
 void GraphContainer::clearPlot(bool replot)
 {
     _plot->detachItems();
+    _plot->setTitle("");
     if (replot)
         _plot->replot();
 }
