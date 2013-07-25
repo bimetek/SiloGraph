@@ -17,12 +17,14 @@
 #define GLOBALS_H
 
 #include <limits>
+#include <QtGlobal>
 #include <QLayout>
 
 #define W_SCALE 1       // Scale everything in UI
 
 
-#define D_NO_DATA (-1 * std::numeric_limits<double>::max())
+#define D_NO_DATA (std::numeric_limits<double>::max())
+#define R_NO_DATA (std::numeric_limits<qreal>::max())
 #define DEGREE_SIGN (QString::fromLatin1("\xba", 1))
 
 #include <QLocale>

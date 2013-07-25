@@ -97,13 +97,11 @@ private:
 
     inline QPointF findNearest(const QPointF &p) const
     {
-        QPointF nearest(std::numeric_limits<qreal>::max(),
-                        std::numeric_limits<qreal>::max());
+        QPointF nearest(R_NO_DATA, R_NO_DATA);
         foreach (QwtPlotItem *it, plot()->itemList(QwtPlotItem::Rtti_PlotCurve))
         {
             QwtPlotCurve *curve = dynamic_cast<QwtPlotCurve *>(it);
-            QPointF current(std::numeric_limits<qreal>::max(),
-                            std::numeric_limits<qreal>::max());
+            QPointF current(R_NO_DATA, R_NO_DATA);
 
             // Try to find the best point on this curve, fill it into "current"
             if (curve->sample(0).x() >= p.x())
@@ -143,10 +141,12 @@ private:
         double vx = plot()->invTransform(QwtPlot::xBottom, p.x());
         double vy = plot()->invTransform(QwtPlot::yLeft, p.y());
         QPointF nearest = findNearest(QPointF(vx, vy));
-        int x = roundTo(plot()->transform(QwtPlot::xBottom, nearest.x()));
-        int y = roundTo(plot()->transform(QwtPlot::yLeft, nearest.y()));
-
-        QCursor::setPos(canvas()->mapToGlobal(QPoint(x, y)));
+        if (nearest.x() != R_NO_DATA && nearest.y() != R_NO_DATA)
+        {
+            int x = roundTo(plot()->transform(QwtPlot::xBottom, nearest.x()));
+            int y = roundTo(plot()->transform(QwtPlot::yLeft, nearest.y()));
+            QCursor::setPos(canvas()->mapToGlobal(QPoint(x, y)));
+        }
     }
 };
 
@@ -274,6 +274,10 @@ GraphContainer::GraphContainer(QWidget *parent) :
                            minorTicks, mediumTicks, majorTicks);
     _plot->setAxisScaleDiv(QwtPlot::xBottom, _weekDiv);
     _plot->setAxisScaleDiv(QwtPlot::yLeft, QwtScaleDiv(10.0, 40.0));
+    _picker = new CurveTrackingPicker(
+                QwtPlot::xBottom, QwtPlot::yLeft,
+                QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn,
+                _plot->canvas(), oneWeekAgo);
 
     QGridLayout *mainLayout = new QGridLayout();
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -373,10 +377,7 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 //    if (_magnifier)
 //        _magnifier->deleteLater();
 //    _magnifier = new LimitedMagnifier(_plot->canvas());
-    if (_picker)
-        _picker->deleteLater();
-    _picker = new CurveTrackingPicker(
-                QwtPlot::xBottom, QwtPlot::yLeft,
-                QwtPlotPicker::NoRubberBand, QwtPicker::AlwaysOn,
-                _plot->canvas(), cutoff);
+    CurveTrackingPicker *picker = dynamic_cast<CurveTrackingPicker *>(_picker);
+    if (picker)
+        picker->setReferenceDateTime(cutoff);
 }
