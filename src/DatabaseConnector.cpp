@@ -23,13 +23,8 @@
     #include <QtConcurrentRun>
 #endif
 #include <QFile>
-#include <QFuture>
 #include <QFutureWatcher>
-#include <QMutexLocker>
-#include <QSqlQuery>
-#include <QSqlRecord>
 #include <QStringList>
-#include <QVariantMap>
 #if QT_VERSION >= 0x050000
     #include <QJsonDocument>
 #else
@@ -41,7 +36,6 @@
 #include "NodeLine.h"
 #include "Node.h"
 #include "NodeData.h"
-#include <QDebug>
 
 Queryable::Context executeNodeQuery(Silo *silo, Node *node, QMutex *m)
 {
