@@ -33,7 +33,7 @@ class Silo : public QObject, public Queryable
 public:
     explicit Silo(QObject *parent = 0);
     void addLine(NodeLine *line);
-     virtual Queryable::Context executeWeekDataFetch(QMutex *mutex);
+    virtual Queryable::Context executeWeekDataFetch(QMutex *mutex);
 
 protected:
     virtual QSqlDatabase database();

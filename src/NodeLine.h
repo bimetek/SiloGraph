@@ -20,18 +20,23 @@
 #define NODELINE_H
 
 #include <QObject>
+#include "Queryable.h"
 #include <QList>
 #include <QString>
 class Silo;
 class Node;
 
-class NodeLine : public QObject
+class NodeLine : public QObject, public Queryable
 {
     Q_OBJECT
 
 public:
     explicit NodeLine(QObject *parent = 0);
     void addNode(Node *node);
+    virtual Context executePoll(QMutex *mutex, bool close = true);
+
+protected:
+    virtual QSqlDatabase database();
 
 private:
     QString _name;

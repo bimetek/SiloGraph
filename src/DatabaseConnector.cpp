@@ -43,12 +43,6 @@
 #include "NodeData.h"
 #include <QDebug>
 
-struct LineQueryContext
-{
-    QSqlQuery query;
-    NodeLine *line;
-};
-
 Queryable::Context executeNodeQuery(Silo *silo, Node *node, QMutex *m)
 {
     if (node)
@@ -57,32 +51,16 @@ Queryable::Context executeNodeQuery(Silo *silo, Node *node, QMutex *m)
         return silo->executeWeekDataFetch(m);
 }
 
-QList<LineQueryContext> executePollForLocation(Location *location, QMutex *m)
+QList<Queryable::Context> executePollForLocation(Location *location, QMutex *m)
 {
-    QMutexLocker locker(m);
-    Q_UNUSED(locker);
-
     QString address = location->databaseAddress();
     QSqlDatabase db = QSqlDatabase::database(address);
 
-    QList<LineQueryContext> contexts;
+    QList<Queryable::Context> contexts;
     foreach (Silo *silo, location->silos())
     {
         foreach (NodeLine *line, silo->lines())
-        {
-            QString queryStringFormat =
-                    "SELECT date, %1 FROM rawdata WHERE silo_cable = \"%2\" "
-                    "ORDER BY date DESC LIMIT 1";
-            QStringList names;
-            foreach (Node *node, line->nodes())
-                names << node->name();
-            QString queryString = queryStringFormat.arg(names.join(", "),
-                                                        line->name());
-            LineQueryContext context;
-            context.query = db.exec(queryString);
-            context.line = line;
-            contexts.append(context);
-        }
+            contexts.append(line->executePoll(m, false));
     }
 
     db.close();
@@ -217,30 +195,34 @@ void DatabaseConnector::processWeekDataQuery()
 void DatabaseConnector::fetchLatestData(Location *location)
 {
     QMutex *m = _databaseMutexes[location->databaseAddress()];
-    QFuture< QList<LineQueryContext> > future =
+    QFuture< QList<Queryable::Context> > future =
             QtConcurrent::run(executePollForLocation, location, m);
-    QFutureWatcher< QList<LineQueryContext> > *watcher =
-            new QFutureWatcher< QList<LineQueryContext> >();
+    QFutureWatcher< QList<Queryable::Context> > *watcher =
+            new QFutureWatcher< QList<Queryable::Context> >();
     connect(watcher, SIGNAL(finished()), this, SLOT(processLatestDataQuery()));
     watcher->setFuture(future);
 }
 
 void DatabaseConnector::processLatestDataQuery()
 {
-    QFutureWatcher< QList<LineQueryContext> > *watcher =
-        reinterpret_cast<QFutureWatcher< QList<LineQueryContext> > *>(sender());
+    typedef QList<Queryable::Context> ContextList;
+    QFutureWatcher<ContextList> *watcher =
+            reinterpret_cast<QFutureWatcher<ContextList> *>(sender());
     watcher->deleteLater();
 
-    QList<LineQueryContext> contexts = watcher->result();
+    QList<Queryable::Context> contexts = watcher->result();
 
-    foreach (LineQueryContext context, contexts)
+    foreach (Queryable::Context context, contexts)
     {
         QSqlQuery &query = context.query;
         bool toLast = query.last();
         if (toLast)    // Successfully moved cursor to last row
         {
             QList<double> temperatures;
-            for (int i = 0; i < context.line->nodes().size(); i++)
+            NodeLine *line = dynamic_cast<NodeLine *>(context.entity);
+            if (!line)
+                continue;
+            for (int i = 0; i < line->nodes().size(); i++)
             {
                 bool ok = false;
                 double temperature = query.value(i + 1).toDouble(&ok);
@@ -249,7 +231,7 @@ void DatabaseConnector::processLatestDataQuery()
                 temperatures.append(temperature);
             }
             QDateTime dateTime = query.value(0).toDateTime();
-            emit dataPolled(context.line, temperatures, dateTime);
+            emit dataPolled(line, temperatures, dateTime);
         }
     }
 }

@@ -32,7 +32,16 @@ public:
         uint dataCount;
     };
 
-    virtual Context executeWeekDataFetch(QMutex *mutex) = 0;
+    virtual Context executeWeekDataFetch(QMutex *, bool close = true)
+    {
+        Q_UNUSED(close);
+        return Context();
+    }
+    virtual Context executePoll(QMutex *, bool close = false)
+    {
+        Q_UNUSED(close);
+        return Context();
+    }
 
 protected:
     virtual QSqlDatabase database() = 0;
