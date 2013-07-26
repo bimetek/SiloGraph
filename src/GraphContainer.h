@@ -42,8 +42,7 @@ public:
 public slots:
     void clearPlot();               // Default replot = true
     void clearPlot(bool replot);
-    void updatePlot(Node *node, Silo *silo,
-                    QList <QList<NodeData *> > dataSets);
+    void updatePlot(Node *node, Silo *silo, QList<NodeData *> dataSet);
     void blockPlot();
     void unblockPlot();
 

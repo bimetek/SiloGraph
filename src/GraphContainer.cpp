@@ -336,50 +336,43 @@ void GraphContainer::unblockPlot()
 }
 
 void GraphContainer::updatePlot(Node *node, Silo *silo,
-                                QList <QList<NodeData *> > dataSets)
+                                QList<NodeData *> dataSet)
 {
     unblockPlot();
     clearPlot(false);
 
-    // Find the earliest date time as x axis's zero
-    QDateTime firstDateTime = QDateTime::currentDateTime();
-    foreach (QList<NodeData *> dataSet, dataSets)
-    {
-        if (dataSet.isEmpty())
-            continue;
-        QDateTime dateTime = dataSet.first()->dateTime();
-        if (dateTime < firstDateTime)
-            firstDateTime = dateTime;
-    }
-    QDateTime cutoff(firstDateTime.date());
+    if (dataSet.isEmpty())
+        return;
 
-    _plot->setAxisScaleDraw(QwtPlot::xBottom, new DateTimeDraw(cutoff));
+    QDateTime minDateTime(dataSet[0]->dateTime().date());
+    QHash< QString, QVector<QPointF> > curvePoints;
+
+    foreach (NodeData *data, dataSet)
+    {
+        int x = minDateTime.secsTo(data->dateTime());
+        foreach (QString key, data->keys())
+        {
+            if (!curvePoints.contains(key))
+                curvePoints.insert(key, QVector<QPointF>());
+            curvePoints[key].append(QPointF(x, data->value(key)));
+        }
+    }
+    qDeleteAll(dataSet);
+
+    _plot->setAxisScaleDraw(QwtPlot::xBottom, new DateTimeDraw(minDateTime));
     _plot->setAxisScaleDiv(QwtPlot::xBottom, _weekDiv);
     _plot->setAxisAutoScale(QwtPlot::yLeft);
 
     int i = 0;
-    double dataCount = dataSets.size();
-    foreach (QList<NodeData *> dataSet, dataSets)
+    foreach (QString key, curvePoints.keys())
     {
-        if (dataSet.isEmpty())
-            continue;
-
-        QVector<QPointF> points;
-        foreach (NodeData *data, dataSet)
-        {
-            QPointF point(cutoff.secsTo(data->dateTime()),
-                          data->temperature());
-            points.append(point);
-        }
-        qDeleteAll(dataSet);
-
         QwtPlotCurve *curve = new QwtPlotCurve();
         curve->setYAxis(QwtPlot::yLeft);
-        QPen pen(QColor::fromHsvF(i++ / dataCount, 1.0, 1.0));
+        QPen pen(QColor::fromHsvF(i++ / curvePoints.size(), 1.0, 1.0));
         pen.setWidth(2);
         curve->setPen(pen);
         curve->attach(_plot);
-        curve->setSamples(points);
+        curve->setSamples(curvePoints[key]);
     }
 
     _plot->replot();
@@ -409,5 +402,5 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 //    _magnifier = new LimitedMagnifier(_plot->canvas());
     CurveTrackingPicker *picker = dynamic_cast<CurveTrackingPicker *>(_picker);
     if (picker)
-        picker->setReferenceDateTime(cutoff);
+        picker->setReferenceDateTime(minDateTime);
 }

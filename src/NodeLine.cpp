@@ -51,7 +51,7 @@ Queryable::Context NodeLine::executePoll(QMutex *mutex, bool close)
     QString queryString = queryFormat.arg(names.join(", "));
     Queryable::Context context;
     context.entity = this;
-    context.dataCount = nodes().size();
+    context.dataKeys = QStringList(name());
 
     context.query = QSqlQuery(db);
     context.query.prepare(queryString);

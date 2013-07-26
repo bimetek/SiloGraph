@@ -44,7 +44,7 @@ Queryable::Context Node::executeWeekDataFetch(QMutex *mutex)
 
     Queryable::Context context;
     context.entity = this;
-    context.dataCount = 1;
+    context.dataKeys = QStringList(name());
 
     context.query = QSqlQuery(db);
     context.query.prepare(queryFormat.arg(name()));

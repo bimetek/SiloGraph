@@ -20,6 +20,7 @@
 #define QUERYABLE_H
 
 #include <QSqlQuery>
+#include <QStringList>
 class QMutex;
 
 class Queryable
@@ -29,7 +30,7 @@ public:
     {
         QSqlQuery query;
         Queryable *entity;
-        uint dataCount;
+        QStringList dataKeys;
     };
 
     virtual Context executeWeekDataFetch(QMutex *, bool close = true)

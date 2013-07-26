@@ -161,29 +161,23 @@ void DatabaseConnector::processWeekDataQuery()
     if (!silo)  // entity is something unrecognizable
         return;
 
-    uint &dataCount = context.dataCount;
-    QList< QList<NodeData *> > dataSets;
-    for (uint i = 0; i < dataCount; i++)
-    {
-        QList<NodeData *> dataSet;
-        dataSets.append(dataSet);
-    }
+    QList<NodeData *> dataSet;
     while (query.next())
     {
-        QDateTime dateTime = query.value(0).toDateTime();
-        for (uint i = 0; i < dataCount; i++)
+        NodeData *data = new NodeData(query.value(0).toDateTime());
+        uint i = 1;
+        foreach (QString key, context.dataKeys)
         {
             bool ok = false;
-            double temperature = query.value(i + 1).toDouble(&ok);
+            qreal value = query.value(i++).toReal(&ok);
             if (!ok)
                 continue;
-            NodeData *data = new NodeData(this);
-            data->setDateTime(dateTime);
-            data->setTemperature(temperature);
-            dataSets[i].append(data);
+            data->setValue(key, value);
         }
+        dataSet.append(data);
     }
-    emit dataFetched(node, silo, dataSets);
+
+    emit dataFetched(node, silo, dataSet);
 }
 
 void DatabaseConnector::fetchLatestData(Location *location)

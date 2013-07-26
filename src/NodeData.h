@@ -21,26 +21,29 @@
 
 #include <QObject>
 #include <QDateTime>
+#include <QHash>
+#include <QList>
 
 class NodeData : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit NodeData(QObject *parent = 0);
+    explicit NodeData(const QDateTime &dateTime = QDateTime::currentDateTime(),
+                      QObject *parent = 0);
+    int valueCount() const;
+    QList<QString> keys() const;
+    qreal value(const QString &key) const;
+    qreal value(const QString &key, const qreal &defaultValue) const;
+    void setValue(const QString &key, const qreal &value);
 
 private:
     QDateTime _dateTime;
-    double _temperature;
-    double _humidity;
+    QHash<QString, qreal> _storage;
 
 public:
     inline QDateTime dateTime() const { return _dateTime; }
-    inline void setDateTime(QDateTime dateTime) { _dateTime = dateTime; }
-    inline double temperature() const { return _temperature; }
-    inline void setTemperature(double temp) { _temperature = temp; }
-    inline double humidity() const { return _humidity; }
-    void setHumidity(double humidity) { _humidity = humidity; }
+    inline void setDateTime(const QDateTime &dateTime) { _dateTime = dateTime; }
 };
 
 #endif // NODEDATA_H

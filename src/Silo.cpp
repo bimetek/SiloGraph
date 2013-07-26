@@ -49,7 +49,10 @@ Silo::Silo(QObject *parent) :
 
      Queryable::Context context;
      context.entity = this;
-     context.dataCount = 2;
+
+     QStringList keys;
+     keys << "Full" << "Empty";
+     context.dataKeys = keys;
 
      context.query = QSqlQuery(db);
      context.query.prepare(queryFormat);

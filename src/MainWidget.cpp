@@ -59,9 +59,9 @@ MainWidget::MainWidget(QWidget *parent) :
     connect(_siloListView, SIGNAL(shouldPollForLocation(Location *)),
             _dbc, SLOT(fetchLatestData(Location *)));
     connect(_dbc,
-            SIGNAL(dataFetched(Node *, Silo *, QList< QList<NodeData *> >)),
+            SIGNAL(dataFetched(Node *, Silo *, QList<NodeData *>)),
             _plotContainer,
-            SLOT(updatePlot(Node *, Silo *, QList <QList<NodeData *> >)));
+            SLOT(updatePlot(Node *, Silo *, QList<NodeData *>)));
     connect(_dbc,
             SIGNAL(dataPolled(NodeLine *, QList<double>, QDateTime)),
             _siloListView,

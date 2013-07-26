@@ -18,7 +18,34 @@
 
 #include "NodeData.h"
 
-NodeData::NodeData(QObject *parent) :
+NodeData::NodeData(const QDateTime &dateTime, QObject *parent) :
     QObject(parent)
 {
+    setDateTime(dateTime);
 }
+
+int NodeData::valueCount() const
+{
+    return _storage.size();
+}
+
+QList<QString> NodeData::keys() const
+{
+    return _storage.keys();
+}
+
+qreal NodeData::value(const QString &key) const
+{
+    return _storage.value(key);
+}
+
+qreal NodeData::value(const QString &key, const qreal &defaultValue) const
+{
+    return _storage.value(key, defaultValue);
+}
+
+void NodeData::setValue(const QString &key, const qreal &value)
+{
+    _storage.insert(key, value);
+}
+
