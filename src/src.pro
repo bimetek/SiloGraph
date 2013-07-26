@@ -65,7 +65,8 @@ HEADERS  += MainWindow.h \
     LogoHolder.h \
     SharedSettings.h \
     SettingsWindow.h \
-    ProgressLayer.h
+    ProgressLayer.h \
+    Queryable.h
 
 OTHER_FILES += \
     locations.json \

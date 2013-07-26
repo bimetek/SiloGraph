@@ -17,7 +17,11 @@
  *****************************************************************************/
 
 #include "Silo.h"
+#include <QDateTime>
+#include <QMutexLocker>
+#include <QVariant>
 #include "NodeLine.h"
+#include "Location.h"
 
 Silo::Silo(QObject *parent) :
     QObject(parent)
@@ -28,4 +32,37 @@ Silo::Silo(QObject *parent) :
  {
      lines().append(line);
      line->setSilo(this);
+ }
+
+ Queryable::Context Silo::executeWeekDataFetch(QMutex *mutex)
+ {
+     QMutexLocker locker(mutex);
+     Q_UNUSED(locker);
+
+     QSqlDatabase db = database();
+
+     QString oneWeekAgo =
+             QDateTime(QDate::currentDate().addDays(-7)).toString(Qt::ISODate);
+     QString queryFormat =
+             "SELECT date, Full, Empty FROM average "
+             "WHERE silo = :siloName AND date > :date ORDER BY date ASC";
+
+     Queryable::Context context;
+     context.entity = this;
+     context.dataCount = 2;
+
+     context.query = QSqlQuery(db);
+     context.query.prepare(queryFormat);
+     context.query.bindValue(":siloName", QVariant(name()));
+     context.query.bindValue(":date", oneWeekAgo);
+     context.query.exec();
+
+     db.close();
+     return context;
+ }
+
+ QSqlDatabase Silo::database()
+ {
+     QString dbn = location()->databaseAddress();
+     return QSqlDatabase::database(dbn);
  }

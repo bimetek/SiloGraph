@@ -43,62 +43,18 @@
 #include "NodeData.h"
 #include <QDebug>
 
-struct NodeQueryContext
-{
-    QSqlQuery query;
-    Silo *silo;
-    Node *node;
-    uint dataCount;
-};
-
 struct LineQueryContext
 {
     QSqlQuery query;
     NodeLine *line;
 };
 
-NodeQueryContext executeNodeQuery(Silo *silo, Node *node, QMutex *m)
+Queryable::Context executeNodeQuery(Silo *silo, Node *node, QMutex *m)
 {
-    QMutexLocker locker(m);
-    Q_UNUSED(locker);
-
-    QString address = silo->location()->databaseAddress();
-    QSqlDatabase db = QSqlDatabase::database(address);
-
-    QString queryString;
-    QString oneWeekAgo =
-            QDateTime(QDate::currentDate().addDays(-7)).toString(Qt::ISODate);
-    uint dataCount = 0;
     if (node)
-    {
-        QString queryFormat =
-                "SELECT date, %1 FROM rawdata "
-                "WHERE silo_cable = \"%2\" AND date > \"%3\" "
-                "ORDER BY date ASC";
-        queryString = queryFormat.arg(
-                    node->name(),
-                    node->line()->name(),
-                    oneWeekAgo);
-        dataCount = 1;
-    }
+        return node->executeWeekDataFetch(m);
     else
-    {
-        QString queryFormat =
-                "SELECT date, Full, Empty FROM average "
-                "WHERE silo = \"%1\" AND date > \"%2\" "
-                "ORDER BY date ASC";
-        queryString = queryFormat.arg(silo->name(), oneWeekAgo);
-        dataCount = 2;
-    }
-
-    NodeQueryContext context;
-    context.query = db.exec(queryString);
-    context.silo = silo;
-    context.node = node;
-    context.dataCount = dataCount;
-
-    db.close();
-    return context;
+        return silo->executeWeekDataFetch(m);
 }
 
 QList<LineQueryContext> executePollForLocation(Location *location, QMutex *m)
@@ -203,10 +159,10 @@ DatabaseConnector::~DatabaseConnector()
 void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
 {
     QMutex *m = _databaseMutexes[silo->location()->databaseAddress()];
-    QFuture<NodeQueryContext> future = QtConcurrent::run(executeNodeQuery,
-                                                         silo, node, m);
-    QFutureWatcher<NodeQueryContext> *watcher =
-            new QFutureWatcher<NodeQueryContext>();
+    QFuture<Queryable::Context> future =
+            QtConcurrent::run(executeNodeQuery, silo, node, m);
+    QFutureWatcher<Queryable::Context> *watcher =
+            new QFutureWatcher<Queryable::Context>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
     watcher->setFuture(future);
     emit fetchingStarted(node, silo);
@@ -214,18 +170,25 @@ void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
 
 void DatabaseConnector::processWeekDataQuery()
 {
-    QFutureWatcher<NodeQueryContext> *watcher =
-            reinterpret_cast<QFutureWatcher<NodeQueryContext> *>(sender());
+    QFutureWatcher<Queryable::Context> *watcher =
+            reinterpret_cast<QFutureWatcher<Queryable::Context> *>(sender());
     watcher->deleteLater();
 
-    NodeQueryContext context = watcher->result();
+    Queryable::Context context = watcher->result();
 
     QSqlQuery &query = context.query;
     if (!query.size())
         return;
 
-    Silo *&silo = context.silo;
-    Node *&node = context.node;
+    Node *node = dynamic_cast<Node *>(context.entity);
+    Silo *silo = 0;
+    if (node)   // Try to make entity a node
+        silo = node->line()->silo();
+    else        // Try to make entity a silo instead
+        silo = dynamic_cast<Silo *>(context.entity);
+    if (!silo)  // entity is something unrecognizable
+        return;
+
     uint &dataCount = context.dataCount;
     QList< QList<NodeData *> > dataSets;
     for (uint i = 0; i < dataCount; i++)

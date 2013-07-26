@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Node.h
+ * Queryable.h
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 26/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -16,36 +16,26 @@
  * this file belongs to.
  *****************************************************************************/
 
-#ifndef NODE_H
-#define NODE_H
+#ifndef QUERYABLE_H
+#define QUERYABLE_H
 
-#include <QObject>
-#include "Queryable.h"
+#include <QSqlQuery>
 class QMutex;
-class Node;
-class NodeLine;
-class Silo;
 
-class Node : public QObject, public Queryable
+class Queryable
 {
-    Q_OBJECT
-
 public:
-    explicit Node(QObject *parent = 0);
-    virtual Queryable::Context executeWeekDataFetch(QMutex *mutex);
+    struct Context
+    {
+        QSqlQuery query;
+        Queryable *entity;
+        uint dataCount;
+    };
+
+    virtual Context executeWeekDataFetch(QMutex *mutex) = 0;
 
 protected:
-    virtual QSqlDatabase database();
-
-private:
-    QString _name;
-    NodeLine *_line;
-
-public:
-    inline QString name() { return _name; }
-    inline void setName(QString name) { _name = name; }
-    inline NodeLine *line() { return _line; }
-    inline void setLine(NodeLine *line) { _line = line; }
+    virtual QSqlDatabase database() = 0;
 };
 
-#endif // NODE_H
+#endif // QUERYABLE_H

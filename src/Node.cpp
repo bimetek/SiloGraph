@@ -17,8 +17,47 @@
  *****************************************************************************/
 
 #include "Node.h"
+#include <QDateTime>
+#include <QMutexLocker>
+#include <QVariant>
+#include "NodeLine.h"
+#include "Silo.h"
+#include "Location.h"
 
 Node::Node(QObject *parent) :
     QObject(parent)
 {
+}
+
+Queryable::Context Node::executeWeekDataFetch(QMutex *mutex)
+{
+    QMutexLocker locker(mutex);
+    Q_UNUSED(locker);
+
+    QSqlDatabase db = database();
+
+    QString oneWeekAgo =
+            QDateTime(QDate::currentDate().addDays(-7)).toString(Qt::ISODate);
+    QString queryFormat =
+            "SELECT date, %1 FROM rawdata "
+            "WHERE silo_cable = :cableName AND date > :date ORDER BY date ASC";
+
+    Queryable::Context context;
+    context.entity = this;
+    context.dataCount = 1;
+
+    context.query = QSqlQuery(db);
+    context.query.prepare(queryFormat.arg(name()));
+    context.query.bindValue(":cableName", QVariant(line()->name()));
+    context.query.bindValue(":date", oneWeekAgo);
+    context.query.exec();
+
+    db.close();
+    return context;
+}
+
+QSqlDatabase Node::database()
+{
+    QString dbn = line()->silo()->location()->databaseAddress();
+    return QSqlDatabase::database(dbn);
 }

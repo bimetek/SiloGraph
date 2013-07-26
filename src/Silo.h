@@ -20,18 +20,23 @@
 #define SILO_H
 
 #include <QObject>
+#include "Queryable.h"
 #include <QList>
 #include <QString>
 class Location;
 class NodeLine;
 
-class Silo : public QObject
+class Silo : public QObject, public Queryable
 {
     Q_OBJECT
 
 public:
     explicit Silo(QObject *parent = 0);
     void addLine(NodeLine *line);
+     virtual Queryable::Context executeWeekDataFetch(QMutex *mutex);
+
+protected:
+    virtual QSqlDatabase database();
 
 private:
     QString _name;
@@ -39,9 +44,9 @@ private:
     QList<NodeLine *> _lines;
 
 public:
-    inline QString name() { return _name; }
+    inline QString name() const { return _name; }
     inline void setName(QString name) { _name = name; }
-    inline Location *location() { return _location; }
+    inline Location *location() const { return _location; }
     inline void setLocation(Location *location) { _location = location; }
     inline QList<NodeLine *> &lines() { return _lines; }
 };
