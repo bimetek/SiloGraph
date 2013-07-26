@@ -37,7 +37,12 @@ public:
         Q_UNUSED(close);
         return Context();
     }
-    virtual Context executePoll(QMutex *, bool close = false)
+    virtual Context executePoll(QMutex *, bool close = true)
+    {
+        Q_UNUSED(close);
+        return Context();
+    }
+    virtual Context executeEnvironmentPoll(QMutex *, bool close = true)
     {
         Q_UNUSED(close);
         return Context();

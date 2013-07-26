@@ -32,12 +32,15 @@ public:
 private:
     QDateTime _dateTime;
     double _temperature;
+    double _humidity;
 
 public:
-    inline QDateTime dateTime() { return _dateTime; }
+    inline QDateTime dateTime() const { return _dateTime; }
     inline void setDateTime(QDateTime dateTime) { _dateTime = dateTime; }
-    inline double temperature() { return _temperature; }
+    inline double temperature() const { return _temperature; }
     inline void setTemperature(double temp) { _temperature = temp; }
+    inline double humidity() const { return _humidity; }
+    void setHumidity(double humidity) { _humidity = humidity; }
 };
 
 #endif // NODEDATA_H
