@@ -335,8 +335,7 @@ void GraphContainer::unblockPlot()
     findChild<ProgressLayer *>()->deleteLater();
 }
 
-void GraphContainer::updatePlot(Node *node, Silo *silo,
-                                QList<NodeData *> dataSet)
+void GraphContainer::updatePlot(Queryable *entity, QList<NodeData *> dataSet)
 {
     unblockPlot();
     clearPlot(false);
@@ -378,14 +377,16 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
     _plot->replot();
 
     QString title;
-    if (node)
+    if (dynamic_cast<Node *>(entity))
     {
+        Node *node = dynamic_cast<Node *>(entity);
         QString format(tr("%1, Sensor %2"));
         title = format.arg(node->line()->name(),
                            node->name().mid(1));
     }
-    else
+    else if (dynamic_cast<Silo *>(entity))
     {
+        Silo *silo = dynamic_cast<Silo *>(entity);
         QString format(tr("Averages for Silo %1"));
         title = format.arg(silo->name().mid(1));
     }

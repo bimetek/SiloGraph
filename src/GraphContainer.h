@@ -28,8 +28,7 @@ class QwtPlotCurve;
 class QwtPlotMagnifier;
 class QwtPlotPanner;
 class QwtPlotPicker;
-class Node;
-class Silo;
+class Queryable;
 class NodeData;
 
 class GraphContainer : public QWidget
@@ -42,7 +41,7 @@ public:
 public slots:
     void clearPlot();               // Default replot = true
     void clearPlot(bool replot);
-    void updatePlot(Node *node, Silo *silo, QList<NodeData *> dataSet);
+    void updatePlot(Queryable *entity, QList<NodeData *> dataSet);
     void blockPlot();
     void unblockPlot();
 

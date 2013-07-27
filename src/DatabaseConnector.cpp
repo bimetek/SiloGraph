@@ -122,21 +122,11 @@ void DatabaseConnector::processWeekDataQuery()
     Queryable::Context context = watcher->result();
     if (!context.isValid())
     {
-        emit dataFetched(0, 0, QList<NodeData *>());
+        emit dataFetched(0, QList<NodeData *>());
         return;
     }
 
     QSqlQuery &query = context.query;
-
-    Node *node = dynamic_cast<Node *>(context.entity);
-    Silo *silo = 0;
-    if (node)   // Try to make entity a node
-        silo = node->line()->silo();
-    else        // Try to make entity a silo instead
-        silo = dynamic_cast<Silo *>(context.entity);
-    if (!silo)  // entity is something unrecognizable
-        return;
-
     QList<NodeData *> dataSet;
     while (query.next())
     {
@@ -153,7 +143,7 @@ void DatabaseConnector::processWeekDataQuery()
         dataSet.append(data);
     }
 
-    emit dataFetched(node, silo, dataSet);
+    emit dataFetched(context.entity, dataSet);
 }
 
 void DatabaseConnector::fetchLatestData(Location *location)

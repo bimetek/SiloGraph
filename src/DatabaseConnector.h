@@ -46,7 +46,7 @@ public slots:
 
 signals:
     void fetchingStarted(Queryable *entity);
-    void dataFetched(Node *node, Silo *silo, QList<NodeData *> dataSet);
+    void dataFetched(Queryable *entity, QList<NodeData *> dataSet);
     void dataPolled(NodeLine *line, QList<double> data, QDateTime dateTime);
     void dataPolled(Location *loc, QHash<QString, double> data, QDateTime dt);
 
