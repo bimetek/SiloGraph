@@ -34,7 +34,7 @@
 #include "Node.h"
 #include "NodeData.h"
 
-Queryable::Context executeNodeQuery(Silo *silo, Node *node, QMutex *m)
+Queryable::Context executeWeekDataQuery(Silo *silo, Node *node, QMutex *m)
 {
     if (node)
         return node->executeWeekDataFetch(m);
@@ -102,7 +102,7 @@ void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
 {
     QMutex *m = _databaseMutexes[silo->location()->databaseAddress()];
     QFuture<Queryable::Context> future =
-            QtConcurrent::run(executeNodeQuery, silo, node, m);
+            QtConcurrent::run(executeWeekDataQuery, silo, node, m);
     QFutureWatcher<Queryable::Context> *watcher =
             new QFutureWatcher<Queryable::Context>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
@@ -117,10 +117,10 @@ void DatabaseConnector::processWeekDataQuery()
     watcher->deleteLater();
 
     Queryable::Context context = watcher->result();
+    if (!context.isValid())
+        return;
 
     QSqlQuery &query = context.query;
-    if (!query.size())
-        return;
 
     Node *node = dynamic_cast<Node *>(context.entity);
     Silo *silo = 0;
@@ -172,24 +172,26 @@ void DatabaseConnector::processLatestDataQuery()
 
     foreach (Queryable::Context context, contexts)
     {
+        if (!context.isValid())
+            continue;
+
         QSqlQuery &query = context.query;
-        bool toLast = query.last();
-        if (toLast)    // Successfully moved cursor to last row
+        if (!query.next())      // We only want the first row
+            continue;
+
+        QList<double> temperatures;
+        NodeLine *line = dynamic_cast<NodeLine *>(context.entity);
+        if (!line)
+            continue;
+        for (int i = 0; i < line->nodes().size(); i++)
         {
-            QList<double> temperatures;
-            NodeLine *line = dynamic_cast<NodeLine *>(context.entity);
-            if (!line)
-                continue;
-            for (int i = 0; i < line->nodes().size(); i++)
-            {
-                bool ok = false;
-                double temperature = query.value(i + 1).toDouble(&ok);
-                if (!ok)
-                    temperature = D_NO_DATA;
-                temperatures.append(temperature);
-            }
-            QDateTime dateTime = query.value(0).toDateTime();
-            emit dataPolled(line, temperatures, dateTime);
+            bool ok = false;
+            double temperature = query.value(i + 1).toDouble(&ok);
+            if (!ok)
+                temperature = D_NO_DATA;
+            temperatures.append(temperature);
         }
+        QDateTime dateTime = query.value(0).toDateTime();
+        emit dataPolled(line, temperatures, dateTime);
     }
 }

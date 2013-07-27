@@ -31,6 +31,13 @@ public:
         QSqlQuery query;
         Queryable *entity;
         QStringList dataKeys;
+
+        inline bool isValid()
+        {
+            if (!entity || !query.size())
+                return false;
+            return true;
+        }
     };
 
     virtual Context executeWeekDataFetch(QMutex *, bool close = true)
