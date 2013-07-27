@@ -390,6 +390,16 @@ void GraphContainer::updatePlot(Queryable *entity, QList<NodeData *> dataSet)
         QString format(tr("Averages for Silo %1"));
         title = format.arg(silo->name().mid(1));
     }
+    else if (dynamic_cast<Location *>(entity))
+    {
+        Location *location = dynamic_cast<Location *>(entity);
+        if (curvePoints.size())
+        {
+            QString format(tr("%1, %2"));
+            QString name = location->sensorKeys()[curvePoints.keys()[0]];
+            title = format.arg(location->name(), name);
+        }
+    }
     _plot->setTitle(title);
 
 

@@ -34,9 +34,9 @@ Silo::Silo(QObject *parent) :
      line->setSilo(this);
  }
 
- Queryable::Context Silo::executeWeekDataFetch(QMutex *mutex)
+ Queryable::Context Silo::executeWeekDataFetch(QMutex *m, QString, bool close)
  {
-     QMutexLocker locker(mutex);
+     QMutexLocker locker(m);
      Q_UNUSED(locker);
 
      QSqlDatabase db = QSqlDatabase::database(databaseName());
@@ -60,7 +60,9 @@ Silo::Silo(QObject *parent) :
      context.query.bindValue(":date", oneWeekAgo);
      context.query.exec();
 
-     db.close();
+     if (close)
+        db.close();
+
      return context;
  }
 

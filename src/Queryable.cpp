@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Node.h
+ * Queryable.cpp
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 28/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -16,34 +16,14 @@
  * this file belongs to.
  *****************************************************************************/
 
-#ifndef NODE_H
-#define NODE_H
+#include "Queryable.h"
 
-#include "NetworkElement.h"
-class QMutex;
-class Node;
-class NodeLine;
-class Silo;
-
-class Node : public NetworkElement
+Queryable::Context Queryable::executeWeekDataFetch(QMutex *, QString, bool)
 {
-    Q_OBJECT
+    return Context();
+}
 
-public:
-    explicit Node(QObject *parent = 0);
-    virtual Queryable::Context executeWeekDataFetch(
-            QMutex *mutex, QString = QString(), bool close = true);
-    virtual QString databaseName();
-
-private:
-    QString _name;
-    NodeLine *_line;
-
-public:
-    inline QString name() { return _name; }
-    inline void setName(QString name) { _name = name; }
-    inline NodeLine *line() { return _line; }
-    inline void setLine(NodeLine *line) { _line = line; }
-};
-
-#endif // NODE_H
+Queryable::Context Queryable::executePoll(QMutex *, QString, bool)
+{
+    return Context();
+}

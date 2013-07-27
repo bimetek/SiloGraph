@@ -34,13 +34,9 @@
 #include "Node.h"
 #include "NodeData.h"
 
-Queryable::Context executeWeekDataQuery(Queryable *entity, QMutex *m)
+Queryable::Context executeWeekDataQuery(Queryable *ent, QString key, QMutex *m)
 {
-    if (dynamic_cast<Node *>(entity))
-        return dynamic_cast<Node *>(entity)->executeWeekDataFetch(m);
-    else if (dynamic_cast<Silo *>(entity))
-        return dynamic_cast<Silo *>(entity)->executeWeekDataFetch(m);
-    return entity->executeWeekDataFetch(m);
+    return ent->executeWeekDataFetch(m, key);
 }
 
 QList<Queryable::Context> executePollForLocation(Location *location, QMutex *m)
@@ -105,7 +101,7 @@ void DatabaseConnector::fetchWeekData(Queryable *entity, QString key)
     Q_UNUSED(key);
     QMutex *m = _databaseMutexes[entity->databaseName()];
     QFuture<Queryable::Context> future =
-            QtConcurrent::run(executeWeekDataQuery, entity, m);
+            QtConcurrent::run(executeWeekDataQuery, entity, key, m);
     QFutureWatcher<Queryable::Context> *watcher =
             new QFutureWatcher<Queryable::Context>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));

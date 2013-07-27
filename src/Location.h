@@ -33,7 +33,10 @@ public:
     explicit Location(QObject *parent = 0);
     void addSilo(Silo *silo);
     void addSensor(const QString &key, const QString &value);
-    virtual Context executePoll(QMutex *mutex, bool close = true);
+    virtual Context executePoll(QMutex *mutex,
+                                QString = QString(), bool close = true);
+    virtual Context executeWeekDataFetch(QMutex *mutex, QString key,
+                                         bool close = true);
     virtual QString databaseName();
 
 private:

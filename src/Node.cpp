@@ -29,9 +29,9 @@ Node::Node(QObject *parent) :
 {
 }
 
-Queryable::Context Node::executeWeekDataFetch(QMutex *mutex)
+Queryable::Context Node::executeWeekDataFetch(QMutex *m, QString, bool close)
 {
-    QMutexLocker locker(mutex);
+    QMutexLocker locker(m);
     Q_UNUSED(locker);
 
     QSqlDatabase db = QSqlDatabase::database(databaseName());
@@ -52,7 +52,9 @@ Queryable::Context Node::executeWeekDataFetch(QMutex *mutex)
     context.query.bindValue(":date", oneWeekAgo);
     context.query.exec();
 
-    db.close();
+    if (close)
+        db.close();
+
     return context;
 }
 

@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "Location.h"
+#include <QDateTime>
 #include <QMutexLocker>
 #include <QVariant>
 #include "Silo.h"
@@ -37,7 +38,7 @@ void Location::addSensor(const QString &key, const QString &value)
     sensorKeys().insert(key, value);
 }
 
-Queryable::Context Location::executePoll(QMutex *mutex, bool close)
+Queryable::Context Location::executePoll(QMutex *mutex, QString, bool close)
 {
     QMutexLocker locker(mutex);
     Q_UNUSED(locker);
@@ -57,6 +58,39 @@ Queryable::Context Location::executePoll(QMutex *mutex, bool close)
     context.query = QSqlQuery(db);
     context.query.prepare(queryString);
     context.query.bindValue(":cableName", QVariant(sensorName()));
+    context.query.exec();
+
+    if (close)
+        db.close();
+
+    return context;
+}
+
+Queryable::Context Location::executeWeekDataFetch(QMutex *mutex,
+                                                  QString key, bool close)
+{
+    if (key.isEmpty())
+        return Queryable::Context();
+
+    QMutexLocker locker(mutex);
+    Q_UNUSED(locker);
+
+    QSqlDatabase db = QSqlDatabase::database(databaseName());
+
+    QString oneWeekAgo =
+            QDateTime(QDate::currentDate().addDays(-7)).toString(Qt::ISODate);
+    QString queryFormat =
+            "SELECT date, %1 FROM rawdata "
+            "WHERE silo_cable = :cableName AND date > :date ORDER BY date ASC";
+
+    Queryable::Context context;
+    context.entity = this;
+    context.dataKeys = QStringList(key);
+
+    context.query = QSqlQuery(db);
+    context.query.prepare(queryFormat.arg(key));
+    context.query.bindValue(":cableName", QVariant(sensorName()));
+    context.query.bindValue(":date", oneWeekAgo);
     context.query.exec();
 
     if (close)

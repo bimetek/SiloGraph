@@ -48,7 +48,8 @@ SOURCES += main.cpp\
     LogoHolder.cpp \
     SharedSettings.cpp \
     SettingsWindow.cpp \
-    ProgressLayer.cpp
+    ProgressLayer.cpp \
+    Queryable.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \

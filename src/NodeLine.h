@@ -32,7 +32,8 @@ class NodeLine : public NetworkElement
 public:
     explicit NodeLine(QObject *parent = 0);
     void addNode(Node *node);
-    virtual Context executePoll(QMutex *mutex, bool close = true);
+    virtual Context executePoll(QMutex *mutex,
+                                QString = QString(), bool close = true);
     virtual QString databaseName();
 
 private:

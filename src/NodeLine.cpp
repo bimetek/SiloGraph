@@ -35,7 +35,7 @@ void NodeLine::addNode(Node *node)
     node->setLine(this);
 }
 
-Queryable::Context NodeLine::executePoll(QMutex *mutex, bool close)
+Queryable::Context NodeLine::executePoll(QMutex *mutex, QString, bool close)
 {
     QMutexLocker locker(mutex);
     Q_UNUSED(locker);

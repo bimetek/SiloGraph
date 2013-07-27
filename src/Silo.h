@@ -32,7 +32,8 @@ class Silo : public NetworkElement
 public:
     explicit Silo(QObject *parent = 0);
     void addLine(NodeLine *line);
-    virtual Queryable::Context executeWeekDataFetch(QMutex *mutex);
+    virtual Queryable::Context executeWeekDataFetch(
+            QMutex *m, QString = QString(), bool close = true);
     virtual QString databaseName();
 
 private:

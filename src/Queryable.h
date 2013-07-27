@@ -43,16 +43,9 @@ public:
     };
 
     virtual QString databaseName() = 0;
-    virtual Context executeWeekDataFetch(QMutex *, bool close = true)
-    {
-        Q_UNUSED(close);
-        return Context();
-    }
-    virtual Context executePoll(QMutex *, bool close = true)
-    {
-        Q_UNUSED(close);
-        return Context();
-    }
+    virtual Context executeWeekDataFetch(
+            QMutex *, QString = QString(), bool = true);
+    virtual Context executePoll(QMutex *, QString, bool);
 };
 
 #endif // QUERYABLE_H

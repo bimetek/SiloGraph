@@ -17,6 +17,7 @@
  *****************************************************************************/
 
 #include "NodeData.h"
+#include <QDebug>
 
 NodeData::NodeData(const QDateTime &dateTime, QObject *parent) :
     QObject(parent)
