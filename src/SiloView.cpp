@@ -50,7 +50,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     // Setup signal mapper for silo buttons
     QSignalMapper *mapper = new QSignalMapper(this);
     connect(mapper, SIGNAL(mapped(QObject *)),
-            this, SLOT(switchToNode(QObject *)));
+            this, SLOT(switchToObject(QObject *)));
 
     // Silo average button
     QString buttonStyle = textFromFile(":/assets/silo_button_styles.css");
@@ -60,7 +60,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     averageButton->setObjectName("averageButton");
     averageButton->setStyleSheet(buttonStyle + "padding: 0 0.5em;");
     connect(averageButton, SIGNAL(clicked()), mapper, SLOT(map()));
-    mapper->setMapping(averageButton, reinterpret_cast<Node *>(0));
+    mapper->setMapping(averageButton, _silo);
 
     // Silo cables' buttons; also lay them out at the same time
     QHBoxLayout *siloLayout = new QHBoxLayout();
@@ -129,10 +129,12 @@ void SiloView::resizeEvent(QResizeEvent *)
     _backgroundHolder->setGeometry(left, 0, w, h);
 }
 
-void SiloView::switchToNode(QObject *obj)
+void SiloView::switchToObject(QObject *obj)
 {
-    Node *node = reinterpret_cast<Node *>(obj);
-    emit targetSwitched(node, _silo);
+    NetworkElement *element = dynamic_cast<NetworkElement *>(obj);
+    if (!element)
+        return;
+    emit targetSwitched(element);
 }
 
 void SiloView::updateLatestData(NodeLine *line, QList<double> &data,

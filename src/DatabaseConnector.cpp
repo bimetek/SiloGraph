@@ -99,8 +99,16 @@ DatabaseConnector::~DatabaseConnector()
     }
 }
 
-void DatabaseConnector::fetchWeekData(Node *node, Silo *silo)
+void DatabaseConnector::fetchWeekData(Queryable *entity)
 {
+    Node *node = dynamic_cast<Node *>(entity);
+    Silo *silo = 0;
+    if (node)
+        silo = node->line()->silo();
+    else
+        silo = dynamic_cast<Silo *>(entity);
+    if (!silo)
+        return;
     QMutex *m = _databaseMutexes[silo->location()->databaseAddress()];
     QFuture<Queryable::Context> future =
             QtConcurrent::run(executeWeekDataQuery, silo, node, m);

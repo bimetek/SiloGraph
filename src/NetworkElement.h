@@ -1,7 +1,7 @@
 /*****************************************************************************
- * Node.h
+ * NetworkElement.h
  *
- * Created: 04/7 2013 by uranusjr
+ * Created: 28/7 2013 by uranusjr
  *
  * Copyright 2013 uranusjr. All rights reserved.
  *
@@ -16,35 +16,17 @@
  * this file belongs to.
  *****************************************************************************/
 
-#ifndef NODE_H
-#define NODE_H
+#ifndef NETWORKELEMENT_H
+#define NETWORKELEMENT_H
 
-#include "NetworkElement.h"
-class QMutex;
-class Node;
-class NodeLine;
-class Silo;
+#include <QObject>
+#include "Queryable.h"
 
-class Node : public NetworkElement
+class NetworkElement : public QObject, public Queryable
 {
-    Q_OBJECT
-
 public:
-    explicit Node(QObject *parent = 0);
-    virtual Queryable::Context executeWeekDataFetch(QMutex *mutex);
-
-protected:
-    virtual QSqlDatabase database();
-
-private:
-    QString _name;
-    NodeLine *_line;
-
-public:
-    inline QString name() { return _name; }
-    inline void setName(QString name) { _name = name; }
-    inline NodeLine *line() { return _line; }
-    inline void setLine(NodeLine *line) { _line = line; }
+    explicit NetworkElement(QObject *parent = 0)
+        : QObject(parent), Queryable() {}
 };
 
-#endif // NODE_H
+#endif // NETWORKELEMENT_H

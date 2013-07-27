@@ -25,6 +25,7 @@
 #include <QList>
 #include <QMutex>
 class QSqlQuery;
+class Queryable;
 class Node;
 class NodeLine;
 class Silo;
@@ -40,7 +41,7 @@ public:
     virtual ~DatabaseConnector();
 
 public slots:
-    void fetchWeekData(Node *node, Silo *silo);
+    void fetchWeekData(Queryable *entity);
     void fetchLatestData(Location *location);
 
 signals:

@@ -54,8 +54,8 @@ MainWidget::MainWidget(QWidget *parent) :
             _siloListView, SLOT(setLocation(Location *)));
     connect(_mapContainer, SIGNAL(locationChanged(Location *)),
             _plotContainer, SLOT(clearPlot()));
-    connect(_siloListView, SIGNAL(targetSwitched(Node *,Silo *)),
-            _dbc, SLOT(fetchWeekData(Node *,Silo *)));
+    connect(_siloListView, SIGNAL(targetSwitched(Queryable *)),
+            _dbc, SLOT(fetchWeekData(Queryable *)));
     connect(_siloListView, SIGNAL(shouldPollForLocation(Location *)),
             _dbc, SLOT(fetchLatestData(Location *)));
     connect(_dbc, SIGNAL(dataFetched(Node *, Silo *, QList<NodeData *>)),

@@ -24,12 +24,11 @@
 #include <QList>
 #include <QPushButton>
 class QHBoxLayout;
+class QSignalMapper;
 class QVBoxLayout;
+class Queryable;
 class Location;
-class Node;
 class NodeLine;
-class Silo;
-class SiloView;
 class LogoHolder;
 
 class SiloListView : public QWidget
@@ -51,16 +50,19 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
 
 signals:
-    void targetSwitched(Node *node, Silo *silo);
+    void targetSwitched(Queryable *entity);
+    void targetSwitched(Location *location, QString key);
     void shouldPollForLocation(Location *location);
 
 private slots:
     void resizeLogo(qreal ratio);
+    void locationSensorClicked(QString name);
 
 private:
     Location *_currentLocation;
     int _pollingTimerId;
     LogoHolder *_logo;
+    QSignalMapper *_sensorsMapper;
     QHBoxLayout *_siloListLayout;
     QHBoxLayout *_titleLayout;
 };

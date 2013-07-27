@@ -22,7 +22,7 @@
 #include "Silo.h"
 
 Location::Location(QObject *parent) :
-    QObject(parent)
+    NetworkElement(parent)
 {
 }
 
@@ -52,7 +52,7 @@ Queryable::Context Location::executePoll(QMutex *mutex, bool close)
     QString queryString = queryFormat.arg(names.join(", "));
     Queryable::Context context;
     context.entity = this;
-    context.dataKeys = sensorKeys().values();
+    context.dataKeys = names;
 
     context.query = QSqlQuery(db);
     context.query.prepare(queryString);

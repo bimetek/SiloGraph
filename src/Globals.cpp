@@ -35,9 +35,9 @@ void clearLayout(QLayout *layout)
         if (item->layout())
         {
             clearLayout(item->layout());
-            delete item->layout();
+            item->layout()->deleteLater();
         }
-        delete item->widget();
+        item->widget()->deleteLater();
         item = layout->takeAt(0);
     }
 }

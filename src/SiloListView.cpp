@@ -20,6 +20,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QTimerEvent>
+#include <QSignalMapper>
 #include "Globals.h"
 #include "Location.h"
 #include "Silo.h"
@@ -36,6 +37,9 @@ SiloListView::SiloListView(QWidget *parent) :
     _pollingTimerId(0)
 {
     _logo = new LogoHolder(":/img/logo_transparent.png", this);
+    _sensorsMapper = new QSignalMapper(this);
+    connect(_sensorsMapper, SIGNAL(mapped(QString)),
+            this, SLOT(locationSensorClicked(QString)));
 
     _siloListLayout = new QHBoxLayout();
     _titleLayout = new QHBoxLayout();
@@ -70,13 +74,15 @@ void SiloListView::setLocation(Location *location)
     _titleLayout->addWidget(title);
 
     QString buttonStyle = textFromFile(":/assets/silo_button_styles.css");
-    foreach (QString name, location->sensorKeys().values())
+    foreach (QString key, location->sensorKeys().keys())
     {
         _titleLayout->addSpacing(20);
-        QPushButton *button = new QPushButton(name);
-        button->setObjectName(name);
+        QPushButton *button = new QPushButton(location->sensorKeys()[key]);
+        button->setObjectName(key);
         button->setStyleSheet(buttonStyle);
         _titleLayout->addWidget(button);
+        connect(button, SIGNAL(clicked()), _sensorsMapper, SLOT(map()));
+        _sensorsMapper->setMapping(button, key);
     }
     _titleLayout->addStretch(1);
 
@@ -85,8 +91,8 @@ void SiloListView::setLocation(Location *location)
     {
         SiloView *sv = new SiloView(silo);
         _siloListLayout->addWidget(sv);
-        connect(sv, SIGNAL(targetSwitched(Node *, Silo *)),
-                this, SIGNAL(targetSwitched(Node *, Silo *)));
+        connect(sv, SIGNAL(targetSwitched(Queryable *)),
+                this, SIGNAL(targetSwitched(Queryable *)));
         connect(this, SIGNAL(shouldPollForLocation(Location *)),
                 sv, SLOT(invalidateLastUpdate()));
     }
@@ -136,12 +142,13 @@ void SiloListView::updateLatestData(Location *location,
     QString suffix;
     foreach (QString key, data.keys())
     {
+        QString sensorName = location->sensorKeys()[key];
         QPushButton *button = findChild<QPushButton *>(key);
         if (button)
         {
-            if (key.compare("temperature", Qt::CaseInsensitive) == 0)
+            if (sensorName.compare("temperature", Qt::CaseInsensitive) == 0)
                 suffix = DEGREE_SIGN;
-            else if (key.compare("humidity", Qt::CaseInsensitive) == 0)
+            else if (sensorName.compare("humidity", Qt::CaseInsensitive) == 0)
                 suffix = "%";
             else
                 suffix = "";
@@ -161,4 +168,9 @@ void SiloListView::resizeLogo(qreal ratio)
     _logo->setGeometry((size().width() - width) / 2,
                        (size().height() - height) / 2,
                        width, height);
+}
+
+void SiloListView::locationSensorClicked(QString name)
+{
+    emit targetSwitched(_currentLocation, name);
 }

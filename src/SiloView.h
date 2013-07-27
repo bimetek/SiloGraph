@@ -22,8 +22,8 @@
 #include <QWidget>
 #include <QDateTime>
 class QLabel;
+class Queryable;
 class Silo;
-class Node;
 class NodeLine;
 
 class SiloView : public QWidget
@@ -41,13 +41,13 @@ public slots:
     void invalidateLastUpdate();
 
 signals:
-    void targetSwitched(Node *node, Silo *silo);
+    void targetSwitched(Queryable *entity);
 
 protected:
     void resizeEvent(QResizeEvent *);
 
 private slots:
-    void switchToNode(QObject *obj);
+    void switchToObject(QObject *obj);
 
 private:
     Silo *_silo;

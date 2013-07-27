@@ -24,7 +24,7 @@
 #include "Location.h"
 
 Silo::Silo(QObject *parent) :
-    QObject(parent)
+    NetworkElement(parent)
 {
 }
 
