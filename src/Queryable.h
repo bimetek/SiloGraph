@@ -28,6 +28,8 @@ class Queryable
 public:
     struct Context
     {
+        Context() : entity(0) {}
+
         QSqlQuery query;
         Queryable *entity;
         QStringList dataKeys;
@@ -40,6 +42,7 @@ public:
         }
     };
 
+    virtual QString databaseName() = 0;
     virtual Context executeWeekDataFetch(QMutex *, bool close = true)
     {
         Q_UNUSED(close);
@@ -50,9 +53,6 @@ public:
         Q_UNUSED(close);
         return Context();
     }
-
-protected:
-    virtual QSqlDatabase database() = 0;
 };
 
 #endif // QUERYABLE_H

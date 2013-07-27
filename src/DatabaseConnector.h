@@ -41,11 +41,11 @@ public:
     virtual ~DatabaseConnector();
 
 public slots:
-    void fetchWeekData(Queryable *entity);
+    void fetchWeekData(Queryable *entity, QString key);
     void fetchLatestData(Location *location);
 
 signals:
-    void fetchingStarted(Node *node, Silo *silo);
+    void fetchingStarted(Queryable *entity);
     void dataFetched(Node *node, Silo *silo, QList<NodeData *> dataSet);
     void dataPolled(NodeLine *line, QList<double> data, QDateTime dateTime);
     void dataPolled(Location *loc, QHash<QString, double> data, QDateTime dt);

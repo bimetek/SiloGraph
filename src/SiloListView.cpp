@@ -91,8 +91,8 @@ void SiloListView::setLocation(Location *location)
     {
         SiloView *sv = new SiloView(silo);
         _siloListLayout->addWidget(sv);
-        connect(sv, SIGNAL(targetSwitched(Queryable *)),
-                this, SIGNAL(targetSwitched(Queryable *)));
+        connect(sv, SIGNAL(targetSwitched(Queryable *, QString)),
+                this, SIGNAL(targetSwitched(Queryable *, QString)));
         connect(this, SIGNAL(shouldPollForLocation(Location *)),
                 sv, SLOT(invalidateLastUpdate()));
     }

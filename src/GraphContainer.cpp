@@ -377,19 +377,17 @@ void GraphContainer::updatePlot(Node *node, Silo *silo,
 
     _plot->replot();
 
-    Location *location = silo->location();
     QString title;
     if (node)
     {
-        QString format(tr("%1, %2, Sensor %3"));
-        title = format.arg(location->name(),
-                           node->line()->name(),
+        QString format(tr("%1, Sensor %2"));
+        title = format.arg(node->line()->name(),
                            node->name().mid(1));
     }
     else
     {
-        QString format(tr("%1, Averages for Silo %2"));
-        title = format.arg(location->name(), silo->name().mid(1));
+        QString format(tr("Averages for Silo %1"));
+        title = format.arg(silo->name().mid(1));
     }
     _plot->setTitle(title);
 

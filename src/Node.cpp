@@ -34,7 +34,7 @@ Queryable::Context Node::executeWeekDataFetch(QMutex *mutex)
     QMutexLocker locker(mutex);
     Q_UNUSED(locker);
 
-    QSqlDatabase db = database();
+    QSqlDatabase db = QSqlDatabase::database(databaseName());
 
     QString oneWeekAgo =
             QDateTime(QDate::currentDate().addDays(-7)).toString(Qt::ISODate);
@@ -56,8 +56,7 @@ Queryable::Context Node::executeWeekDataFetch(QMutex *mutex)
     return context;
 }
 
-QSqlDatabase Node::database()
+QString Node::databaseName()
 {
-    QString dbn = line()->silo()->location()->databaseAddress();
-    return QSqlDatabase::database(dbn);
+    return line()->silo()->location()->databaseAddress();
 }

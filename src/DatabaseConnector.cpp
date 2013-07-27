@@ -34,12 +34,13 @@
 #include "Node.h"
 #include "NodeData.h"
 
-Queryable::Context executeWeekDataQuery(Silo *silo, Node *node, QMutex *m)
+Queryable::Context executeWeekDataQuery(Queryable *entity, QMutex *m)
 {
-    if (node)
-        return node->executeWeekDataFetch(m);
-    else
-        return silo->executeWeekDataFetch(m);
+    if (dynamic_cast<Node *>(entity))
+        return dynamic_cast<Node *>(entity)->executeWeekDataFetch(m);
+    else if (dynamic_cast<Silo *>(entity))
+        return dynamic_cast<Silo *>(entity)->executeWeekDataFetch(m);
+    return entity->executeWeekDataFetch(m);
 }
 
 QList<Queryable::Context> executePollForLocation(Location *location, QMutex *m)
@@ -99,24 +100,17 @@ DatabaseConnector::~DatabaseConnector()
     }
 }
 
-void DatabaseConnector::fetchWeekData(Queryable *entity)
+void DatabaseConnector::fetchWeekData(Queryable *entity, QString key)
 {
-    Node *node = dynamic_cast<Node *>(entity);
-    Silo *silo = 0;
-    if (node)
-        silo = node->line()->silo();
-    else
-        silo = dynamic_cast<Silo *>(entity);
-    if (!silo)
-        return;
-    QMutex *m = _databaseMutexes[silo->location()->databaseAddress()];
+    Q_UNUSED(key);
+    QMutex *m = _databaseMutexes[entity->databaseName()];
     QFuture<Queryable::Context> future =
-            QtConcurrent::run(executeWeekDataQuery, silo, node, m);
+            QtConcurrent::run(executeWeekDataQuery, entity, m);
     QFutureWatcher<Queryable::Context> *watcher =
             new QFutureWatcher<Queryable::Context>();
     connect(watcher, SIGNAL(finished()), this, SLOT(processWeekDataQuery()));
     watcher->setFuture(future);
-    emit fetchingStarted(node, silo);
+    emit fetchingStarted(entity);
 }
 
 void DatabaseConnector::processWeekDataQuery()
@@ -127,7 +121,10 @@ void DatabaseConnector::processWeekDataQuery()
 
     Queryable::Context context = watcher->result();
     if (!context.isValid())
+    {
+        emit dataFetched(0, 0, QList<NodeData *>());
         return;
+    }
 
     QSqlQuery &query = context.query;
 

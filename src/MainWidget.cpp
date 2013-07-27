@@ -18,6 +18,7 @@
 
 #include "MainWidget.h"
 #include <QHBoxLayout>
+#include <QString>
 #include <QTimerEvent>
 #include <QVBoxLayout>
 #include "DatabaseConnector.h"
@@ -54,8 +55,8 @@ MainWidget::MainWidget(QWidget *parent) :
             _siloListView, SLOT(setLocation(Location *)));
     connect(_mapContainer, SIGNAL(locationChanged(Location *)),
             _plotContainer, SLOT(clearPlot()));
-    connect(_siloListView, SIGNAL(targetSwitched(Queryable *)),
-            _dbc, SLOT(fetchWeekData(Queryable *)));
+    connect(_siloListView, SIGNAL(targetSwitched(Queryable *, QString)),
+            _dbc, SLOT(fetchWeekData(Queryable *, QString)));
     connect(_siloListView, SIGNAL(shouldPollForLocation(Location *)),
             _dbc, SLOT(fetchLatestData(Location *)));
     connect(_dbc, SIGNAL(dataFetched(Node *, Silo *, QList<NodeData *>)),
@@ -68,6 +69,6 @@ MainWidget::MainWidget(QWidget *parent) :
                              Location *, QHash<QString,double>, QDateTime)),
             _siloListView, SLOT(updateLatestData(
                             Location *, QHash<QString, double>, QDateTime)));
-    connect(_dbc, SIGNAL(fetchingStarted(Node *, Silo *)),
+    connect(_dbc, SIGNAL(fetchingStarted(Queryable *)),
             _plotContainer, SLOT(blockPlot()));
 }

@@ -50,8 +50,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *);
 
 signals:
-    void targetSwitched(Queryable *entity);
-    void targetSwitched(Location *location, QString key);
+    void targetSwitched(Queryable *entity, QString key);
     void shouldPollForLocation(Location *location);
 
 private slots:

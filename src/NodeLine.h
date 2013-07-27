@@ -33,9 +33,7 @@ public:
     explicit NodeLine(QObject *parent = 0);
     void addNode(Node *node);
     virtual Context executePoll(QMutex *mutex, bool close = true);
-
-protected:
-    virtual QSqlDatabase database();
+    virtual QString databaseName();
 
 private:
     QString _name;

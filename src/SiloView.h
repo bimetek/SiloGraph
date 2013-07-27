@@ -41,7 +41,7 @@ public slots:
     void invalidateLastUpdate();
 
 signals:
-    void targetSwitched(Queryable *entity);
+    void targetSwitched(Queryable *entity, QString key = QString());
 
 protected:
     void resizeEvent(QResizeEvent *);

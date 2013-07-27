@@ -34,9 +34,7 @@ public:
     void addSilo(Silo *silo);
     void addSensor(const QString &key, const QString &value);
     virtual Context executePoll(QMutex *mutex, bool close = true);
-
-protected:
-    virtual QSqlDatabase database();
+    virtual QString databaseName();
 
 private:
     QString _name;

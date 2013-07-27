@@ -40,7 +40,7 @@ Queryable::Context NodeLine::executePoll(QMutex *mutex, bool close)
     QMutexLocker locker(mutex);
     Q_UNUSED(locker);
 
-    QSqlDatabase db = database();
+    QSqlDatabase db = QSqlDatabase::database(databaseName());
 
     QString queryFormat =
             "SELECT date, %1 FROM rawdata WHERE silo_cable = :cableName "
@@ -64,7 +64,7 @@ Queryable::Context NodeLine::executePoll(QMutex *mutex, bool close)
     return context;
 }
 
-QSqlDatabase NodeLine::database()
+QString NodeLine::databaseName()
 {
-    return QSqlDatabase::database(silo()->location()->databaseAddress());
+    return silo()->location()->databaseAddress();
 }

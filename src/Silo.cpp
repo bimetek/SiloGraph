@@ -39,7 +39,7 @@ Silo::Silo(QObject *parent) :
      QMutexLocker locker(mutex);
      Q_UNUSED(locker);
 
-     QSqlDatabase db = database();
+     QSqlDatabase db = QSqlDatabase::database(databaseName());
 
      QString oneWeekAgo =
              QDateTime(QDate::currentDate().addDays(-7)).toString(Qt::ISODate);
@@ -64,8 +64,7 @@ Silo::Silo(QObject *parent) :
      return context;
  }
 
- QSqlDatabase Silo::database()
+ QString Silo::databaseName()
  {
-     QString dbn = location()->databaseAddress();
-     return QSqlDatabase::database(dbn);
+     return location()->databaseAddress();
  }

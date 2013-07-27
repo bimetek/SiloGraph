@@ -42,7 +42,7 @@ Queryable::Context Location::executePoll(QMutex *mutex, bool close)
     QMutexLocker locker(mutex);
     Q_UNUSED(locker);
 
-    QSqlDatabase db = database();
+    QSqlDatabase db = QSqlDatabase::database(databaseName());
 
     QString queryFormat =
             "SELECT date, %1 FROM rawdata WHERE silo_cable = :cableName "
@@ -65,7 +65,7 @@ Queryable::Context Location::executePoll(QMutex *mutex, bool close)
     return context;
 }
 
-QSqlDatabase Location::database()
+QString Location::databaseName()
 {
-    return QSqlDatabase::database(databaseAddress());
+    return databaseAddress();
 }

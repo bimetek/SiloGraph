@@ -32,9 +32,7 @@ class Node : public NetworkElement
 public:
     explicit Node(QObject *parent = 0);
     virtual Queryable::Context executeWeekDataFetch(QMutex *mutex);
-
-protected:
-    virtual QSqlDatabase database();
+    virtual QString databaseName();
 
 private:
     QString _name;
