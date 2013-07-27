@@ -17,6 +17,8 @@
  *****************************************************************************/
 
 #include "Location.h"
+#include <QMutexLocker>
+#include <QVariant>
 #include "Silo.h"
 
 Location::Location(QObject *parent) :
@@ -28,4 +30,42 @@ void Location::addSilo(Silo *silo)
 {
     silos().append(silo);
     silo->setLocation(this);
+}
+
+void Location::addSensor(const QString &key, const QString &value)
+{
+    sensorKeys().insert(key, value);
+}
+
+Queryable::Context Location::executePoll(QMutex *mutex, bool close)
+{
+    QMutexLocker locker(mutex);
+    Q_UNUSED(locker);
+
+    QSqlDatabase db = database();
+
+    QString queryFormat =
+            "SELECT date, %1 FROM rawdata WHERE silo_cable = :cableName "
+            "ORDER BY date DESC LIMIT 1";
+    QStringList names(sensorKeys().keys());
+
+    QString queryString = queryFormat.arg(names.join(", "));
+    Queryable::Context context;
+    context.entity = this;
+    context.dataKeys = sensorKeys().values();
+
+    context.query = QSqlQuery(db);
+    context.query.prepare(queryString);
+    context.query.bindValue(":cableName", QVariant(sensorName()));
+    context.query.exec();
+
+    if (close)
+        db.close();
+
+    return context;
+}
+
+QSqlDatabase Location::database()
+{
+    return QSqlDatabase::database(databaseAddress());
 }

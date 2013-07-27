@@ -47,6 +47,7 @@ signals:
     void fetchingStarted(Node *node, Silo *silo);
     void dataFetched(Node *node, Silo *silo, QList<NodeData *> dataSet);
     void dataPolled(NodeLine *line, QList<double> data, QDateTime dateTime);
+    void dataPolled(Location *loc, QHash<QString, double> data, QDateTime dt);
 
 private slots:
     void processWeekDataQuery();

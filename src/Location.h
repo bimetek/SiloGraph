@@ -20,17 +20,24 @@
 #define LOCATION_H
 
 #include <QObject>
+#include "Queryable.h"
 #include <QList>
-#include <QString>
+#include <QHash>
+#include <QSqlDatabase>
 class Silo;
 
-class Location : public QObject
+class Location : public QObject, public Queryable
 {
     Q_OBJECT
 
 public:
     explicit Location(QObject *parent = 0);
     void addSilo(Silo *silo);
+    void addSensor(const QString &key, const QString &value);
+    virtual Context executePoll(QMutex *mutex, bool close = true);
+
+protected:
+    virtual QSqlDatabase database();
 
 private:
     QString _name;
@@ -38,6 +45,8 @@ private:
     double _latitude;
     double _longitude;
     QList<Silo *> _silos;
+    QString _sensorName;
+    QHash<QString, QString> _sensorKeys;
 
 public:
     inline QString name() { return _name; }
@@ -49,6 +58,9 @@ public:
     inline double longitude() { return _longitude; }
     inline void setLongitude(double longitude) { _longitude = longitude; }
     inline QList<Silo *> &silos() { return _silos; }
+    QString sensorName() const { return _sensorName; }
+    void setSensorName(const QString &sensorName) { _sensorName = sensorName; }
+    QHash<QString, QString> &sensorKeys() { return _sensorKeys; }
 };
 
 #endif // LOCATION_H

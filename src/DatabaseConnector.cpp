@@ -48,6 +48,7 @@ QList<Queryable::Context> executePollForLocation(Location *location, QMutex *m)
     QSqlDatabase db = QSqlDatabase::database(address);
 
     QList<Queryable::Context> contexts;
+    contexts.append(location->executePoll(m, false));
     foreach (Silo *silo, location->silos())
     {
         foreach (NodeLine *line, silo->lines())
@@ -179,19 +180,39 @@ void DatabaseConnector::processLatestDataQuery()
         if (!query.next())      // We only want the first row
             continue;
 
-        QList<double> temperatures;
-        NodeLine *line = dynamic_cast<NodeLine *>(context.entity);
-        if (!line)
-            continue;
-        for (int i = 0; i < line->nodes().size(); i++)
-        {
-            bool ok = false;
-            double temperature = query.value(i + 1).toDouble(&ok);
-            if (!ok)
-                temperature = D_NO_DATA;
-            temperatures.append(temperature);
-        }
         QDateTime dateTime = query.value(0).toDateTime();
-        emit dataPolled(line, temperatures, dateTime);
+
+        NodeLine *line = dynamic_cast<NodeLine *>(context.entity);
+        if (line)
+        {
+            QList<double> temperatures;
+            for (int i = 0; i < line->nodes().size(); i++)
+            {
+                bool ok = false;
+                double temperature = query.value(i + 1).toDouble(&ok);
+                if (!ok)
+                    temperature = D_NO_DATA;
+                temperatures.append(temperature);
+            }
+            emit dataPolled(line, temperatures, dateTime);
+            continue;
+        }
+
+        Location *location = dynamic_cast<Location *>(context.entity);
+        if (location)
+        {
+            QHash<QString, double> values;
+            uint i = 1;
+            foreach (QString key, context.dataKeys)
+            {
+                bool ok = false;
+                double value = query.value(i++).toDouble(&ok);
+                if (!ok)
+                    value = D_NO_DATA;
+                values.insert(key, value);
+            }
+            emit dataPolled(location, values, dateTime);
+            continue;
+        }
     }
 }

@@ -84,6 +84,14 @@ MapContainer::MapContainer(QWidget *parent) :
         location->setDatabaseAddress(address);
         location->setLatitude(info["latitude"].toDouble());
         location->setLongitude(info["longitude"].toDouble());
+        if (info.contains("sensors"))
+        {
+            QJsonObject sensors = info["sensors"].toObject();
+            location->setSensorName(sensors["name"].toString());
+            QJsonObject sensorKeys = sensors["keys"].toObject();
+            foreach (QString key, sensorKeys.keys())
+                location->addSensor(key, sensorKeys[key].toString());
+        }
         foreach (QJsonValue siloItem, info["silos"].toArray())
         {
             Silo *silo = new Silo(location);

@@ -50,11 +50,6 @@ public:
         Q_UNUSED(close);
         return Context();
     }
-    virtual Context executeEnvironmentPoll(QMutex *, bool close = true)
-    {
-        Q_UNUSED(close);
-        return Context();
-    }
 
 protected:
     virtual QSqlDatabase database() = 0;
