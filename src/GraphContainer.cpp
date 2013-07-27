@@ -62,11 +62,10 @@ protected:
             return QwtText();
 
         QDateTime dt = _datetime.addSecs(p.x());
-        QString format = QString(" %1 \n%2%3");
+        QString format = QString(" %1 \n%2");
 
         QwtText result(format.arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
-                                  QString::number(p.y(), 'f', 2),
-                                  DEGREE_SIGN));
+                                  QString::number(p.y(), 'f', 2)));
         QBrush whiteBrush(Qt::white);
         result.setBackgroundBrush(whiteBrush);
         return result;
