@@ -6,12 +6,15 @@
 
 QT       += core gui sql webkit
 
+unix|win32-g++:LIBS += -L../lib
+
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets webkitwidgets
-    LIBS += -lQt5Concurrent
 }
 !greaterThan(QT_MAJOR_VERSION, 4) {
-    LIBS += -lqjson
+    INCLUDEPATH += ../3rdparty/qjson-backport
+    unix|win32-g++:LIBS += -lqjsonbackport
+    else:LIBS += ../lib/qjsonbackport.lib
 }
 
 TARGET = SiloGraph
@@ -23,8 +26,8 @@ CONFIG += qwt
 
 INCLUDEPATH += ../3rdparty
 
-unix:LIBS += -L../lib -lQProgressIndicator
-win32:LIBS += ../lib/QProgressIndicator.lib
+unix|win32-g++:LIBS += -lQProgressIndicator
+else:LIBS += ../lib/QProgressIndicator.lib
 
 SOURCES += main.cpp\
     MainWindow.cpp \

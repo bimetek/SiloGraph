@@ -24,28 +24,29 @@ after a new checkout, as it is set to be *assumed unchanged* in Git.
   See [documentation](http://qt-project.org/doc/qt-4.8/sql-driver.html) for
   details.
 * [Qwt] 6.1.0 or greater.
-* [QJson] if using Qt 4.
 
 
 ## Licensing
 
 All source files (files inside `src` directory) in this project, unless
-stated otherwise, may be distributed under the terms of Public License version
-3 (GPL v3) as defined by the Free Software Foundation (FSF). A copy of the
-license should have been included inside the `LICENSE` directory.
+stated otherwise, may be distributed under the terms of the GNU Public License
+version 3 (GPL v3) as defined by the Free Software Foundation (FSF). A copy of
+the license should have been included inside the `LICENSE` directory.
 
 **[Qwt]** is used under the terms of the Qwt License, Version 1.0. You may find
 contents of the license at [http://qwt.sourceforge.net/qwtlicense.html].
 
-**[QJson]** is used under the terms of the Lesser GNU General Public License version
-2.1 (LGPL 2.1). Visit QJson's homepage for more information.
+**[QProgressIndicator]** is used and redistributed under the terms of the
+Lesser GNU General Public License version 2.1 (LGPL 2.1). You may find more
+information for the project at its project page.
 
-**[QProgressIndicator]** is used and redistributed under the terms of the Lesser GNU
-General Public License version 2.1 (LGPL 2.1). You may find more information for
-the project at its project page.
+**[qjson-backport]** is a collection of JSON-related classes extracted from Qt
+5, and is modified and redistributed under the terms of the GNU Public License
+version 3.0 (GPL 3.0). Backporting efforts go to [@5in4 on GitHub.com].
 
 
 [Qwt]: http://qwt.sourceforge.net
-[QJson]: http://qjson.sourceforge.net
 [http://qwt.sourceforge.net/qwtlicense.html]: http://qwt.sourceforge.net/qwtlicense.html
 [QProgressIndicator]: https://github.com/mojocorp/QProgressIndicator
+[qjson-backport]: https://github.com/5in4/qjson-backport
+[@5in4 on GitHub.com]: https://github.com/5in4

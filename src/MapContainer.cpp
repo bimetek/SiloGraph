@@ -22,13 +22,9 @@
 #include <QPushButton>
 #include <QSignalMapper>
 #include <QVariantMap>
-#if QT_VERSION >= 0x050000
-    #include <QJsonDocument>
-    #include <QJsonObject>
-    #include <QJsonArray>
-#else
-    #include <qjson/parser.h>
-#endif
+#include <qjsonarray.h>
+#include <qjsondocument.h>
+#include <qjsonobject.h>
 #include "Globals.h"
 #include "MapView.h"
 #include "MapMarker.h"
@@ -54,14 +50,14 @@ MapContainer::MapContainer(QWidget *parent) :
     QFile json("locations.json");
 
 
-#if QT_VERSION >= 0x050000
     dbFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(dbFile.readAll(), &parseError);
     dbFile.close();
     if (parseError.error != QJsonParseError::NoError)
     {
-        qFatal(parseError.errorString().toUtf8().data());
+        qFatal("JSON error in databases.json (MapContainer.cpp): %d",
+               parseError.error);
         return;
     }
     QJsonObject dbInfo = doc.object();
@@ -72,7 +68,7 @@ MapContainer::MapContainer(QWidget *parent) :
     json.close();
     if (parseError.error != QJsonParseError::NoError)
     {
-        qFatal(parseError.errorString().toUtf8().data());
+        qFatal("JSON error in locations.json: %d", parseError.error);
         return;
     }
     QJsonObject result = doc.object();
@@ -110,60 +106,7 @@ MapContainer::MapContainer(QWidget *parent) :
         }
         _locations.insert(location->name(), location);
     }
-#else
-    QJson::Parser parser;
-    bool success = false;
 
-    QVariantMap dbInfo = parser.parse(&dbFile, &success).toMap();
-    if (!success)
-    {
-        qFatal("Database JSON cannot be parsed");
-        return;
-    }
-    QString defaultAddress = dbInfo["default"].toString();
-
-    QVariantMap result = parser.parse(&json, &success).toMap();
-    if (!success)
-    {
-        qFatal("Location JSON cannot be parsed");
-        return;
-    }
-
-    foreach(QVariant item, result["locations"].toList())
-    {
-        QVariantMap info = item.toMap();
-        QString address = defaultAddress;
-        if (info.contains("databaseAddress"))
-            address = info["databaseAddress"].toString();
-
-        Location *location = new Location(this);
-        location->setName(info["name"].toString());
-        location->setDatabaseAddress(address);
-        location->setLatitude(info["latitude"].toDouble());
-        location->setLongitude(info["longitude"].toDouble());
-        foreach (QVariant siloItem, info["silos"].toList())
-        {
-            Silo *silo = new Silo(location);
-            info = siloItem.toMap();
-            silo->setName(info["name"].toString());
-            foreach (QVariant lineItem, info["lines"].toList())
-            {
-                NodeLine *line = new NodeLine(silo);
-                info = lineItem.toMap();
-                line->setName(info["name"].toString());
-                for (int i = 0; i < info["nodesCount"].toInt(); i++)
-                {
-                    Node *node = new Node(line);
-                    node->setName(QString("s%1").arg(QString::number(i + 1)));
-                    line->addNode(node);
-                }
-                silo->addLine(line);
-            }
-            location->addSilo(silo);
-        }
-        _locations.insert(location->name(), location);
-    }
-#endif
     setMinimumWidth(100);
 }
 

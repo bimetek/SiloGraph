@@ -18,18 +18,15 @@
 
 #include "DatabaseConnector.h"
 #if QT_VERSION >= 0x050000
-    #include <QtConcurrent/QtConcurrent>
+    #include <QtConcurrent/QtConcurrentRun>
 #else
     #include <QtConcurrentRun>
 #endif
 #include <QFile>
 #include <QFutureWatcher>
 #include <QStringList>
-#if QT_VERSION >= 0x050000
-    #include <QJsonDocument>
-#else
-    #include <qjson/parser.h>
-#endif
+#include <qjsondocument.h>
+#include <qjsonobject.h>
 #include "Globals.h"
 #include "Location.h"
 #include "Silo.h"
@@ -66,14 +63,13 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
 {
     QFile dbFile("databases.json");
 
-#if QT_VERSION >= 0x050000
     dbFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(dbFile.readAll(), &parseError);
     dbFile.close();
     if (parseError.error != QJsonParseError::NoError)
     {
-        qFatal(parseError.errorString().toUtf8().data());
+        qFatal("JSON error in database.json: %d", parseError.error);
         return;
     }
     QJsonObject dbs = doc.object()["databases"].toObject();
@@ -91,32 +87,6 @@ DatabaseConnector::DatabaseConnector(QObject *parent) :
         if (info.contains("port"))
             db.setPort(info["port"].toDouble());
     }
-#else
-    QJson::Parser parser;
-    bool success = false;
-    QVariant result = parser.parse(&dbFile, &success);
-
-    if (!success)
-    {
-        qFatal("Database JSON cannot be parsed");
-        return;
-    }
-    QVariantMap dbs = result.toMap()["databases"].toMap();
-    foreach (QString key, dbs.keys())
-    {
-        QVariantMap info = dbs[key].toMap();
-        QString address = info["address"].toString();
-        _databaseMutexes.insert(address, new QMutex());
-        QSqlDatabase db = QSqlDatabase::addDatabase(info["driver"].toString(),
-                                                    address);
-        db.setHostName(address);
-        db.setUserName(info["username"].toString());
-        db.setPassword(info["password"].toString());
-        db.setDatabaseName("almin");
-        if (info.contains("port"))
-            db.setPort(info["port"].toInt());
-    }
-#endif
 }
 
 DatabaseConnector::~DatabaseConnector()
