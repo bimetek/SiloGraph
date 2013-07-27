@@ -38,11 +38,16 @@ SiloListView::SiloListView(QWidget *parent) :
     _logo = new LogoHolder(":/img/logo_transparent.png", this);
 
     _siloListLayout = new QHBoxLayout();
+    _titleLayout = new QHBoxLayout();
+    _titleLayout->setContentsMargins(0, 0, 0, 0);
+    _titleLayout->setAlignment(Qt::AlignBottom);
+
     QVBoxLayout *mainLayout = new QVBoxLayout();
+    mainLayout->addLayout(_titleLayout, 0);
     mainLayout->addLayout(_siloListLayout, 1);
     setLayout(mainLayout);
 
-    setMinimumHeight(400);
+    setMinimumHeight(450);
 
     connect(SharedSettings::sharedSettings(),
             SIGNAL(logoSizeRatioChanged(qreal)),
@@ -56,6 +61,24 @@ void SiloListView::setLocation(Location *location)
         return;
 
     _currentLocation = location;
+
+    QLabel *title = new QLabel(location->name());
+    title->setStyleSheet("font-size: 20px; font-weight: bold; height: 16px;");
+
+    clearLayout(_titleLayout);
+    _titleLayout->addStretch(1);
+    _titleLayout->addWidget(title);
+
+    QString buttonStyle = textFromFile(":/assets/silo_button_styles.css");
+    foreach (QString name, location->sensorKeys().values())
+    {
+        _titleLayout->addSpacing(20);
+        QPushButton *button = new QPushButton(name);
+        button->setObjectName(name);
+        button->setStyleSheet(buttonStyle);
+        _titleLayout->addWidget(button);
+    }
+    _titleLayout->addStretch(1);
 
     clearLayout(_siloListLayout);
     foreach (Silo *silo, location->silos())
@@ -101,6 +124,30 @@ void SiloListView::updateLatestData(NodeLine *line, QList<double> data,
     Silo *silo = line->silo();
     SiloView *sv = findChild<SiloView *>(silo->name());
     sv->updateLatestData(line, data, dateTime);
+}
+
+void SiloListView::updateLatestData(Location *location,
+                                    QHash<QString, double> data, QDateTime)
+{
+    if (_currentLocation != location)
+        return;
+
+    QString format("%1%2");
+    QString suffix;
+    foreach (QString key, data.keys())
+    {
+        QPushButton *button = findChild<QPushButton *>(key);
+        if (button)
+        {
+            if (key.compare("temperature", Qt::CaseInsensitive) == 0)
+                suffix = DEGREE_SIGN;
+            else if (key.compare("humidity", Qt::CaseInsensitive) == 0)
+                suffix = "%";
+            else
+                suffix = "";
+            button->setText(format.arg(QString::number(data[key]), suffix));
+        }
+    }
 }
 
 void SiloListView::resizeLogo(qreal ratio)

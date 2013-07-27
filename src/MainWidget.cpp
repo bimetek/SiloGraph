@@ -58,14 +58,16 @@ MainWidget::MainWidget(QWidget *parent) :
             _dbc, SLOT(fetchWeekData(Node *,Silo *)));
     connect(_siloListView, SIGNAL(shouldPollForLocation(Location *)),
             _dbc, SLOT(fetchLatestData(Location *)));
-    connect(_dbc,
-            SIGNAL(dataFetched(Node *, Silo *, QList<NodeData *>)),
-            _plotContainer,
-            SLOT(updatePlot(Node *, Silo *, QList<NodeData *>)));
-    connect(_dbc,
-            SIGNAL(dataPolled(NodeLine *, QList<double>, QDateTime)),
-            _siloListView,
-            SLOT(updateLatestData(NodeLine *, QList<double>, QDateTime)));
+    connect(_dbc, SIGNAL(dataFetched(Node *, Silo *, QList<NodeData *>)),
+            _plotContainer, SLOT(updatePlot(
+                                     Node *, Silo *, QList<NodeData *>)));
+    connect(_dbc, SIGNAL(dataPolled(NodeLine *, QList<double>, QDateTime)),
+            _siloListView, SLOT(updateLatestData(
+                                    NodeLine *, QList<double>, QDateTime)));
+    connect(_dbc, SIGNAL(dataPolled(
+                             Location *, QHash<QString,double>, QDateTime)),
+            _siloListView, SLOT(updateLatestData(
+                            Location *, QHash<QString, double>, QDateTime)));
     connect(_dbc, SIGNAL(fetchingStarted(Node *, Silo *)),
             _plotContainer, SLOT(blockPlot()));
 }

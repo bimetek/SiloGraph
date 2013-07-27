@@ -22,7 +22,9 @@
 #include <QWidget>
 #include <QDateTime>
 #include <QList>
+#include <QPushButton>
 class QHBoxLayout;
+class QVBoxLayout;
 class Location;
 class Node;
 class NodeLine;
@@ -41,6 +43,8 @@ public slots:
     void setLocation(Location *location);
     void updateLatestData(NodeLine *line, QList<double> data,
                           QDateTime dateTime);
+    void updateLatestData(Location *location,
+                          QHash<QString, double> data, QDateTime);
 
 protected:
     virtual void timerEvent(QTimerEvent *e);
@@ -56,8 +60,9 @@ private slots:
 private:
     Location *_currentLocation;
     int _pollingTimerId;
-    QHBoxLayout *_siloListLayout;
     LogoHolder *_logo;
+    QHBoxLayout *_siloListLayout;
+    QHBoxLayout *_titleLayout;
 };
 
 #endif // SILOLISTVIEW_H
