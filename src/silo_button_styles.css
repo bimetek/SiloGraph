@@ -2,13 +2,13 @@ QPushButton {
     border: 1px solid black;
     border-radius: 5px;
     padding: 0 10px;
-    min-width: 45px;
+    min-width: 50px;
     height: 16px;
     margin-bottom: 1px;
     background: #87b4ff;
     color: black;
     font-weight: bold;
-    font-size: 10px;
+    font-size: 13px;
 }
 
 QPushButton:hover {
