@@ -19,18 +19,19 @@
 #ifndef SILO_H
 #define SILO_H
 
-#include "NetworkElement.h"
+#include <QObject>
+#include "Queryable.h"
 #include <QList>
-#include <QString>
 class Location;
 class NodeLine;
 
-class Silo : public NetworkElement
+class Silo : public QObject, public Queryable
 {
     Q_OBJECT
 
 public:
     explicit Silo(QObject *parent = 0);
+    virtual ~Silo();
     void addLine(NodeLine *line);
     virtual Queryable::Context executeWeekDataFetch(
             QMutex *m, QString = QString(), bool close = true);

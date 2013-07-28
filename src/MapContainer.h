@@ -32,6 +32,9 @@ class MapContainer : public QWidget
 public:
     explicit MapContainer(QWidget *parent = 0);
 
+public slots:
+    void setMinimumWidth(int minw);
+
 signals:
     void locationChanged(Location *location);
 

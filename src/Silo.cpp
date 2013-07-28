@@ -24,7 +24,11 @@
 #include "Location.h"
 
 Silo::Silo(QObject *parent) :
-    NetworkElement(parent)
+    QObject(parent), Queryable()
+{
+}
+
+Silo::~Silo()
 {
 }
 

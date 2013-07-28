@@ -19,18 +19,20 @@
 #ifndef LOCATION_H
 #define LOCATION_H
 
-#include "NetworkElement.h"
+#include <QObject>
+#include "Queryable.h"
 #include <QList>
 #include <QHash>
 #include <QSqlDatabase>
 class Silo;
 
-class Location : public NetworkElement
+class Location : public QObject, public Queryable
 {
     Q_OBJECT
 
 public:
     explicit Location(QObject *parent = 0);
+    virtual ~Location();
     void addSilo(Silo *silo);
     void addSensor(const QString &key, const QString &value);
     virtual Context executePoll(QMutex *mutex,

@@ -26,6 +26,7 @@
 #include "MapContainer.h"
 #include "SiloListView.h"
 #include "LogoHolder.h"
+#include "SharedSettings.h"
 #include <QDebug>
 
 MainWidget::MainWidget(QWidget *parent) :
@@ -70,4 +71,17 @@ MainWidget::MainWidget(QWidget *parent) :
                             Location *, QHash<QString, double>, QDateTime)));
     connect(_dbc, SIGNAL(fetchingStarted(Queryable *)),
             _plotContainer, SLOT(blockPlot()));
+
+    // Settings syncing
+    SharedSettings *settings = SharedSettings::sharedSettings();
+    _siloListView->setMinimumHeight(settings->siloMinimumHeight());
+    _siloListView->setLogoSizeRatio(settings->logoSizeRatio());
+    _mapContainer->setMinimumWidth(settings->mapMinimumWidth());
+
+    connect(settings, SIGNAL(logoSizeRatioChanged(qreal)),
+            _siloListView, SLOT(resizeLogo(qreal)));
+    connect(settings, SIGNAL(siloMinimumHeightChanged(int)),
+            _siloListView, SLOT(setMinimumHeight(int)));
+    connect(settings, SIGNAL(mapMinimumWidthChanged(int)),
+            _mapContainer, SLOT(setMinimumWidth(int)));
 }

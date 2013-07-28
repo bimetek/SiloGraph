@@ -19,18 +19,20 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "NetworkElement.h"
+#include <QObject>
+#include "Queryable.h"
 class QMutex;
 class Node;
 class NodeLine;
 class Silo;
 
-class Node : public NetworkElement
+class Node : public QObject, public Queryable
 {
     Q_OBJECT
 
 public:
     explicit Node(QObject *parent = 0);
+    virtual ~Node();
     virtual Queryable::Context executeWeekDataFetch(
             QMutex *mutex, QString = QString(), bool close = true);
     virtual QString databaseName();

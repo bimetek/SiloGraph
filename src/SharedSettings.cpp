@@ -19,6 +19,14 @@
 #include "SharedSettings.h"
 #include <QSettings>
 
+static const char *LOGO_SIZE_RATIO_KEY = "logo_size_ratio";
+static const char *SILO_MIN_HEIGHT_KEY = "silo_min_height";
+static const char *MAP_MIN_WIDTH_KEY = "map_min_width";
+
+static const qreal LOGO_SIZE_RATIO_DEFAULT = 0.5;
+static const int SILO_MIN_HEIGHT_DEFAULT = 450;
+static const int MAP_MIN_WIDTH_DEFAULT = 200;
+
 SharedSettings::SharedSettings(QObject *parent) :
     QObject(parent)
 {
@@ -35,16 +43,47 @@ SharedSettings *SharedSettings::sharedSettings()
 
 qreal SharedSettings::logoSizeRatio() const
 {
-    static qreal defaultValue = 0.5;
-
     bool ok = false;
-    qreal value = _settings->value("logo_size_ratio", defaultValue).toReal(&ok);
-    return ok ? value : defaultValue;
+    qreal v = _settings->value(LOGO_SIZE_RATIO_KEY,
+                               LOGO_SIZE_RATIO_DEFAULT).toReal(&ok);
+    return ok ? v : LOGO_SIZE_RATIO_DEFAULT;
 }
 
 void SharedSettings::setLogoSizeRatio(const qreal &value)
 {
-    _settings->setValue("logo_size_ratio", value);
+    _settings->setValue(LOGO_SIZE_RATIO_KEY, value);
     _settings->sync();
     emit logoSizeRatioChanged(value);
 }
+
+int SharedSettings::siloMinimumHeight() const
+{
+    bool ok = false;
+    int value = _settings->value(SILO_MIN_HEIGHT_KEY,
+                                 SILO_MIN_HEIGHT_DEFAULT).toInt(&ok);
+    return ok ? value : SILO_MIN_HEIGHT_DEFAULT;
+}
+
+void SharedSettings::setSiloMinimumHeight(const int value)
+{
+    _settings->setValue(SILO_MIN_HEIGHT_KEY, value);
+    _settings->sync();
+    emit siloMinimumHeightChanged(value);
+}
+
+int SharedSettings::mapMinimumWidth() const
+{
+    bool ok = false;
+    int value = _settings->value(MAP_MIN_WIDTH_KEY,
+                                 MAP_MIN_WIDTH_DEFAULT).toInt(&ok);
+    return ok ? value : MAP_MIN_WIDTH_DEFAULT;
+}
+
+void SharedSettings::setMapMinimumWidth(const int value)
+{
+    _settings->setValue(MAP_MIN_WIDTH_KEY, value);
+    _settings->sync();
+    emit mapMinimumWidthChanged(value);
+}
+
+

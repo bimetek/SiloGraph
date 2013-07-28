@@ -19,18 +19,19 @@
 #ifndef NODELINE_H
 #define NODELINE_H
 
-#include "NetworkElement.h"
+#include <QObject>
+#include "Queryable.h"
 #include <QList>
-#include <QString>
 class Silo;
 class Node;
 
-class NodeLine : public NetworkElement
+class NodeLine : public QObject, public Queryable
 {
     Q_OBJECT
 
 public:
     explicit NodeLine(QObject *parent = 0);
+    virtual ~NodeLine();
     void addNode(Node *node);
     virtual Context executePoll(QMutex *mutex,
                                 QString = QString(), bool close = true);

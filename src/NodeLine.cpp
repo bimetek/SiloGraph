@@ -25,7 +25,11 @@
 #include "Location.h"
 
 NodeLine::NodeLine(QObject *parent) :
-    NetworkElement(parent)
+    QObject(parent), Queryable()
+{
+}
+
+NodeLine::~NodeLine()
 {
 }
 

@@ -70,8 +70,7 @@ HEADERS  += MainWindow.h \
     SharedSettings.h \
     SettingsWindow.h \
     ProgressLayer.h \
-    Queryable.h \
-    NetworkElement.h
+    Queryable.h
 
 OTHER_FILES += \
     locations.json \

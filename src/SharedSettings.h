@@ -31,10 +31,18 @@ public:
     static SharedSettings *sharedSettings();
 
     qreal logoSizeRatio() const;
+    int siloMinimumHeight() const;
+    int mapMinimumWidth() const;
+
+public slots:
     void setLogoSizeRatio(const qreal &value);
+    void setSiloMinimumHeight(const int value);
+    void setMapMinimumWidth(const int value);
 
 signals:
     void logoSizeRatioChanged(qreal value);
+    void siloMinimumHeightChanged(int value);
+    void mapMinimumWidthChanged(int value);
 
 private:
     QSettings *_settings;

@@ -38,12 +38,21 @@ class SiloListView : public QWidget
 public:
     explicit SiloListView(QWidget *parent = 0);
 
+    qreal logoSizeRatio() const { return _logoSizeRatio; }
+    void setLogoSizeRatio(const qreal &value)
+    {
+        _logoSizeRatio = value;
+        resizeLogo(value);
+    }
+
 public slots:
     void setLocation(Location *location);
     void updateLatestData(NodeLine *line, QList<double> data,
                           QDateTime dateTime);
     void updateLatestData(Location *location,
                           QHash<QString, double> data, QDateTime);
+    void setMinimumHeight(int minh);
+    void resizeLogo(qreal ratio);
 
 protected:
     virtual void timerEvent(QTimerEvent *e);
@@ -54,13 +63,13 @@ signals:
     void shouldPollForLocation(Location *location);
 
 private slots:
-    void resizeLogo(qreal ratio);
     void locationSensorClicked(QString name);
 
 private:
     Location *_currentLocation;
     int _pollingTimerId;
     LogoHolder *_logo;
+    qreal _logoSizeRatio;
     QSignalMapper *_sensorsMapper;
     QHBoxLayout *_siloListLayout;
     QHBoxLayout *_titleLayout;
