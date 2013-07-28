@@ -20,8 +20,6 @@
 #define SETTINGSWINDOW_H
 
 #include <QDialog>
-class QPushButton;
-class QSlider;
 class SharedSettings;
 
 class SettingsWindow : public QDialog
@@ -33,11 +31,10 @@ public:
 
 private slots:
     void setLogoRatio(int sliderValue);
+    void setSiloMinimumHeight(int value);
 
 private:
     SharedSettings *_settings;
-    QSlider *_logoRatio;
-    QPushButton *_okButton;
 };
 
 #endif // SETTINGSWINDOW_H

@@ -51,12 +51,14 @@ SiloListView::SiloListView(QWidget *parent) :
     mainLayout->addLayout(_siloListLayout, 1);
     setLayout(mainLayout);
 
-    setMinimumHeight(450);
+    SharedSettings *settings = SharedSettings::sharedSettings();
 
-    connect(SharedSettings::sharedSettings(),
-            SIGNAL(logoSizeRatioChanged(qreal)),
-            this,
-            SLOT(resizeLogo(qreal)));
+    setMinimumHeight(settings->siloMinimumHeight());
+
+    connect(settings, SIGNAL(logoSizeRatioChanged(qreal)),
+            this, SLOT(resizeLogo(qreal)));
+    connect(settings, SIGNAL(siloMinimumHeightChanged(int)),
+            this, SLOT(setMinimumHeight(int)));
 }
 
 void SiloListView::setLocation(Location *location)
@@ -155,6 +157,11 @@ void SiloListView::updateLatestData(Location *location,
             button->setText(format.arg(QString::number(data[key]), suffix));
         }
     }
+}
+
+void SiloListView::setMinimumHeight(int minh)
+{
+    QWidget::setMinimumHeight(minh);
 }
 
 void SiloListView::resizeLogo(qreal ratio)

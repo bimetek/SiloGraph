@@ -17,10 +17,12 @@
  *****************************************************************************/
 
 #include "SettingsWindow.h"
+#include <QSpinBox>
 #include <QFormLayout>
 #include <QHBoxLayout>
-#include <QVBoxLayout>
+#include <QIntValidator>
 #include <QLabel>
+#include <QVBoxLayout>
 #include <QPushButton>
 #include <QSlider>
 #include "SharedSettings.h"
@@ -32,24 +34,35 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
     setAttribute(Qt::WA_DeleteOnClose);
 
-    _logoRatio = new QSlider(Qt::Horizontal);
-    _logoRatio->setMinimum(0);
-    _logoRatio->setMaximum(100);
-    _logoRatio->setMinimumWidth(300);
-    _logoRatio->setTracking(true);
-    _logoRatio->setValue(_settings->logoSizeRatio() * 100);
-    connect(_logoRatio, SIGNAL(valueChanged(int)),
+    // The form
+    QSlider *logoRatio = new QSlider(Qt::Horizontal);
+    logoRatio->setMinimum(0);
+    logoRatio->setMaximum(100);
+    logoRatio->setMinimumWidth(300);
+    logoRatio->setTracking(true);
+    logoRatio->setValue(_settings->logoSizeRatio() * 100);
+    connect(logoRatio, SIGNAL(valueChanged(int)),
             this, SLOT(setLogoRatio(int)));
 
-    QFormLayout *formLayout = new QFormLayout();
-    formLayout->addRow(new QLabel(tr("Logo size")), _logoRatio);
+    QSpinBox *siloMinHeight = new QSpinBox();
+    siloMinHeight->setMinimum(1);
+    siloMinHeight->setMaximum(1000);
+    siloMinHeight->setValue(_settings->siloMinimumHeight());
+    connect(siloMinHeight, SIGNAL(valueChanged(int)),
+            this, SLOT(setSiloMinimumHeight(int)));
 
-    _okButton = new QPushButton(tr("Close"));
-    connect(_okButton, SIGNAL(clicked()), this, SLOT(accept()));
+    // Button under form
+    QPushButton *okButton = new QPushButton(tr("Close"));
+    connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
+
+    // Layout everything
+    QFormLayout *formLayout = new QFormLayout();
+    formLayout->addRow(new QLabel(tr("Logo size")), logoRatio);
+    formLayout->addRow(new QLabel(tr("Minimum silo height")), siloMinHeight);
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout();
     buttonsLayout->addStretch(1);
-    buttonsLayout->addWidget(_okButton);
+    buttonsLayout->addWidget(okButton);
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->addLayout(formLayout);
@@ -59,8 +72,15 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
 
 void SettingsWindow::setLogoRatio(int sliderValue)
 {
-    QSlider *slider = reinterpret_cast<QSlider *>(sender());
+    QSlider *slider = dynamic_cast<QSlider *>(sender());
+    if (!slider)
+        return;
     qreal steps = slider->maximum() - slider->minimum();
     qreal ratio = sliderValue / steps;
     _settings->setLogoSizeRatio(ratio);
+}
+
+void SettingsWindow::setSiloMinimumHeight(int value)
+{
+    _settings->setSiloMinimumHeight(value);
 }

@@ -19,6 +19,9 @@
 #include "SharedSettings.h"
 #include <QSettings>
 
+static const char *LOGO_SIZE_RATIO_KEY = "logo_size_ratio";
+static const char *SILO_MIN_HEIGHT_KEY = "silo_min_height";
+
 SharedSettings::SharedSettings(QObject *parent) :
     QObject(parent)
 {
@@ -35,16 +38,33 @@ SharedSettings *SharedSettings::sharedSettings()
 
 qreal SharedSettings::logoSizeRatio() const
 {
-    static qreal defaultValue = 0.5;
+    static const qreal defaultValue = 0.5;
 
     bool ok = false;
-    qreal value = _settings->value("logo_size_ratio", defaultValue).toReal(&ok);
-    return ok ? value : defaultValue;
+    qreal v = _settings->value(LOGO_SIZE_RATIO_KEY, defaultValue).toReal(&ok);
+    return ok ? v : defaultValue;
 }
 
 void SharedSettings::setLogoSizeRatio(const qreal &value)
 {
-    _settings->setValue("logo_size_ratio", value);
+    _settings->setValue(LOGO_SIZE_RATIO_KEY, value);
     _settings->sync();
     emit logoSizeRatioChanged(value);
 }
+
+int SharedSettings::siloMinimumHeight() const
+{
+    static const int defaultValue = 450;
+
+    bool ok = false;
+    int value = _settings->value(SILO_MIN_HEIGHT_KEY, defaultValue).toInt(&ok);
+    return ok ? value : defaultValue;
+}
+
+void SharedSettings::setSiloMinimumHeight(const int &value)
+{
+    _settings->setValue(SILO_MIN_HEIGHT_KEY, value);
+    _settings->sync();
+    emit siloMinimumHeightChanged(value);
+}
+

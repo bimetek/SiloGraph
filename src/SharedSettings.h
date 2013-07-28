@@ -33,8 +33,12 @@ public:
     qreal logoSizeRatio() const;
     void setLogoSizeRatio(const qreal &value);
 
+    int siloMinimumHeight() const;
+    void setSiloMinimumHeight(const int &value);
+
 signals:
     void logoSizeRatioChanged(qreal value);
+    void siloMinimumHeightChanged(int value);
 
 private:
     QSettings *_settings;

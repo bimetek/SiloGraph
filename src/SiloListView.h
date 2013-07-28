@@ -44,6 +44,7 @@ public slots:
                           QDateTime dateTime);
     void updateLatestData(Location *location,
                           QHash<QString, double> data, QDateTime);
+    void setMinimumHeight(int minh);
 
 protected:
     virtual void timerEvent(QTimerEvent *e);
