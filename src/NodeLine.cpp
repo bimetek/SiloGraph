@@ -29,6 +29,10 @@ NodeLine::NodeLine(QObject *parent) :
 {
 }
 
+NodeLine::~NodeLine()
+{
+}
+
 void NodeLine::addNode(Node *node)
 {
     nodes().append(node);

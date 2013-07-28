@@ -27,6 +27,10 @@ Location::Location(QObject *parent) :
 {
 }
 
+Location::~Location()
+{
+}
+
 void Location::addSilo(Silo *silo)
 {
     silos().append(silo);

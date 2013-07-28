@@ -28,6 +28,10 @@ Silo::Silo(QObject *parent) :
 {
 }
 
+Silo::~Silo()
+{
+}
+
  void Silo::addLine(NodeLine *line)
  {
      lines().append(line);

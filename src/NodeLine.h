@@ -31,6 +31,7 @@ class NodeLine : public QObject, public Queryable
 
 public:
     explicit NodeLine(QObject *parent = 0);
+    virtual ~NodeLine();
     void addNode(Node *node);
     virtual Context executePoll(QMutex *mutex,
                                 QString = QString(), bool close = true);

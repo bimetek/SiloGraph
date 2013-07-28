@@ -32,6 +32,7 @@ class Location : public QObject, public Queryable
 
 public:
     explicit Location(QObject *parent = 0);
+    virtual ~Location();
     void addSilo(Silo *silo);
     void addSensor(const QString &key, const QString &value);
     virtual Context executePoll(QMutex *mutex,

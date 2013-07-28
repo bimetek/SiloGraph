@@ -32,6 +32,7 @@ class Node : public QObject, public Queryable
 
 public:
     explicit Node(QObject *parent = 0);
+    virtual ~Node();
     virtual Queryable::Context executeWeekDataFetch(
             QMutex *mutex, QString = QString(), bool close = true);
     virtual QString databaseName();

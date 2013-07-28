@@ -31,6 +31,7 @@ class Silo : public QObject, public Queryable
 
 public:
     explicit Silo(QObject *parent = 0);
+    virtual ~Silo();
     void addLine(NodeLine *line);
     virtual Queryable::Context executeWeekDataFetch(
             QMutex *m, QString = QString(), bool close = true);

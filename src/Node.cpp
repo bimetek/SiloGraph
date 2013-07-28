@@ -29,6 +29,10 @@ Node::Node(QObject *parent) :
 {
 }
 
+Node::~Node()
+{
+}
+
 Queryable::Context Node::executeWeekDataFetch(QMutex *m, QString, bool close)
 {
     QMutexLocker locker(m);
