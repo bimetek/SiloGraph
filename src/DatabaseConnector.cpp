@@ -34,22 +34,23 @@
 #include "Node.h"
 #include "NodeData.h"
 
-Queryable::Context executeWeekDataQuery(Queryable *ent, QString key, QMutex *m)
+static Queryable::Context executeWeekDataQuery(Queryable *entity,
+                                               QString key, QMutex *mutex)
 {
-    return ent->executeWeekDataFetch(m, key);
+    return entity->executeWeekDataFetch(mutex, key);
 }
 
-QList<Queryable::Context> executePollForLocation(Location *location, QMutex *m)
+static QList<Queryable::Context> executePoll(Location *location, QMutex *mutex)
 {
     QString address = location->databaseAddress();
     QSqlDatabase db = QSqlDatabase::database(address);
 
     QList<Queryable::Context> contexts;
-    contexts.append(location->executePoll(m, false));
+    contexts.append(location->executePoll(mutex, false));
     foreach (Silo *silo, location->silos())
     {
         foreach (NodeLine *line, silo->lines())
-            contexts.append(line->executePoll(m, false));
+            contexts.append(line->executePoll(mutex, false));
     }
 
     db.close();
@@ -146,7 +147,7 @@ void DatabaseConnector::fetchLatestData(Location *location)
 {
     QMutex *m = _databaseMutexes[location->databaseAddress()];
     QFuture< QList<Queryable::Context> > future =
-            QtConcurrent::run(executePollForLocation, location, m);
+            QtConcurrent::run(executePoll, location, m);
     QFutureWatcher< QList<Queryable::Context> > *watcher =
             new QFutureWatcher< QList<Queryable::Context> >();
     connect(watcher, SIGNAL(finished()), this, SLOT(processLatestDataQuery()));
