@@ -28,7 +28,6 @@
 #include "Node.h"
 #include "SiloView.h"
 #include "LogoHolder.h"
-#include "SharedSettings.h"
 #include <QDebug>
 
 SiloListView::SiloListView(QWidget *parent) :
@@ -50,15 +49,6 @@ SiloListView::SiloListView(QWidget *parent) :
     mainLayout->addLayout(_titleLayout, 0);
     mainLayout->addLayout(_siloListLayout, 1);
     setLayout(mainLayout);
-
-    SharedSettings *settings = SharedSettings::sharedSettings();
-
-    setMinimumHeight(settings->siloMinimumHeight());
-
-    connect(settings, SIGNAL(logoSizeRatioChanged(qreal)),
-            this, SLOT(resizeLogo(qreal)));
-    connect(settings, SIGNAL(siloMinimumHeightChanged(int)),
-            this, SLOT(setMinimumHeight(int)));
 }
 
 void SiloListView::setLocation(Location *location)
@@ -118,7 +108,7 @@ void SiloListView::timerEvent(QTimerEvent *e)
 
 void SiloListView::resizeEvent(QResizeEvent *)
 {
-    resizeLogo(SharedSettings::sharedSettings()->logoSizeRatio());
+    resizeLogo(logoSizeRatio());
 }
 
 void SiloListView::updateLatestData(NodeLine *line, QList<double> data,
