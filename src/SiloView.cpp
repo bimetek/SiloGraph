@@ -131,10 +131,10 @@ void SiloView::resizeEvent(QResizeEvent *)
 
 void SiloView::switchToObject(QObject *obj)
 {
-    NetworkElement *element = dynamic_cast<NetworkElement *>(obj);
-    if (!element)
+    Queryable *entity = dynamic_cast<Queryable *>(obj);
+    if (!entity)
         return;
-    emit targetSwitched(element);
+    emit targetSwitched(entity);
 }
 
 void SiloView::updateLatestData(NodeLine *line, QList<double> &data,

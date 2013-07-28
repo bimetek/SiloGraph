@@ -25,7 +25,7 @@
 #include "Location.h"
 
 Node::Node(QObject *parent) :
-    NetworkElement(parent)
+    QObject(parent), Queryable()
 {
 }
 

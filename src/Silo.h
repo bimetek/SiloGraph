@@ -19,13 +19,13 @@
 #ifndef SILO_H
 #define SILO_H
 
-#include "NetworkElement.h"
+#include <QObject>
+#include "Queryable.h"
 #include <QList>
-#include <QString>
 class Location;
 class NodeLine;
 
-class Silo : public NetworkElement
+class Silo : public QObject, public Queryable
 {
     Q_OBJECT
 

@@ -19,13 +19,14 @@
 #ifndef NODE_H
 #define NODE_H
 
-#include "NetworkElement.h"
+#include <QObject>
+#include "Queryable.h"
 class QMutex;
 class Node;
 class NodeLine;
 class Silo;
 
-class Node : public NetworkElement
+class Node : public QObject, public Queryable
 {
     Q_OBJECT
 
