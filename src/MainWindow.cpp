@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowTitle("Silo Graph");
 
     QMenu *tools = new QMenu("Tools");
-    tools->addAction("Settings", this, SLOT(showSettings()));
+    tools->addAction(SETTINGS_WINDOW_TITLE, this, SLOT(showSettings()));
 
     menuBar()->addMenu(tools);
 
@@ -49,6 +49,7 @@ void MainWindow::showSettings()
     if (!_settings)
     {
         _settings = new SettingsWindow();
+        _settings->setWindowTitle(SETTINGS_WINDOW_TITLE);
         connect(_settings, SIGNAL(destroyed()), this, SLOT(cleanSettings()));
         _settings->show();
     }

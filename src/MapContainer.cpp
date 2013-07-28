@@ -114,8 +114,11 @@ MapContainer::MapContainer(QWidget *parent) :
         }
         _locations.insert(location->name(), location);
     }
+}
 
-    setMinimumWidth(100);
+void MapContainer::setMinimumWidth(int minw)
+{
+    QWidget::setMinimumWidth(minw);
 }
 
 void MapContainer::switchToMarkerLocation(MapMarker *marker)

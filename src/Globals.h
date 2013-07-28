@@ -21,16 +21,18 @@
 
 #include <limits>
 #include <QtGlobal>
+#include <QLocale>
 #include <QLayout>
 
-#define W_SCALE 1       // Scale everything in UI
+const double D_NO_DATA = std::numeric_limits<double>::max();
+const qreal R_NO_DATA = std::numeric_limits<qreal>::max();
+const QString DEGREE_SIGN = QString::fromLatin1("\xba", 1);
 
-
-#define D_NO_DATA (std::numeric_limits<double>::max())
-#define R_NO_DATA (std::numeric_limits<qreal>::max())
-#define DEGREE_SIGN (QString::fromLatin1("\xba", 1))
-
-#include <QLocale>
+#ifdef Q_OS_MAC
+    const QString SETTINGS_WINDOW_TITLE = "Preferences";
+#else
+    const QString SETTINGS_WINDOW_TITLE = "Settings";
+#endif
 
 double roundTo(double value);
 void clearLayout(QLayout *layout);

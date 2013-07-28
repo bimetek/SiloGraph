@@ -31,7 +31,6 @@ public:
 
 private slots:
     void setLogoRatio(int sliderValue);
-    void setSiloMinimumHeight(int value);
 
 private:
     SharedSettings *_settings;

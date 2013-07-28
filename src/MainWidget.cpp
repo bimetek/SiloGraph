@@ -76,9 +76,12 @@ MainWidget::MainWidget(QWidget *parent) :
     SharedSettings *settings = SharedSettings::sharedSettings();
     _siloListView->setMinimumHeight(settings->siloMinimumHeight());
     _siloListView->setLogoSizeRatio(settings->logoSizeRatio());
+    _mapContainer->setMinimumWidth(settings->mapMinimumWidth());
 
     connect(settings, SIGNAL(logoSizeRatioChanged(qreal)),
             _siloListView, SLOT(resizeLogo(qreal)));
     connect(settings, SIGNAL(siloMinimumHeightChanged(int)),
             _siloListView, SLOT(setMinimumHeight(int)));
+    connect(settings, SIGNAL(mapMinimumWidthChanged(int)),
+            _mapContainer, SLOT(setMinimumWidth(int)));
 }

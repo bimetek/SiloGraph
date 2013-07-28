@@ -49,7 +49,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     siloMinHeight->setMaximum(1000);
     siloMinHeight->setValue(_settings->siloMinimumHeight());
     connect(siloMinHeight, SIGNAL(valueChanged(int)),
-            this, SLOT(setSiloMinimumHeight(int)));
+            _settings, SLOT(setSiloMinimumHeight(int)));
+
+    QSpinBox *mapMinWidth = new QSpinBox();
+    mapMinWidth->setMinimum(1);
+    mapMinWidth->setMaximum(1000);
+    mapMinWidth->setValue(_settings->mapMinimumWidth());
+    connect(mapMinWidth, SIGNAL(valueChanged(int)),
+            _settings, SLOT(setMapMinimumWidth(int)));
 
     // Button under form
     QPushButton *okButton = new QPushButton(tr("Close"));
@@ -59,6 +66,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     QFormLayout *formLayout = new QFormLayout();
     formLayout->addRow(new QLabel(tr("Logo size")), logoRatio);
     formLayout->addRow(new QLabel(tr("Minimum silo height")), siloMinHeight);
+    formLayout->addRow(new QLabel(tr("Minimum map width")), mapMinWidth);
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout();
     buttonsLayout->addStretch(1);
@@ -78,9 +86,4 @@ void SettingsWindow::setLogoRatio(int sliderValue)
     qreal steps = slider->maximum() - slider->minimum();
     qreal ratio = sliderValue / steps;
     _settings->setLogoSizeRatio(ratio);
-}
-
-void SettingsWindow::setSiloMinimumHeight(int value)
-{
-    _settings->setSiloMinimumHeight(value);
 }
