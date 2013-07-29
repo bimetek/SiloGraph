@@ -59,9 +59,7 @@ QwtText CurveTrackingPicker::trackerTextF(const QPointF &p) const
                    QwtText::PlainText);
     QBrush whiteBrush(Qt::white);
     result.setBackgroundBrush(whiteBrush);
-#ifdef Q_OS_WIN32
-    result.setFont(QFont("sarif"));
-#endif
+    result.setFont(QFont("sans-sarif"));
     return result;
 }
 
