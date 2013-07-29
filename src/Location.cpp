@@ -114,12 +114,12 @@ QString Location::nameForDataKey(const QString &key)
     return sensorKeys().value(key);
 }
 
-QString Location::unitForKey(const QString &key)
+QString Location::unitForDataKey(const QString &key)
 {
     QString name = sensorKeys().value(key);
     if (name.compare("temperature", Qt::CaseInsensitive) == 0)
         return DEGREE_SIGN;
     else if (name.compare("humidity", Qt::CaseInsensitive) == 0)
         return "%";
-    return Queryable::unitForKey(key);
+    return Queryable::unitForDataKey(key);
 }

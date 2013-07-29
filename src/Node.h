@@ -36,7 +36,8 @@ public:
     virtual Queryable::Context executeWeekDataFetch(
             QMutex *mutex, QString = QString(), bool close = true);
     virtual QString databaseName();
-    virtual QString unitForKey(const QString &);
+    virtual QString nameForDataKey(const QString &key);
+    virtual QString unitForDataKey(const QString &);
 
 private:
     QString _name;

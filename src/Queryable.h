@@ -44,7 +44,7 @@ public:
 
     virtual QString databaseName() = 0;
     virtual QString nameForDataKey(const QString &key) { return key; }
-    virtual QString unitForKey(const QString &) { return QString(); }
+    virtual QString unitForDataKey(const QString &) { return QString(); }
     virtual Context executeWeekDataFetch(
             QMutex *, QString = QString(), bool = true);
     virtual Context executePoll(QMutex *, QString, bool);

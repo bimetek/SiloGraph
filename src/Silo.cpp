@@ -76,7 +76,15 @@ Silo::~Silo()
      return location()->databaseAddress();
  }
 
- QString Silo::unitForKey(const QString &)
+ QString Silo::nameForDataKey(const QString &key)
+ {
+     if (key == name())
+         return "temperature";
+     else
+         return Queryable::nameForDataKey(key);
+ }
+
+ QString Silo::unitForDataKey(const QString &)
  {
      return DEGREE_SIGN;
  }

@@ -174,7 +174,7 @@ void GraphContainer::updatePlot(Queryable *entity, QList<NodeData *> dataSet)
         curve->setSamples(curvePoints[key]);
         curve->setTitle(entity->nameForDataKey(key)
                         + TEXT_SEPARATOR
-                        + entity->unitForKey(key));
+                        + entity->unitForDataKey(key));
     }
 
     _plot->replot();

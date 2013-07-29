@@ -68,7 +68,15 @@ QString Node::databaseName()
     return line()->silo()->location()->databaseAddress();
 }
 
-QString Node::unitForKey(const QString &)
+QString Node::nameForDataKey(const QString &key)
+{
+    if (key == name())
+        return "temperature";
+    else
+        return Queryable::nameForDataKey(key);
+}
+
+QString Node::unitForDataKey(const QString &)
 {
     return DEGREE_SIGN;
 }
