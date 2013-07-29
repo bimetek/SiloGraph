@@ -33,8 +33,7 @@ stated otherwise, may be distributed under the terms of the GNU Public License
 version 3 (GPL v3) as defined by the Free Software Foundation (FSF). A copy of
 the license should have been included inside the `LICENSE` directory.
 
-**[Qwt]** is used under the terms of the Qwt License, Version 1.0. You may find
-contents of the license at [http://qwt.sourceforge.net/qwtlicense.html].
+### Re-deployed Thrid-party Sources
 
 **[QProgressIndicator]** is used and redistributed under the terms of the
 Lesser GNU General Public License version 2.1 (LGPL 2.1). You may find more
@@ -42,11 +41,21 @@ information for the project at its project page.
 
 **[qjson-backport]** is a collection of JSON-related classes extracted from Qt
 5, and is modified and redistributed under the terms of the GNU Public License
-version 3.0 (GPL 3.0). Backporting efforts go to [@5in4 on GitHub.com].
+version 3.0 (GPL 3.0). Backporting efforts go to [@5in4] on GitHub.
+
+### Libraries Bundled with the Deployed Binaries
+
+**[Qwt]** is used under the terms of the Qwt License, Version 1.0. You may find
+contents of the license at [http://qwt.sourceforge.net/qwtlicense.html].
+
+**MySQL Connector/C (libmysql)** is used under the terms of the GNU Public
+License version 3.0 (GPL 3.0). Detailed information may be found at
+[http://www.mysql.com].
 
 
 [Qwt]: http://qwt.sourceforge.net
 [http://qwt.sourceforge.net/qwtlicense.html]: http://qwt.sourceforge.net/qwtlicense.html
 [QProgressIndicator]: https://github.com/mojocorp/QProgressIndicator
 [qjson-backport]: https://github.com/5in4/qjson-backport
-[@5in4 on GitHub.com]: https://github.com/5in4
+[http://www.mysql.com]: http://www.mysql.com
+[@5in4]: https://github.com/5in4
