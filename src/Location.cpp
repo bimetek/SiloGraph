@@ -20,6 +20,7 @@
 #include <QDateTime>
 #include <QMutexLocker>
 #include <QVariant>
+#include "Globals.h"
 #include "Silo.h"
 
 Location::Location(QObject *parent) :
@@ -106,4 +107,19 @@ Queryable::Context Location::executeWeekDataFetch(QMutex *mutex,
 QString Location::databaseName()
 {
     return databaseAddress();
+}
+
+QString Location::nameForDataKey(const QString &key)
+{
+    return sensorKeys().value(key);
+}
+
+QString Location::unitForKey(const QString &key)
+{
+    QString name = sensorKeys().value(key);
+    if (name.compare("temperature", Qt::CaseInsensitive) == 0)
+        return DEGREE_SIGN;
+    else if (name.compare("humidity", Qt::CaseInsensitive) == 0)
+        return "%";
+    return Queryable::unitForKey(key);
 }

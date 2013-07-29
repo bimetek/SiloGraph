@@ -73,3 +73,14 @@ QString textFromFile(QString filename)
     file.close();
     return text;
 }
+
+QString capitalized(const QString &input, bool toLower)
+{
+    if (input.isEmpty())
+        return input;
+    QString output = input;
+    if (toLower)
+        output = output.toLower();
+    output[0] = output[0].toUpper();
+    return output;
+}

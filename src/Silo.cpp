@@ -20,6 +20,7 @@
 #include <QDateTime>
 #include <QMutexLocker>
 #include <QVariant>
+#include "Globals.h"
 #include "NodeLine.h"
 #include "Location.h"
 
@@ -73,4 +74,9 @@ Silo::~Silo()
  QString Silo::databaseName()
  {
      return location()->databaseAddress();
+ }
+
+ QString Silo::unitForKey(const QString &)
+ {
+     return DEGREE_SIGN;
  }

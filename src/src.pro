@@ -49,7 +49,8 @@ SOURCES += main.cpp\
     SharedSettings.cpp \
     SettingsWindow.cpp \
     ProgressLayer.cpp \
-    Queryable.cpp
+    Queryable.cpp \
+    CurveTrackingPicker.cpp
 
 HEADERS  += MainWindow.h \
     MainWidget.h \
@@ -70,7 +71,8 @@ HEADERS  += MainWindow.h \
     SharedSettings.h \
     SettingsWindow.h \
     ProgressLayer.h \
-    Queryable.h
+    Queryable.h \
+    CurveTrackingPicker.h
 
 OTHER_FILES += \
     locations.json \

@@ -21,6 +21,7 @@
 #include <QMutexLocker>
 #include <QVariant>
 #include "NodeLine.h"
+#include "Globals.h"
 #include "Silo.h"
 #include "Location.h"
 
@@ -65,4 +66,9 @@ Queryable::Context Node::executeWeekDataFetch(QMutex *m, QString, bool close)
 QString Node::databaseName()
 {
     return line()->silo()->location()->databaseAddress();
+}
+
+QString Node::unitForKey(const QString &)
+{
+    return DEGREE_SIGN;
 }

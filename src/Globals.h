@@ -27,6 +27,7 @@
 const double D_NO_DATA = std::numeric_limits<double>::max();
 const qreal R_NO_DATA = std::numeric_limits<qreal>::max();
 const QString DEGREE_SIGN = QString::fromLatin1("\xba", 1);
+const QString TEXT_SEPARATOR = "___";
 
 #ifdef Q_OS_MAC
     const QString SETTINGS_WINDOW_TITLE = "Preferences";
@@ -41,5 +42,6 @@ QLocale::Country getCurrentCountry();
 QLocale getCurrentLocale();
 QFont defaultFontForSize(uint pointSize = 0);
 QString textFromFile(QString filename);
+QString capitalized(const QString &input, bool toLower = true);
 
 #endif // GLOBALS_H

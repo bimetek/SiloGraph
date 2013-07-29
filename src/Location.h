@@ -40,6 +40,8 @@ public:
     virtual Context executeWeekDataFetch(QMutex *mutex, QString key,
                                          bool close = true);
     virtual QString databaseName();
+    virtual QString nameForDataKey(const QString &key);
+    virtual QString unitForKey(const QString &key);
 
 private:
     QString _name;
