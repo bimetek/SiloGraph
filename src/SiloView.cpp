@@ -88,6 +88,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
             lineLayout->insertWidget(0, button);
         }
         lineView->setLayout(lineLayout);
+
         siloLayout->addWidget(lineView, 1);
     }
     siloLayout->addStretch(1);
@@ -124,7 +125,7 @@ void SiloView::resizeEvent(QResizeEvent *)
     // the parent, width calculated by keeping aspect. Left and right margins
     // are so that the holder is horizontally centered.
     int h = size().height() - 25;   // Minus height for _lastUpdate
-    int w = (_silo->lines().size() + 1) * 65;
+    int w = (_silo->lines().size() + 1) * 70;
     int left = (size().width() - w) / 2;
     _backgroundHolder->setGeometry(left, 0, w, h);
 }
