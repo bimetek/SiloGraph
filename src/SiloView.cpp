@@ -77,7 +77,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
         foreach (Node *node, line->nodes())
         {
             QString nodeButtonTitle =
-                    node->name().replace('s', "Node ", Qt::CaseInsensitive);
+                    node->name().replace('s', "Sensor ", Qt::CaseInsensitive);
             QPushButton *button = new QPushButton(nodeButtonTitle);
             button->setObjectName(node->name());
             button->setStyleSheet(buttonStyle);

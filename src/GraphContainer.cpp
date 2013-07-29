@@ -339,7 +339,7 @@ void GraphContainer::updatePlot(Queryable *entity, QList<NodeData *> dataSet)
     unblockPlot();
     clearPlot(false);
 
-    if (dataSet.isEmpty())
+    if (!entity || dataSet.isEmpty())
         return;
 
     QDateTime minDateTime(dataSet[0]->dateTime().date());
