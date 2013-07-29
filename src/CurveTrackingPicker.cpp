@@ -42,7 +42,7 @@ QwtText CurveTrackingPicker::trackerTextF(const QPointF &p) const
         return QwtText();
 
     QDateTime dt = _datetime.addSecs(p.x());
-    QString format = QString(" %1 \n%2: %3%4");
+    QString format = QString(" %1 \n   %2: %3%4   ");
     QString itemName;
     QString suffix;
     if (_grabbedItem)
@@ -55,9 +55,13 @@ QwtText CurveTrackingPicker::trackerTextF(const QPointF &p) const
     QwtText result(format.arg(dt.toString("yyyy-MM-dd HH:mm:ss"),
                               capitalized(itemName),
                               QString::number(p.y(), 'f', 2),
-                              suffix));
+                              suffix),
+                   QwtText::PlainText);
     QBrush whiteBrush(Qt::white);
     result.setBackgroundBrush(whiteBrush);
+#ifdef Q_OS_WIN32
+    result.setFont(QFont("sarif"));
+#endif
     return result;
 }
 
