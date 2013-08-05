@@ -41,7 +41,7 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     // Misc. UI initialization
     _lastUpdate = new QLabel();
     _lastUpdate->setAlignment(Qt::AlignHCenter);
-    _lastUpdate->setStyleSheet("font-size: 11pt;");
+    _lastUpdate->setStyleSheet("font-size: 16pt; font-weight: bold;");
     _backgroundHolder = new QLabel(this);
     QString styleSheet =
         "border-image: url(:/img/silo_background.png) 0 0 0 0 stretch stretch;";
@@ -124,8 +124,8 @@ void SiloView::resizeEvent(QResizeEvent *)
     // Recalculate the background holder's geometry. The new height should fill
     // the parent, width calculated by keeping aspect. Left and right margins
     // are so that the holder is horizontally centered.
-    int h = size().height() - 25;   // Minus height for _lastUpdate
-    int w = (_silo->lines().size() + 1) * 80;
+    int h = size().height() - 30;   // Minus height for _lastUpdate
+    int w = (_silo->lines().size() + 1) * 90;
     int left = (size().width() - w) / 2;
     _backgroundHolder->setGeometry(left, 0, w, h);
 }
