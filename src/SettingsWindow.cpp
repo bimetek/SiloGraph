@@ -58,6 +58,13 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     connect(mapMinWidth, SIGNAL(valueChanged(int)),
             _settings, SLOT(setMapMinimumWidth(int)));
 
+    QSpinBox *lastUpdateHeight = new QSpinBox();
+    lastUpdateHeight->setMinimum(1);
+    lastUpdateHeight->setMaximum(1000);
+    lastUpdateHeight->setValue(_settings->lastUpdateLabelHeight());
+    connect(lastUpdateHeight, SIGNAL(valueChanged(int)),
+            _settings, SLOT(setLastUpdateLabelHeight(int)));
+
     // Button under form
     QPushButton *okButton = new QPushButton(tr("Close"));
     connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
@@ -67,6 +74,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) :
     formLayout->addRow(new QLabel(tr("Logo size")), logoRatio);
     formLayout->addRow(new QLabel(tr("Minimum silo height")), siloMinHeight);
     formLayout->addRow(new QLabel(tr("Minimum map width")), mapMinWidth);
+    formLayout->addRow(new QLabel(tr("Last update height")), lastUpdateHeight);
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout();
     buttonsLayout->addStretch(1);

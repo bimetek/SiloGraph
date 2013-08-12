@@ -29,6 +29,7 @@
 #include "NodeLine.h"
 #include "Node.h"
 #include "Silo.h"
+#include "SharedSettings.h"
 #include <QDebug>
 
 SiloView::SiloView(Silo *silo, QWidget *parent) :
@@ -117,17 +118,15 @@ SiloView::SiloView(Silo *silo, QWidget *parent) :
     mainLayout->addLayout(siloInfoLayout);
     mainLayout->addStretch(1);
     setLayout(mainLayout);
+
+    connect(SharedSettings::sharedSettings(),
+            SIGNAL(lastUpdateLabelHeightChanged(int)),
+            this, SLOT(recalculateFixedLayout()));
 }
 
 void SiloView::resizeEvent(QResizeEvent *)
 {
-    // Recalculate the background holder's geometry. The new height should fill
-    // the parent, width calculated by keeping aspect. Left and right margins
-    // are so that the holder is horizontally centered.
-    int h = size().height() - 30;   // Minus height for _lastUpdate
-    int w = (_silo->lines().size() + 1) * 90;
-    int left = (size().width() - w) / 2;
-    _backgroundHolder->setGeometry(left, 0, w, h);
+    recalculateFixedLayout();
 }
 
 void SiloView::switchToObject(QObject *obj)
@@ -190,4 +189,16 @@ void SiloView::refreshLastUpdate(QString text, bool clearAll)
 void SiloView::invalidateLastUpdate()
 {
     refreshLastUpdate("Loading...", true);
+}
+
+void SiloView::recalculateFixedLayout()
+{
+    // Recalculate the background holder's geometry. The new height should fill
+    // the parent, width calculated by keeping aspect. Left and right margins
+    // are so that the holder is horizontally centered.
+    int luh = SharedSettings::sharedSettings()->lastUpdateLabelHeight();
+    int h = size().height() - luh;      // Minus height for _lastUpdate
+    int w = (_silo->lines().size() + 1) * 90;
+    int left = (size().width() - w) / 2;
+    _backgroundHolder->setGeometry(left, 0, w, h);
 }

@@ -48,6 +48,7 @@ protected:
 
 private slots:
     void switchToObject(QObject *obj);
+    void recalculateFixedLayout();
 
 private:
     Silo *_silo;

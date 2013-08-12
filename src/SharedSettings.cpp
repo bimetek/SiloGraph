@@ -22,10 +22,12 @@
 static const char *LOGO_SIZE_RATIO_KEY = "logo_size_ratio";
 static const char *SILO_MIN_HEIGHT_KEY = "silo_min_height";
 static const char *MAP_MIN_WIDTH_KEY = "map_min_width";
+static const char *LAST_UPDATE_HEIGHT_KEY = "last_update_height";
 
 static const qreal LOGO_SIZE_RATIO_DEFAULT = 0.5;
 static const int SILO_MIN_HEIGHT_DEFAULT = 450;
 static const int MAP_MIN_WIDTH_DEFAULT = 200;
+static const int LAST_UPDATE_HEIGHT_DEFAULT = 40;
 
 SharedSettings::SharedSettings(QObject *parent) :
     QObject(parent)
@@ -84,6 +86,21 @@ void SharedSettings::setMapMinimumWidth(const int value)
     _settings->setValue(MAP_MIN_WIDTH_KEY, value);
     _settings->sync();
     emit mapMinimumWidthChanged(value);
+}
+
+int SharedSettings::lastUpdateLabelHeight() const
+{
+    bool ok = false;
+    int value = _settings->value(LAST_UPDATE_HEIGHT_KEY,
+                                 LAST_UPDATE_HEIGHT_DEFAULT).toInt(&ok);
+    return ok ? value : LAST_UPDATE_HEIGHT_DEFAULT;
+}
+
+void SharedSettings::setLastUpdateLabelHeight(const int value)
+{
+    _settings->setValue(LAST_UPDATE_HEIGHT_KEY, value);
+    _settings->sync();
+    emit lastUpdateLabelHeightChanged(value);
 }
 
 
